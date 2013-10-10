@@ -155,12 +155,11 @@
       }
 
       $.plot($("#imexam-xplot")[0], [xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
-      //$.plot($("#imexam-yplot")[0], [ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
+      $.plot($("#imexam-yplot")[0], [ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
 
       //var max = imexam.ndops.max(imstat.imag)
 
-      surface($("#imexam-yplot")[0], imstat.imag, imexam.ndops.max(imstat.imag)*2.25);
-      console.log(imexam.ndops.max(imstat.imag))
+      surface($("#imexam-3plot")[0], imstat.imag, imexam.ndops.max(imstat.imag)*2.25);
     }
     </script>
 
@@ -172,23 +171,18 @@
 </td>
 <td>
   <div id="region-info" style="visibility:hidden">
-    <div id="imexam-text">
-      JS9 can perform data analysis in response to region changes:
-      <ul>
-      <li> choose an analysis task by clicking one of the analysis buttons above
-      <li> display an image by clicking on one of the data file URLs.
-      <li> create a region using the JS9 Region menu
-      <li> as you move or resize the region, the task will be run on that region
-      <li> suspend analysis via the region's context menu (double-click the region)
-      </ul>
-      See the page source for implementation details.
-    </div>
 
       <table>
-	<tr><td align=center> X Projection </td><td align=center> 3d Projection </td>
+	<tr><td align=center> Region Info </td><td align=center> X Projection </td>
 	<tr>
-	    <td> <div id="imexam-xplot" style="height:300px; width:300px"> </td>
-	    <td> <div id="imexam-yplot" style="height:300px; width:300px"> </td>
+	    <td> <div id="imexam-text" style="height:300px; width:300px"> </div></td>
+	    <td> <div id="imexam-yplot" style="height:300px; width:300px"> </div></td>
+	</tr>
+
+	<tr><td align=center> Y Projection </td><td align=center> 3d Projection </td>
+	<tr>
+	    <td> <div id="imexam-xplot" style="height:300px; width:300px"></div></td>
+	    <td> <div id="imexam-3plot" style="height:300px; width:300px"></div></td>
 	</tr>
       </table>
     </div>
