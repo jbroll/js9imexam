@@ -249,6 +249,8 @@ ndops.flatten = function() {
 ndops.median = function(a) {
 	ndops.sort(a);
 
+	console.log(a.get(a.size/2))
+
 	return a.get(a.size/2);
 }
 
