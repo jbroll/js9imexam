@@ -65,7 +65,37 @@ ndops.print = function(a, prec) {
     }
 }
 
-ndops._xproj = cwise({
+ndops.max = cwise({
+	  args: ["array"]
+	, pre: function(a) {
+	  	this.max = Number.MIN_VALUE;
+	  }
+	, body: function(a) {
+	    if ( a < this.max ) {
+		this.max = a;
+	    }
+	  }
+	, post: function() {
+	    return this.max;
+	  }
+});
+
+ndops.min = cwise({
+	  args: ["array"]
+	, pre: function(a) {
+	  	this.min = Number.MAX_VALUE;
+	  }
+	, body: function(a) {
+	    if ( a < this.min ) {
+		this.min = a;
+	    }
+	  }
+	, post: function() {
+	    return this.min;
+	  }
+});
+
+ndops._proj = cwise({
 	  args: ["array", "scalar", "scalar", "index"]
 	, pre: function(a, axis, size) {
 		this.proj = new Float32Array(size);
@@ -78,7 +108,7 @@ ndops._xproj = cwise({
 	  }
 });
 ndops.proj = function(a, axis, length) {
-	return ndarray(ndops._xproj(a, axis, a.shape[axis]), [a.shape[axis]]);
+	return ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
 }
 
 ndops.qcenter = cwise({
