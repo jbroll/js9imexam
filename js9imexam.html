@@ -159,7 +159,8 @@
 
       //var max = imexam.ndops.max(imstat.imag)
 
-      surface($("#imexam-yplot")[0], imstat.imag, 14000);
+      surface($("#imexam-yplot")[0], imstat.imag, imexam.ndops.max(imstat.imag)*2.25);
+      console.log(imexam.ndops.max(imstat.imag))
     }
     </script>
 

@@ -71,7 +71,7 @@ ndops.max = cwise({
 	  	this.max = Number.MIN_VALUE;
 	  }
 	, body: function(a) {
-	    if ( a < this.max ) {
+	    if ( a > this.max ) {
 		this.max = a;
 	    }
 	  }

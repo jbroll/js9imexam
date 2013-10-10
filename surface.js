@@ -35,15 +35,15 @@ function surface(div, data, normalize) {
 
     var numRows = surf.getNumberOfRows();
     var numCols = surf.getNumberOfColumns();
-    var idx;
+    var idx = 0;
 
     for (var i = 0; i < numRows; i++) {
 	for (var j = 0; j < numCols; j++) {
-	    var value = data.get(i, j)/normalize;
+	    var value = data.get(i, j);
 
-	    surf.set(i, j, value)
+	    surf.set(i, j, value/normalize)
 
-	    tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value;
+	    tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value.toFixed(2);
 	    idx++;
 	}
     }
