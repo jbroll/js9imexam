@@ -1,0 +1,200 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+  <link type="text/css" rel="stylesheet" href="css/jquery.contextMenu.css">
+  <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
+  <link type="text/css" rel="stylesheet" href="js9.css">
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/kinetic.min.js"></script>
+  <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
+  <script type="text/javascript" src="js/jquery.flot.min.js"></script>
+  <script type="text/javascript" src="js/jquery.flot.errorbars.min.js"></script>
+  <script type="text/javascript" src="js/sprintf.min.js"></script>
+  <script type="text/javascript" src="js/dhtmlwindow.min.js">
+  /***********************************************
+  * DHTML Window Widget- © Dynamic Drive (www.dynamicdrive.com)
+  * This notice must stay intact for legal use.
+  * Visit http://www.dynamicdrive.com/ for full source code
+  ***********************************************/
+  </script>
+  <script type="text/javascript" src="js/fitsy.js"></script>
+  <script type="text/javascript" src="js9.js"></script>
+
+  <script type="text/javascript" src="js/imexam/imexam.js"></script>
+
+  <!--[if IE]><script type="text/javascript" src="javascript/excanvas.js"></script><![endif]-->
+  <script type="text/javascript" src="js/imexam/JSSurfacePlot/javascript/SurfacePlot.js"></script>
+  <script type="text/javascript" src="js/imexam/JSSurfacePlot/javascript/ColourGradient.js"></script>
+
+  <script type="text/javascript" src="js/imexam/surface.js"></script>
+
+    <div id="imstat-template" style="visibility:hidden">
+    <table>
+	<tr><td>Region at</td><td align=right>{reg.pos.x%.2f} , {reg.pos.y%.2f}</td>
+			      <td align=right>{reg.size.width%.2f} , {reg.size.height%.2f}</td>
+
+	</tr>
+	<tr>		      <td align=right>js {jspix%.2f}</td> </tr>
+	<tr>		      <td align=right>im {impix%.2f}</td> </tr>
+	<tr>		      <td align=right>rg {rgpix%.2f}</td> </tr>
+	<tr><td>Counts</td><td> {counts%.2f}	</tr>
+    </table>
+    </div>
+
+</head>
+<body>
+
+    <script type="text/javascript">
+
+	function template(templateid,data){
+	    
+	    return document.getElementById(templateid).innerHTML.replace(/{([a-zA-Z0-9_.%]*)}/g,
+		function(m,key){
+		    var type, prec, val;
+		    var val = data;
+		
+		    key = key.split("%");
+
+		    if ( key.length <= 1 ) {
+			fmt = "%s"
+		    } else {
+			fmt = key[1]
+		    }
+
+		    key = key[0]
+		    key = key.split(".");
+
+		    for ( i = 0; i < key.length; i++ ) {
+			if ( val.hasOwnProperty(key[i]) ) {
+			    val = val[key[i]];
+			} else {
+			    return "";
+			}
+		    }
+
+		    type = fmt.substring(fmt.length-1)
+		    prec = fmt.substring(1, fmt.length-1)
+
+		    switch ( type ) {
+		     case "s":
+			break;
+		     case "f":
+			val = val.toFixed(prec);
+			break;
+		     case "d":
+			val = val.toFixed(0);
+			break;
+		    }
+
+		    return val;
+		}
+	    );
+	}
+
+	imexam = require("./imexam");
+
+    // this is the callback for all region changes
+    //
+    JS9.regionOpts.xeqonchange = "runImExam";
+
+    function runImExam(im, xreg) {
+
+	$("#region-info").css("visibility", "visible");
+
+
+        switch ( xreg.shape ) {
+	    case "box":
+	       w = xreg.size.width;
+	       h = xreg.size.height;
+
+	       break;
+	    case "circle":
+	       xreg.size = new Object();
+
+	       xreg.size.width  = xreg.radius*2;
+	       xreg.size.height = xreg.radius*2;
+
+	       break;
+
+	    default:
+		    return;
+        }
+	
+	var im_2d  = imexam.ndarray(im.raw.data, [im.raw.width, im.raw.height]);
+	var imstat = imexam.imops.imstat(im_2d
+		, imexam.imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height
+		, xreg.shape));
+
+	imstat.im  = im
+	imstat.reg = xreg;
+	imstat.jspix = im.raw.data[xreg.pos.y*im.raw.width+xreg.pos.x]
+	imstat.impix = im_2d.get(xreg.pos.y, xreg.pos.x)
+	imstat.rgpix = imstat.imag.get(xreg.size.width/2, xreg.size.height/2)
+
+
+	dispImExam(im, xreg, imstat);
+    }
+
+    function dispImExam(im, xreg, imstat) {
+
+      $("#imexam-text")[0].innerHTML = template("imstat-template", imstat);
+
+      var x;
+      var xdata = [];
+      var ydata = [];
+
+
+      for ( x = 0;  x < imstat.xproj.shape[0]; x++ ) {
+	xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
+      }
+      for ( x = 0;  x < imstat.yproj.shape[0]; x++ ) {
+	ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
+      }
+
+      $.plot($("#imexam-xplot")[0], [xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
+      //$.plot($("#imexam-yplot")[0], [ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
+
+      //var max = imexam.ndops.max(imstat.imag)
+
+      surface($("#imexam-yplot")[0], imstat.imag, 14000);
+    }
+    </script>
+
+<table>
+<tr>
+<td>
+    <div class="JS9Menubar"></div>
+    <div class="JS9"></div>
+</td>
+<td>
+  <div id="region-info" style="visibility:hidden">
+    <div id="imexam-text">
+      JS9 can perform data analysis in response to region changes:
+      <ul>
+      <li> choose an analysis task by clicking one of the analysis buttons above
+      <li> display an image by clicking on one of the data file URLs.
+      <li> create a region using the JS9 Region menu
+      <li> as you move or resize the region, the task will be run on that region
+      <li> suspend analysis via the region's context menu (double-click the region)
+      </ul>
+      See the page source for implementation details.
+    </div>
+
+      <table>
+	<tr><td align=center> X Projection </td><td align=center> 3d Projection </td>
+	<tr>
+	    <td> <div id="imexam-xplot" style="height:300px; width:300px"> </td>
+	    <td> <div id="imexam-yplot" style="height:300px; width:300px"> </td>
+	</tr>
+      </table>
+    </div>
+  </div>
+</td>
+</tr>
+</table>
+
+</body>
+</html>
