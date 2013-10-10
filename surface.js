@@ -51,5 +51,6 @@ function surface(div, data, normalize) {
     var options = {xPos: 0, yPos: 0, width: 300, height: 300, colourGradient: colours, fillPolygons: fillPly,
 	    tooltips: tooltipStrings, xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader, restrictXRotation: false};
 
+    div.innerHTML = "";
     surfacePlot.draw(surf, options);
 }
