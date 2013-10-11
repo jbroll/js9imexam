@@ -36,15 +36,11 @@ ndops.reshape = function(a, shape) {
 
 
 ndops.section = function(a, x1, x2, y1, y2) {
-
-	//console.log("section: ", x1, x2, y1, y2);
-
 	return a.lo(x1, y1).hi(x2-x1, y2-y1)
 }
 
 ndops.print = function(a, prec) {
     var x, y;
-
 
     if ( prec === undefined ) { prec = 3; }
 
@@ -65,7 +61,7 @@ ndops.print = function(a, prec) {
     }
 }
 
-ndops.max = cwise({
+ndops.maxvalue = cwise({
 	  args: ["array"]
 	, pre: function(a) {
 	  	this.max = Number.MIN_VALUE;
@@ -80,7 +76,7 @@ ndops.max = cwise({
 	  }
 });
 
-ndops.min = cwise({
+ndops.minvalue = cwise({
 	  args: ["array"]
 	, pre: function(a) {
 	  	this.min = Number.MAX_VALUE;
@@ -94,6 +90,7 @@ ndops.min = cwise({
 	    return this.min;
 	  }
 });
+
 
 ndops._proj = cwise({
 	  args: ["array", "scalar", "scalar", "index"]

@@ -154,9 +154,7 @@
       $.plot($("#imexam-xplot")[0], [xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
       $.plot($("#imexam-yplot")[0], [ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
 
-      //var max = imexam.ndops.max(imstat.imag)
-
-      surface($("#imexam-3plot")[0], imstat.imag, imexam.ndops.max(imstat.imag)*2.25);
+      surface($("#imexam-3plot")[0], imstat.imag, imexam.ndops.maxvalue(imstat.imag)*2.25);
     }
     </script>
 
