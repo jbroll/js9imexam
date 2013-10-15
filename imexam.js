@@ -47,13 +47,12 @@ ndops.print = function(a, width, prec) {
 
     if ( a.shape.length === 1 ) {
 	for (x=0;x<a.shape[0];++x) {
-	    process.stdout.write(("%" + width.tostring()).format(a.get(x).toFixed(prec)) + " ");
+	    process.stdout.write(a.get(x).toFixed(prec) + " ");
 	}
         process.stdout.write("\n");
     } else {
 	for ( y = a.shape[1]-1; y >= 0; --y ) {
 	  for ( x = 0; x < a.shape[0]; ++x ) {
-	    process.stdout.write(("%" + width.toString()).format(a.get(x, y).toFixed(prec)) + " ");
 	    process.stdout.write(a.get(x, y).toFixed(prec) + " ");
 	  }
 
@@ -62,6 +61,47 @@ ndops.print = function(a, width, prec) {
 	process.stdout.write("\n");
     }
 }
+
+ndops._hist = cwise({
+      args: ["array", "scalar", "scalar", "scalar"]
+    , pre: function(a, width, min, max) {
+	var size = (max-min) / width + 1
+
+	this.width = width
+	this.size = size
+	this.min = min
+	this.max = max
+
+	console.log(size)
+	this.h = new Int32Array(size);
+    }
+    , body: function(a) {
+    	var bin = Math.max(0, Math.min(this.size, (a-this.min))/this.width);
+
+    	this.h.set(bin, this.h.get(bin)+1)
+    }
+    , post: function() {
+    	return this.h
+    }
+})
+
+ndops.hist = function(a, width, min, max) {
+    if ( min === undefined ) {
+	min = ndops.minvalue(a);
+    }
+    if ( max === undefined ) {
+	max = ndops.maxvalue(a);
+    }
+    if ( width === undefined ) {
+	width = 1;
+    }
+
+    reply = ndops._hist(a, width, min, max);
+
+    return ndarray(reply, [reply.length])
+}
+
+
 
 ndops.maxvalue = cwise({
 	  args: ["array"]
@@ -312,6 +352,7 @@ imops.imstat = function (image, section, type) {
 	ndops.subs(stat.data, stat.imag, stat.backgr);
 	
 	stat.centoid = ndops.centroid(stat.imag, ndops.qcenter(stat.data));
+	stat.hist    = ndops.hist(stat.imag);
 
 
 	stat.xproj   = ndops.proj(stat.imag, 1);

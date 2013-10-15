@@ -28,6 +28,11 @@ im.set(45, 54, 1)
 
 imstat = imexam.imops.imstat(im, [[45, 55], [45, 55]], "box")
 
+xx = imexam.ndops.hist(im)
+
+
+imexam.ndops.print(xx, 4)
+    log("\n")
 imexam.ndops.print(im, 4)
 
 log(imexam.ndops.minvalue(im))
