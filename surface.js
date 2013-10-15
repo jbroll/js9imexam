@@ -37,6 +37,9 @@ function surface(div, data, normalize) {
     var numCols = surf.getNumberOfColumns();
     var idx = 0;
 
+    var height = div.offsetHeight;
+    var width  = div.offsetWidth;
+
     for (var i = 0; i < numRows; i++) {
 	for (var j = 0; j < numCols; j++) {
 	    var value = data.get(i, j);
@@ -48,7 +51,7 @@ function surface(div, data, normalize) {
 	}
     }
     
-    var options = {xPos: 0, yPos: 0, width: 300, height: 300, colourGradient: colours, fillPolygons: fillPly,
+    var options = {xPos: 0, yPos: 0, width: width, height: height, colourGradient: colours, fillPolygons: fillPly,
 	    tooltips: tooltipStrings, xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader, restrictXRotation: false};
 
     div.innerHTML = "";

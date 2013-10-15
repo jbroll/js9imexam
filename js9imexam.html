@@ -23,6 +23,7 @@
   <script type="text/javascript" src="js/fitsy.js"></script>
   <script type="text/javascript" src="js9.js"></script>
 
+  <script type="text/javascript" src="js/imexam/template.js"></script>
   <script type="text/javascript" src="js/imexam/imexam.js"></script>
 
   <!--[if IE]><script type="text/javascript" src="javascript/excanvas.js"></script><![endif]-->
@@ -31,65 +32,37 @@
 
   <script type="text/javascript" src="js/imexam/surface.js"></script>
 
-    <div id="imstat-template" style="visibility:hidden">
+    <script type="text/template" id="imstat-template">
     <table>
 	 <tr><td>Region at</td><td align=right>{reg.pos.x%.2f} , {reg.pos.y%.2f}</td></tr>
 	 <tr><td align=right>Size</td>      <td align=right>{reg.size.width%.2f} , {reg.size.height%.2f}</td></tr>
-	 <tr><td align=right>Counts</td><td> {counts%.2f}			</tr>
+	 <tr><td align=right>Counts</td>    <td align=right>{counts%.2f}	</tr>
 	 <tr><td align=right>Background</td><td align=right>{backgr%.2f}</td>	</tr>
 	 <tr><td align=right>Noise</td>     <td align=right>{noise%.2f}</td>	</tr>
     </table>
-    </div>
+    </script>
+
+
+    <script type="text/template" id="imexam-box-template">
+    <form>
+	<input type=image class="imexam-pin" src="js/imexam/unpinned.png"
+		onclick='imexamPin($(this).parents(".imexam-box")[0]); return false;'>
+	<select class="imexam-menu" onchange='imexamUpdate($(this).parents(".imexam-box")[0], undefined, this.options[this.selectedIndex].value);'>
+		<option value="stats"> Regions Stats</option>
+		<option value="xproj"> X Projection</option>
+		<option value="yproj"> Y Projection</option>
+		<option value="3plot"> 3d Plot</option>
+		<option value="histo"> Histogram</option>
+	</select>
+    </form>
+    <div id="imexam-box-display" style="height:280px; width:280px"> </div>
+    </script>
 
 </head>
 <body>
 
     <script type="text/javascript">
 
-	function template(templateid,data){
-	    
-	    return document.getElementById(templateid).innerHTML.replace(/{([a-zA-Z0-9_.%]*)}/g,
-		function(m,key){
-		    var type, prec, val;
-		    var val = data;
-		
-		    key = key.split("%");
-
-		    if ( key.length <= 1 ) {
-			fmt = "%s"
-		    } else {
-			fmt = key[1]
-		    }
-
-		    key = key[0]
-		    key = key.split(".");
-
-		    for ( i = 0; i < key.length; i++ ) {
-			if ( val.hasOwnProperty(key[i]) ) {
-			    val = val[key[i]];
-			} else {
-			    return "";
-			}
-		    }
-
-		    type = fmt.substring(fmt.length-1)
-		    prec = fmt.substring(1, fmt.length-1)
-
-		    switch ( type ) {
-		     case "s":
-			break;
-		     case "f":
-			val = val.toFixed(prec);
-			break;
-		     case "d":
-			val = val.toFixed(0);
-			break;
-		    }
-
-		    return val;
-		}
-	    );
-	}
 
 	imexam = require("./imexam");
 
@@ -99,25 +72,22 @@
 
     function runImExam(im, xreg) {
 
-	$("#region-info").css("visibility", "visible");
-
-
         switch ( xreg.shape ) {
 	    case "box":
-	       w = xreg.size.width;
-	       h = xreg.size.height;
+	        w = xreg.size.width;
+	        h = xreg.size.height;
 
-	       break;
+	        break;
 	    case "circle":
-	       xreg.size = new Object();
+	        xreg.size = new Object();
 
-	       xreg.size.width  = xreg.radius*2;
-	       xreg.size.height = xreg.radius*2;
+	        xreg.size.width  = xreg.radius*2;
+	        xreg.size.height = xreg.radius*2;
 
-	       break;
+	        break;
 
 	    default:
-		    return;
+		return;
         }
 	
 	var im_2d  = imexam.ndarray(im.raw.data, [im.raw.width, im.raw.height]);
@@ -131,31 +101,114 @@
 	imstat.impix = im_2d.get(xreg.pos.y, xreg.pos.x)
 	imstat.rgpix = imstat.imag.get(xreg.size.width/2, xreg.size.height/2)
 
-
 	dispImExam(im, xreg, imstat);
     }
 
-    function dispImExam(im, xreg, imstat) {
+    NextType = 0;
 
-      $("#imexam-text")[0].innerHTML = template("imstat-template", imstat);
+    function imexamPin(el) {
+	var pinned = $(el).data("pinned");
+	var img;
 
-      var x;
-      var xdata = [];
-      var ydata = [];
-
-
-      for ( x = 0;  x < imstat.xproj.shape[0]; x++ ) {
-	xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
-      }
-      for ( x = 0;  x < imstat.yproj.shape[0]; x++ ) {
-	ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
-      }
-
-      $.plot($("#imexam-xplot")[0], [xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
-      $.plot($("#imexam-yplot")[0], [ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
-
-      surface($("#imexam-3plot")[0], imstat.imag, imexam.ndops.maxvalue(imstat.imag)*2.25);
+	if ( pinned === undefined || pinned === 0 ) {
+	    pinned = 1;
+	    img = "js/imexam/pinned.png"
+	} else {
+	    pinned = 0;
+	    img = "js/imexam/unpinned.png"
+	}
+	
+	$(el).find(".imexam-pin")[0].setAttribute("src", img);
+	$(el).data("pinned", pinned);
+	
     }
+
+    function imexamUpdate(el, imstat, type) {
+	if ( $(el).data("pinned") ) {
+	    return;
+	}
+
+	if ( type === undefined ) {
+	    type = $(el).data("type")
+
+	    if ( type === undefined ) {
+		el.innerHTML = template("imexam-box-template", null);
+
+		var menu = $(el).find(".imexam-menu")[0];
+
+		menu.selectedIndex = NextType;
+		type = menu.options[NextType].value;
+		
+		NextType++
+
+		$(el).data("type", type)
+	    }
+	} else {
+	    $(el).data("type", type)
+	}
+
+	if ( imstat === undefined ) {
+	    imstat = $(el).data("imstat")
+	} else {
+	    $(el).data("imstat", imstat)
+	}
+
+	var box = $(el).find("#imexam-box-display")[0];
+
+	switch ( type ) {
+	 case "stats" : {
+	    box.innerHTML = template("imstat-template", imstat);
+	    break;
+	 }
+	 case "xproj" : {
+	    $.plot(box, [imstat.xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
+	    break;
+	 }
+	 case "yproj" : {
+	    $.plot(box, [imstat.ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
+	    break;
+	 }
+	 case "histo" : {
+	    $.plot(box, [imstat.hdata]);
+	    break;
+	 }
+	 case "3plot" : {
+	    surface(box, imstat.imag, imexam.ndops.maxvalue(imstat.imag)*2.25);
+	    break;
+	 }
+	 default:
+	    console.log("None")
+	}
+    }
+
+    function dispImExam(im, xreg, imstat) {
+        $("#region-info").css("visibility", "visible");
+
+        var x;
+        var xdata = [];
+        var ydata = [];
+        var hdata = [];
+
+
+        for ( x = 0;  x < imstat.xproj.shape[0]; x++ ) {
+	    xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
+        }
+        for ( x = 0;  x < imstat.yproj.shape[0]; x++ ) {
+	    ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
+        }
+        for ( h = 0;  h < imstat.hist.data.shape[0]; h++ ) {
+	    var value = imstat.hist.data.get(h);
+
+	    if ( value ) { hdata[h] = [h*imstat.hist.width, value] }
+        }
+
+        imstat.xdata = xdata;
+        imstat.ydata = ydata;
+        imstat.hdata = hdata;
+
+	$(".imexam-box").each(function(i, obj) { imexamUpdate(obj, imstat); });
+    }
+
     </script>
 
 <table>
@@ -165,19 +218,17 @@
     <div class="JS9"></div>
 </td>
 <td>
-  <div id="region-info" style="visibility:hidden">
+  <div id="region-info" style="visibility:visible">
 
       <table>
-	<tr><td align=center> Region Info </td><td align=center> X Projection </td>
 	<tr>
-	    <td> <div id="imexam-text" style="height:300px; width:300px"> </div></td>
-	    <td> <div id="imexam-yplot" style="height:300px; width:300px"> </div></td>
+	    <td> <div class="imexam-box" style="height:300px; width:300px"> </div></td>
+	    <td> <div class="imexam-box" style="height:300px; width:300px"> </div></td>
 	</tr>
 
-	<tr><td align=center> Y Projection </td><td align=center> 3d Projection </td>
 	<tr>
-	    <td> <div id="imexam-xplot" style="height:300px; width:300px"></div></td>
-	    <td> <div id="imexam-3plot" style="height:300px; width:300px"></div></td>
+	    <td> <div class="imexam-box" style="height:300px; width:300px"></div></td>
+	    <td> <div class="imexam-box" style="height:300px; width:300px"></div></td>
 	</tr>
       </table>
     </div>
