@@ -279,6 +279,14 @@ ndops._centroid = cwise({
 		reply.cenx = this.sumx/this.sum;
 		reply.ceny = this.sumy/this.sum;
 
+		var rmom = ( this.sumxx - this.sumx * this.sumx / this.sum + this.sumyy - this.sumy * this.sumy / this.sum ) / this.sum;
+
+		if ( rmom <= 0 ) {
+		    reply.fwhm = -1.0;
+		} else {
+		    reply.fwhm = Math.sqrt(rmom)  * 2.354 / Math.sqrt(2.0);
+		}
+
 		return reply;
 	}
 })
@@ -346,8 +354,8 @@ imops._rproj = cwise({
 		this.i = 0
 	  }
 	, body: function(a, cx, cy, length, index) {
-		this.reply[this.i] = a
-		this.reply[this.i*, length] = Math.sqrt((index[0]-cx)*(index[0]-cx) + (index[1]-cy)*(index[1]-cy))
+		this.reply[this.i*2  ] = Math.sqrt((index[0]-cx)*(index[0]-cx) + (index[1]-cy)*(index[1]-cy))
+		this.reply[this.i*2+1] = a
 
 		this.i++;
 	  }
@@ -357,7 +365,9 @@ imops._rproj = cwise({
 })
 
 imops.rproj = function(im, center) {
-    var reply = ndarray(ndops._rproj(im, center[0], center[1], im.data.size), [im.data.size, 2])
+    var reply = ndarray(imops._rproj(im, center[0], center[1], im.size), [im.size, 2])
+
+    ndops.sort(reply)
 
     return reply;
 }
@@ -395,12 +405,10 @@ imops.imstat = function (image, section, type) {
 
 	stat.centroid = ndops.centroid(stat.data, ndops.qcenter(stat.data));
 
-	console.log(ndops.qcenter(stat.data), [stat.centroid.cenx, stat.centroid.ceny])
-
 	stat.hist    = ndops.hist(stat.imag);
 	stat.xproj   = ndops.proj(stat.imag, 1);
 	stat.yproj   = ndops.proj(stat.imag, 0);
-	stat.rproj   = ndops.rproj(stat.imag, [stat.centroid.cenx, stat.centroid.ceny]);
+	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.cenx, stat.centroid.ceny]);
 
 	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
 

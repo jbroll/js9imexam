@@ -39,6 +39,8 @@
 	 <tr><td align=right>Counts</td>    <td align=right>{counts%.2f}	</tr>
 	 <tr><td align=right>Background</td><td align=right>{backgr%.2f}</td>	</tr>
 	 <tr><td align=right>Noise</td>     <td align=right>{noise%.2f}</td>	</tr>
+	 <tr><td align=right>Centroid</td>  <td align=right>{centroid.cenx%.2f}, {centroid.ceny%.2f}</td>	</tr>
+	 <tr><td align=right>FWHM</td>  <td align=right>{centroid.fwhm%.2f}</td></tr>
     </table>
     </script>
 
@@ -49,9 +51,10 @@
 		onclick='imexamPin($(this).parents(".imexam-box")[0]); return false;'>
 	<select class="imexam-menu" onchange='imexamUpdate($(this).parents(".imexam-box")[0], undefined, this.options[this.selectedIndex].value);'>
 		<option value="stats"> Regions Stats</option>
+		<option value="rproj"> Radial Profile</option>
+		<option value="3plot"> 3d Plot</option>
 		<option value="xproj"> X Projection</option>
 		<option value="yproj"> Y Projection</option>
-		<option value="3plot"> 3d Plot</option>
 		<option value="histo"> Histogram</option>
 	</select>
     </form>
@@ -160,6 +163,15 @@
 	    box.innerHTML = template("imstat-template", imstat);
 	    break;
 	 }
+	 case "rproj" : {
+	    $.plot(box, [imstat.rdata], { series: {
+						points: {
+							radius: 1,
+							show: true,
+						}
+						} } );
+	    break;
+	 }
 	 case "xproj" : {
 	    $.plot(box, [imstat.xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
 	    break;
@@ -185,26 +197,27 @@
         $("#region-info").css("visibility", "visible");
 
         var x;
-        var xdata = [];
-        var ydata = [];
-        var hdata = [];
+        imstat.xdata = [];
+        imstat.ydata = [];
+        imstat.hdata = [];
+        imstat.rdata = [];
 
 
         for ( x = 0;  x < imstat.xproj.shape[0]; x++ ) {
-	    xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
+	    imstat.xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
         }
         for ( x = 0;  x < imstat.yproj.shape[0]; x++ ) {
-	    ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
+	    imstat.ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
         }
         for ( h = 0;  h < imstat.hist.data.shape[0]; h++ ) {
 	    var value = imstat.hist.data.get(h);
 
-	    if ( value ) { hdata[h] = [h*imstat.hist.width, value] }
+	    if ( value ) { imstat.hdata[h] = [h*imstat.hist.width, value] }
         }
+        for ( r = 0;  r < imstat.rproj.shape[0]; r++ ) {
+	    imstat.rdata[r] = [imstat.rproj.get(r, 0), imstat.rproj.get(r, 1)]
+	}
 
-        imstat.xdata = xdata;
-        imstat.ydata = ydata;
-        imstat.hdata = hdata;
 
 	$(".imexam-box").each(function(i, obj) { imexamUpdate(obj, imstat); });
     }

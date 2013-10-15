@@ -23,8 +23,8 @@ $(JS9JS)/template.js: template.js
 	cp -p template.js $(JS9JS)/template.js
 
 $(JS9JS)/unpinned.png: unpinned.png
-	cp -p unpinned.js $(JS9JS)/unpinned.png
+	cp -p unpinned.png $(JS9JS)/unpinned.png
 
 $(JS9JS)/pinned.png: pinned.png
-	cp -p pinned.js $(JS9JS)/pinned.png
+	cp -p pinned.png $(JS9JS)/pinned.png
 
