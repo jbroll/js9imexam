@@ -39,19 +39,21 @@ ndops.section = function(a, x1, x2, y1, y2) {
 	return a.lo(x1, y1).hi(x2-x1, y2-y1)
 }
 
-ndops.print = function(a, prec) {
+ndops.print = function(a, width, prec) {
     var x, y;
 
+    if ( width === undefined ) { width = 7; }
     if ( prec === undefined ) { prec = 3; }
 
     if ( a.shape.length === 1 ) {
 	for (x=0;x<a.shape[0];++x) {
-	    process.stdout.write(a.get(x, y).toFixed(prec) + " ");
+	    process.stdout.write(("%" + width.tostring()).format(a.get(x).toFixed(prec)) + " ");
 	}
         process.stdout.write("\n");
     } else {
 	for ( y = a.shape[1]-1; y >= 0; --y ) {
 	  for ( x = 0; x < a.shape[0]; ++x ) {
+	    process.stdout.write(("%" + width.toString()).format(a.get(x, y).toFixed(prec)) + " ");
 	    process.stdout.write(a.get(x, y).toFixed(prec) + " ");
 	  }
 
@@ -200,26 +202,36 @@ ndops.sum_wt = cwise({
 	  }
 	});
 
-ndops.centroid = cwise({
+ndops._centroid = cwise({
 	  args: ["array", "scalar", "scalar", "index"]
-	, pre: function(a, cx, cy) {
-		this.center = new Array(2);
+	, pre: function(a, nx, ny) {
+		this.sum   = 0;
+		this.sumx  = 0;
+		this.sumy  = 0;
+		this.sumxx = 0;
+		this.sumyy = 0;
 
-		this.center[0] = cx;
-		this.center[1] = cy;
-
-		this.sum   = 0
-		this.sumx  = 0
-		this.sumy  = 0
-		this.sumxx = 0
-		this.sumyy = 0
+		this.nx = nx;
+		this.ny = ny;
 	  }
-	, body: function(a, index) {
+	, body: function(a, nx, ny, index) {
+		this.sum	+= a
+		this.sumx	+= a * index[0]
+		this.sumxx	+= a * index[0] * index[0]
+		this.sumy	+= a * index[1]
+		this.sumyy	+= a * index[1] * index[1]
 	  }
 	, post: function() {
-		return this.center;
+		return {  sum: this.sum
+		    	, cenx: this.sumx/this.sum - this.nx/2
+		    	, ceny: this.sumy/this.sum - this.ny/2
+		}
 	}
 })
+
+ndops.centroid = function(a) {
+    ndops._centroid(a, a.shape[0], a.shape[1]);
+}
 
 
 ndops.flatten = function() {
@@ -245,8 +257,6 @@ ndops.flatten = function() {
 
 ndops.median = function(a) {
 	ndops.sort(a);
-
-	console.log(a.get(a.size/2))
 
 	return a.get(a.size/2);
 }
@@ -306,7 +316,7 @@ imops.imstat = function (image, section, type) {
 
 	stat.xproj   = ndops.proj(stat.imag, 1);
 	stat.yproj   = ndops.proj(stat.imag, 0);
-	//stat.rproj   = ndops.rproj(stat.imag, stat.centroid);
+//	stat.rproj   = ndops.rproj(stat.imag, stat.centroid);
 
 	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
 
