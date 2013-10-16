@@ -344,6 +344,25 @@ imops.rproj = function(im, center) {
     return reply;
 }
 
+imops.eener = function(fraction, imag, center, counts, fwhm) {
+	return numeric.uncmin(function(x) {
+
+	    var mask = imops.circle_mask(imag.shape[0], imag.shape[1]
+		, center[1], center[0]
+		, x[0]);
+//ndops.print(imag)
+//ndops.print(mask)
+
+	    var eener = ndops.sum_wt(imag, mask) * fraction;
+
+console.log(counts, x, eener);
+
+	    return counts-eener;
+
+	}, [fwhm/2], .001).solution;
+
+}
+
 imops.imstat = function (image, section, type) {
 	var stat = new Object();
 
@@ -380,14 +399,16 @@ imops.imstat = function (image, section, type) {
 	stat.hist    = ndops.hist(stat.imag);
 	stat.xproj   = ndops.proj(stat.imag, 1);
 	stat.yproj   = ndops.proj(stat.imag, 0);
-	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.cenx, stat.centroid.ceny]);
+	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
+
+	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
+
+	stat.ee80    = imops.eener(.8, stat.data, [stat.centroid.ceny, stat.centroid.cenx], stat.counts-stat.backgr, stat.centroid.fwhm)[0];
 
 	stat.centroid.cenx += section[0][0]
 	stat.centroid.ceny += section[1][0]
 
-	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
 
-	// stat.ee80    = ndops.ee80(im, stat.counts-stat.backgr);
 
 	return stat;
 }
