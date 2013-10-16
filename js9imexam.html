@@ -127,9 +127,6 @@
     }
 
     function imexamUpdate(el, imstat, type) {
-	if ( $(el).data("pinned") ) {
-	    return;
-	}
 
 	if ( type === undefined ) {
 	    type = $(el).data("type")
@@ -153,6 +150,10 @@
 	if ( imstat === undefined ) {
 	    imstat = $(el).data("imstat")
 	} else {
+	    if ( $(el).data("pinned") ) {
+		return;
+	    }
+
 	    $(el).data("imstat", imstat)
 	}
 
@@ -185,6 +186,7 @@
 	    break;
 	 }
 	 case "3plot" : {
+	    console.log("max", imexam.ndops.maxvalue(imstat.imag))
 	    surface(box, imstat.imag, imexam.ndops.maxvalue(imstat.imag)*2.25);
 	    break;
 	 }
@@ -201,7 +203,6 @@
         imstat.ydata = [];
         imstat.hdata = [];
         imstat.rdata = [];
-
 
         for ( x = 0;  x < imstat.xproj.shape[0]; x++ ) {
 	    imstat.xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]

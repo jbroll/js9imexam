@@ -143,3 +143,4 @@ greg.ross.visualisation.ColourGradient = function(minValue, maxValue, rgbColourA
 		return factor;
 	}
 }
+
