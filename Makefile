@@ -29,3 +29,7 @@ $(JS9JS)/unpinned.png: unpinned.png
 $(JS9JS)/pinned.png: pinned.png
 	cp -p pinned.png $(JS9JS)/pinned.png
 
+
+install:
+	rm -rf $(JS9JS)/JSSurfacePlot
+	cp -rp JSSurfacePlot-V1.7 $(JS9JS)/JSSurfacePlot
