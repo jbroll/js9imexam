@@ -11,6 +11,11 @@ ndops.fill    = require("ndarray-fill")
 ndops.sort    = require("ndarray-sort")
 ndops.moments = require("ndarray-moments")
 
+numeric       = require("numeric")
+
+ndops.maxvalue = ndops.sup
+ndops.minvalue = ndops.inf
+
 ndops.size = function(shape) {
 	var i;
 	var size = 1
@@ -33,7 +38,6 @@ ndops.reshape = function(a, shape) {
 
     return ndarray(a.data, shape);
 }
-
 
 ndops.section = function(a, x1, x2, y1, y2) {
 	return a.lo(x1, y1).hi(x2-x1, y2-y1)
@@ -109,39 +113,6 @@ ndops.hist = function(a, width, min, max) {
 
     return hist
 }
-
-
-
-ndops.maxvalue = cwise({
-	  args: ["array"]
-	, pre: function(a) {
-	  	this.max = Number.MIN_VALUE;
-	  }
-	, body: function(a) {
-	    if ( a > this.max ) {
-		this.max = a;
-	    }
-	  }
-	, post: function() {
-	    return this.max;
-	  }
-});
-
-ndops.minvalue = cwise({
-	  args: ["array"]
-	, pre: function(a) {
-	  	this.min = Number.MAX_VALUE;
-	  }
-	, body: function(a) {
-	    if ( a < this.min ) {
-		this.min = a;
-	    }
-	  }
-	, post: function() {
-	    return this.min;
-	  }
-});
-
 
 ndops._proj = cwise({
 	  args: ["array", "scalar", "scalar", "index"]
@@ -266,10 +237,10 @@ ndops._centroid = cwise({
 	, body: function(a, nx, ny, index) {
 		if ( a > 0 ) {
 		    this.sum	+= a
-		    this.sumx	+= a * index[0]
-		    this.sumxx	+= a * index[0] * index[0]
-		    this.sumy	+= a * index[1]
-		    this.sumyy	+= a * index[1] * index[1]
+		    this.sumx	+= a * index[1]
+		    this.sumxx	+= a * index[1] * index[1]
+		    this.sumy	+= a * index[0]
+		    this.sumyy	+= a * index[0] * index[0]
 		}
 	  }
 	, post: function() {
@@ -297,7 +268,6 @@ ndops.centroid = function(a) {
     return(reply);
 }
 
-
 ndops.flatten = function() {
 	var size = 0
 	for ( i = 0; i < arguments.length; i++ ) {
@@ -323,6 +293,8 @@ ndops.median = function(a) {
 
 	return a.get(a.size/2);
 }
+
+
 
 
 imops.backgr = function(data, width) {
@@ -372,6 +344,25 @@ imops.rproj = function(im, center) {
     return reply;
 }
 
+imops.eener = function(fraction, imag, center, counts, fwhm) {
+	return numeric.uncmin(function(x) {
+
+	    var mask = imops.circle_mask(imag.shape[0], imag.shape[1]
+		, center[1], center[0]
+		, x[0]);
+//ndops.print(imag)
+//ndops.print(mask)
+
+	    var eener = ndops.sum_wt(imag, mask) * fraction;
+
+console.log(counts, x, eener);
+
+	    return counts-eener;
+
+	}, [fwhm/2], .001).solution;
+
+}
+
 imops.imstat = function (image, section, type) {
 	var stat = new Object();
 
@@ -408,15 +399,21 @@ imops.imstat = function (image, section, type) {
 	stat.hist    = ndops.hist(stat.imag);
 	stat.xproj   = ndops.proj(stat.imag, 1);
 	stat.yproj   = ndops.proj(stat.imag, 0);
-	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.cenx, stat.centroid.ceny]);
+	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
 
 	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
 
-	// stat.ee80    = ndops.ee80(im, stat.counts-stat.backgr);
+	//stat.ee80    = imops.eener(.8, stat.data, [stat.centroid.ceny, stat.centroid.cenx], stat.counts-stat.backgr, stat.centroid.fwhm)[0];
+
+	stat.centroid.cenx += section[0][0]
+	stat.centroid.ceny += section[1][0]
+
+
 
 	return stat;
 }
 
+exports.numeric = numeric
 exports.ndarray = ndarray
 exports.ndops   = ndops
 exports.imops   = imops

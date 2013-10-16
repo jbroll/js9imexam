@@ -82,9 +82,9 @@ greg.ross.visualisation.ColourGradient = function(minValue, maxValue, rgbColourA
 		var scaleWidth = 1 / (numberOfColours - 1);
 		var index = (value / scaleWidth);
 		var index = parseInt(index + "");
-				
-		index = index ==  (numberOfColours - 1) ? index - 1 : index;
-		
+
+		index = index >=  (numberOfColours - 1) ? (numberOfColours - 2): index;
+
 		var rgb1 = rgbColourArray[index];
 		var rgb2 = rgbColourArray[index + 1];
 		
@@ -143,3 +143,4 @@ greg.ross.visualisation.ColourGradient = function(minValue, maxValue, rgbColourA
 		return factor;
 	}
 }
+
