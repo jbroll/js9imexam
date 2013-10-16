@@ -403,7 +403,7 @@ imops.imstat = function (image, section, type) {
 
 	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
 
-	stat.ee80    = imops.eener(.8, stat.data, [stat.centroid.ceny, stat.centroid.cenx], stat.counts-stat.backgr, stat.centroid.fwhm)[0];
+	//stat.ee80    = imops.eener(.8, stat.data, [stat.centroid.ceny, stat.centroid.cenx], stat.counts-stat.backgr, stat.centroid.fwhm)[0];
 
 	stat.centroid.cenx += section[0][0]
 	stat.centroid.ceny += section[1][0]
