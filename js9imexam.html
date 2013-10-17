@@ -71,6 +71,69 @@
 
 	imexam = require("./imexam");
 
+	    function FitsyConvertPixel(data, bitpix, zero) {
+		var dv = new DataView(data);
+
+		switch( bitpix ) {
+		case   8:
+		    return dv.getUint8(0, false);
+		case -16:
+		    return dv.getUint16(0, false) - zero;
+		case  16:
+		    if ( zero === 32768 ) {
+			return dv.getUint16(0, false) - zero;
+		    } else {
+			return dv.getInt16(0, false);
+		    }
+		case  32:
+		    return dv.getInt32(0, false);
+		case -32:
+		    return dv.getFloat32(0, false);
+		case -64:
+		    return dv.getFloat64(0, false);
+		}
+
+		return undefined;
+	    }
+
+	    function FitsyReadPixel(fits, hdu, index, deliver) {
+		fits.read.onloadend = function() {
+			fits.pixel = FitsyConvertPixel(fits.read.result, hdu.bitpix, hdu.bzero || 0)
+			deliver();
+		}
+
+		var ptr = hdu.dataseek + (index[0] * hdu.axis[1] + index[1]) * Math.abs(hdu.bitpix/8)
+
+		fits.read.readAsArrayBuffer(Fitsy.getSlice(fits.file, ptr, ptr+Math.abs(hdu.bitpix/8)))
+	    }
+
+	    function HxRGReadPixelStack(fits, n, index, deliver, data) {
+		if ( n === 0 ) {
+		    data = []
+		} else {
+		    data[n-1] = fits.pixel
+
+		console.log(fits.nhdu, n, fits.hdu[n].bzero, fits.pixel)
+
+		}
+
+		n += 1;
+
+		if ( n >= fits.nhdu ) {
+		    var tmp   = data[0];
+		    data[0]   = data[n-1]
+		    data[n-1] = tmp
+
+		    deliver(data);
+
+		    return
+		}
+
+		FitsyReadPixel(fits, fits.hdu[n], index, function() { HxRGReadPixelStack(fits, n, index, deliver, data) });
+	    }
+
+
+
     // this is the callback for all region changes
     //
     JS9.regionOpts.xeqonchange = "runImExam";
@@ -190,21 +253,15 @@
 	    break;
 	 }
 	 case "hxrg-stack" : {
-	    HxRGReadPixelStack(im.raw.hdu.fits, 0, imstat.reg.x, imstat.reg.y, function(data) {
-		$.plot(box, [data]);
-	    })
+	    HxRGReadPixelStack(im.raw.hdu.fits, 0, [imstat.reg.pos.y, imstat.reg.pos.x], function(data) {
 
-	    function HxRGReadPixelStack(fits, undefined, x, y, deliver) {
-		if ( n === 0 || n >= fits.nhdr ) {
-			Read
-			return;
-		} 
-		if ( n >= fits.nhdr ) {
-			deliver(data);
-		} else {
-			
-		}
-	    }
+		hxrg = []
+		for ( i = 0; i < data.length; i++ ) {
+		    hxrg[i] = [i, data[i]]
+	 	}
+
+		$.plot(box, [hxrg]);
+	    })
 
 	    break;
 	 }

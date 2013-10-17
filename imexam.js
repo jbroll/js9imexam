@@ -11,7 +11,9 @@ ndops.fill    = require("ndarray-fill")
 ndops.sort    = require("ndarray-sort")
 ndops.moments = require("ndarray-moments")
 
-numeric       = require("numeric")
+//numeric       = require("numeric")
+
+
 
 ndops.maxvalue = ndops.sup
 ndops.minvalue = ndops.inf
@@ -172,7 +174,7 @@ function pixwt(r, x, y, D) {
 	D = 1;
     }
 
-    if ( D < .0001 ) {					// Just stop after a while.
+    if ( D < .001 ) {					// Just stop after a while.
 	return 0;
     }
 
@@ -344,6 +346,43 @@ imops.rproj = function(im, center) {
     return reply;
 }
 
+ndops.gauss1d = function(data, x0) {
+    var reply = ndops.ndarray(data.shape)
+
+    ndops.fill(reply, function(x) {
+	var a = x0[0]
+	var b = x0[1]
+	var c = x0[2]
+	var d = x0[3]
+
+	return a * Math.pow(2.71828, - ((data.get(x)-b)*(x*b) / 2*c*c)) + d;
+    });
+
+    return reply;    
+}
+
+ndops.gsfit1d = function(data, x0) {
+    return numeric.uncmin(function(x) {
+	var here = ndops.ndarray(data.shape);
+	var modl = ndops.gauss1d(data, x);
+
+ndops.print(data)
+ndops.print(modl)
+
+
+
+	ndops.sub(here, modl, data)
+	ndops.mul(here, here, here)
+
+	var sum = ndops.sum(here)
+
+	console.log(sum)
+
+	return sum;
+    }, x0, .0001).solution
+}
+
+
 imops.eener = function(fraction, imag, center, counts, fwhm) {
 	return numeric.uncmin(function(x) {
 
@@ -352,17 +391,17 @@ imops.eener = function(fraction, imag, center, counts, fwhm) {
 	    var mask = imops.circle_mask(imag.shape[0], imag.shape[1]
 		, center[1], center[0]
 		, x[0]);
-//ndops.print(imag)
-//ndops.print(mask)
+
+	    //ndops.print(imag)
+	    //ndops.print(mask)
 
 	    var eener = ndops.sum_wt(imag, mask);
 
-console.log(counts, x[0], eener);
+	    console.log(counts, x[0], eener);
 
 	    return counts*fraction-eener;
 
 	}, [fwhm], .01).solution;
-
 }
 
 imops.imstat = function (image, section, type) {
@@ -402,6 +441,7 @@ imops.imstat = function (image, section, type) {
 	stat.xproj   = ndops.proj(stat.imag, 1);
 	stat.yproj   = ndops.proj(stat.imag, 0);
 	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
+//	stat.rpfit   = imops.rpfit(stat.rproj);
 
 	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
 
@@ -413,7 +453,7 @@ imops.imstat = function (image, section, type) {
 	return stat;
 }
 
-exports.numeric = numeric
+//exports.numeric = numeric
 exports.ndarray = ndarray
 exports.ndops   = ndops
 exports.imops   = imops
