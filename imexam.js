@@ -423,7 +423,8 @@ imops.imstat = function (image, section, type) {
 	    ndops.assigns(stat.mask, 1);
 	}
 
-
+	stat.min = ndops.minvalue(stat.imag)
+	stat.max = ndops.maxvalue(stat.imag)
 
 	backgr  = imops.backgr(stat.imag, 4);
 
