@@ -78,10 +78,10 @@
 		case   8:
 		    return dv.getUint8(0, false);
 		case -16:
-		    return dv.getUint16(0, false) - zero;
+		    return dv.getUint16(0, false) + zero;
 		case  16:
 		    if ( zero === 32768 ) {
-			return dv.getUint16(0, false) - zero;
+			return dv.getUint16(0, false) + zero;
 		    } else {
 			return dv.getInt16(0, false);
 		    }
