@@ -49,10 +49,11 @@
     <form>
 	<input type=image class="imexam-pin" src="js/imexam/unpinned.png"
 		onclick='imexamPin($(this).parents(".imexam-box")[0]); return false;'>
-	<select class="imexam-menu" onchange='imexamUpdate($(this).parents(".imexam-box")[0], undefined, this.options[this.selectedIndex].value);'>
+	<select class="imexam-menu" onchange='imexamUpdate(undefined, $(this).parents(".imexam-box")[0], undefined, this.options[this.selectedIndex].value);'>
 		<option value="stats"> Regions Stats</option>
 		<option value="rproj"> Radial Profile</option>
 		<option value="3plot"> 3d Plot</option>
+		<option value="hxrg-stack"> HxRG Pixel Stack</option>
 		<option value="xproj"> X Projection</option>
 		<option value="yproj"> Y Projection</option>
 		<option value="histo"> Histogram</option>
@@ -126,7 +127,7 @@
 	
     }
 
-    function imexamUpdate(el, imstat, type) {
+    function imexamUpdate(im, el, imstat, type) {
 
 	if ( type === undefined ) {
 	    type = $(el).data("type")
@@ -149,12 +150,14 @@
 
 	if ( imstat === undefined ) {
 	    imstat = $(el).data("imstat")
+	    im     = $(el).data("im")
 	} else {
 	    if ( $(el).data("pinned") ) {
 		return;
 	    }
 
 	    $(el).data("imstat", imstat)
+	    $(el).data("im"    , im)
 	}
 
 	var box = $(el).find("#imexam-box-display")[0];
@@ -183,6 +186,25 @@
 	 }
 	 case "histo" : {
 	    $.plot(box, [imstat.hdata]);
+	    break;
+	 }
+	 case "hxrg-stack" : {
+	    HxRGReadPixelStack(im.raw.hdu.fits, 0, imstat.reg.x, imstat.reg.y, function(data) {
+		$.plot(box, [data]);
+	    })
+
+	    function HxRGReadPixelStack(fits, undefined, x, y, deliver) {
+		if ( n === 0 || n >= fits.nhdr ) {
+			Read
+			return;
+		} 
+		if ( n >= fits.nhdr ) {
+			deliver(data);
+		} else {
+			
+		}
+	    }
+
 	    break;
 	 }
 	 case "3plot" : {
@@ -220,7 +242,7 @@
 	}
 
 
-	$(".imexam-box").each(function(i, obj) { imexamUpdate(obj, imstat); });
+	$(".imexam-box").each(function(i, obj) { imexamUpdate(im, obj, imstat); });
     }
 
     </script>
