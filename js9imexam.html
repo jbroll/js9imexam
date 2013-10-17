@@ -41,6 +41,7 @@
 	 <tr><td align=right>Noise</td>     <td align=right>{noise%.2f}</td>	</tr>
 	 <tr><td align=right>Centroid</td>  <td align=right>{centroid.cenx%.2f}, {centroid.ceny%.2f}</td>	</tr>
 	 <tr><td align=right>FWHM</td>      <td align=right>{centroid.fwhm%.2f}</td></tr>
+	 <tr><td align=right>EE80</td>      <td align=right>{ee80%.2f}</td></tr>
     </table>
     </script>
 
@@ -186,7 +187,6 @@
 	    break;
 	 }
 	 case "3plot" : {
-	    console.log("max", imexam.ndops.maxvalue(imstat.imag))
 	    surface(box, imstat.imag);
 	    break;
 	 }

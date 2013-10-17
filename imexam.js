@@ -172,7 +172,7 @@ function pixwt(r, x, y, D) {
 	D = 1;
     }
 
-    if ( D < .001 ) {					// Just stop after a while.
+    if ( D < .0001 ) {					// Just stop after a while.
 	return 0;
     }
 
@@ -347,19 +347,21 @@ imops.rproj = function(im, center) {
 imops.eener = function(fraction, imag, center, counts, fwhm) {
 	return numeric.uncmin(function(x) {
 
+	    if ( x[0] <= 0 ) { return 0; }
+
 	    var mask = imops.circle_mask(imag.shape[0], imag.shape[1]
 		, center[1], center[0]
 		, x[0]);
 //ndops.print(imag)
 //ndops.print(mask)
 
-	    var eener = ndops.sum_wt(imag, mask) * fraction;
+	    var eener = ndops.sum_wt(imag, mask);
 
-console.log(counts, x, eener);
+console.log(counts, x[0], eener);
 
-	    return counts-eener;
+	    return counts*fraction-eener;
 
-	}, [fwhm/2], .001).solution;
+	}, [fwhm], .01).solution;
 
 }
 
@@ -407,8 +409,6 @@ imops.imstat = function (image, section, type) {
 
 	stat.centroid.cenx += section[0][0]
 	stat.centroid.ceny += section[1][0]
-
-
 
 	return stat;
 }
