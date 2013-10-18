@@ -73,42 +73,6 @@
 
 	imexam = require("./imexam");
 
-	    function FitsyConvertPixel(data, bitpix, zero) {
-		var dv = new DataView(data);
-
-		switch( bitpix ) {
-		case   8:
-		    return dv.getUint8(0, false);
-		case -16:
-		    return dv.getInt16(0, false) + zero;
-		case  16:
-		    if ( zero === 32768 ) {
-			return dv.getInt16(0, false) + zero;
-		    } else {
-			return dv.getInt16(0, false);
-		    }
-		case  32:
-		    return dv.getInt32(0, false);
-		case -32:
-		    return dv.getFloat32(0, false);
-		case -64:
-		    return dv.getFloat64(0, false);
-		}
-
-		return undefined;
-	    }
-
-	    function FitsyReadPixel(fits, hdu, index, deliver) {
-		fits.read.onloadend = function() {
-			fits.pixel = FitsyConvertPixel(fits.read.result, hdu.bitpix, hdu.bzero || 0)
-			deliver();
-		}
-
-		var ptr = hdu.dataseek + (index[0] * hdu.axis[1] + index[1]) * Math.abs(hdu.bitpix/8)
-
-		fits.read.readAsArrayBuffer(Fitsy.getSlice(fits.file, ptr, ptr+Math.abs(hdu.bitpix/8)))
-	    }
-
 	    function HxRGReadPixelStack(fits, n, index, deliver, data) {
 		if ( n === 0 ) {
 		    data = []
@@ -128,9 +92,8 @@
 		    return
 		}
 
-		FitsyReadPixel(fits, fits.hdu[n], index, function() { HxRGReadPixelStack(fits, n, index, deliver, data) });
+		Fitsy.readPixel(fits, fits.hdu[n], index, function() { HxRGReadPixelStack(fits, n, index, deliver, data) });
 	    }
-
 
 
     // this is the callback for all region changes
@@ -231,6 +194,11 @@
 	    break;
 	 }
 	 case "rproj" : {
+	    imstat.rdata = [];
+	    for ( var r = 0;  r < imstat.rproj.shape[0]; r++ ) {
+		imstat.rdata[r] = [imstat.rproj.get(r, 0), imstat.rproj.get(r, 1)]
+	    }
+
 	    $.plot(box, [imstat.rdata], { series: {
 						points: {
 							radius: 1,
@@ -240,22 +208,50 @@
 	    break;
 	 }
 	 case "xproj" : {
+	    imstat.xdata = [];
+	    for ( var x = 0;  x < imstat.xproj.shape[0]; x++ ) {
+		imstat.xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
+	    }
+
 	    $.plot(box, [imstat.xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
 	    break;
 	 }
 	 case "yproj" : {
+	    imstat.ydata = [];
+	    for ( var x = 0;  x < imstat.yproj.shape[0]; x++ ) {
+		imstat.ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
+	    }
+
 	    $.plot(box, [imstat.ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
 	    break;
 	 }
 	 case "histo" : {
+	    imstat.hdata = [];
+
+	    var n = 0
+	    var skip = imstat.hist.sum * .001
+	    var h = 0
+
+	    for ( var i = 0; i < imstat.hist.data.shape[0]; i++ ) {
+		n += imstat.hist.data.get(i);
+
+		if ( n < skip ) { continue }
+		if ( n > imstat.hist.sum - skip ) { break }
+
+		var value = imstat.hist.data.get(h);
+
+		imstat.hdata[h] = [i*imstat.hist.width, value]
+		h++
+	    }
+	
 	    $.plot(box, [imstat.hdata]);
 	    break;
 	 }
 	 case "hxrg-stack" : {
 	    HxRGReadPixelStack(im.raw.hdu.fits, 0, [imstat.reg.pos.y, imstat.reg.pos.x], function(data) {
 
-		hxrg = []
-		for ( i = 0; i < data.length; i++ ) {
+		var hxrg = []
+		for ( var i = 0; i < data.length; i++ ) {
 		    hxrg[i] = [i, data[i]]
 	 	}
 
@@ -276,27 +272,6 @@
     function dispImExam(im, xreg, imstat) {
         $("#region-info").css("visibility", "visible");
 
-        var x;
-        imstat.xdata = [];
-        imstat.ydata = [];
-        imstat.hdata = [];
-        imstat.rdata = [];
-
-        for ( x = 0;  x < imstat.xproj.shape[0]; x++ ) {
-	    imstat.xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
-        }
-        for ( x = 0;  x < imstat.yproj.shape[0]; x++ ) {
-	    imstat.ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
-        }
-        for ( h = 0;  h < imstat.hist.data.shape[0]; h++ ) {
-	    var value = imstat.hist.data.get(h);
-
-	    if ( value ) { imstat.hdata[h] = [h*imstat.hist.width, value] }
-        }
-        for ( r = 0;  r < imstat.rproj.shape[0]; r++ ) {
-	    imstat.rdata[r] = [imstat.rproj.get(r, 0), imstat.rproj.get(r, 1)]
-	}
-
 	$(".imexam-box").each(function(i, obj) { imexamUpdate(im, obj, imstat); });
     }
 
@@ -305,6 +280,7 @@
 <table>
 <tr>
 <td>
+	<A href="javascript:Fitsy.fetchURL('gauss.fits', window.JS9.Load)">gauss.fits</A>
     <div class="JS9Menubar"></div>
     <div class="JS9"></div>
 </td>
