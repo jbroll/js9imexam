@@ -94,7 +94,7 @@ ndops._hist = cwise({
 })
 
 ndops.hist = function(a, width, min, max) {
-	hist = new Object()
+	hist = {};
 
     if ( min === undefined ) {
 	min = ndops.minvalue(a);
@@ -438,7 +438,10 @@ imops.imstat = function (image, section, type) {
 
 	stat.centroid = ndops.centroid(stat.data, ndops.qcenter(stat.data));
 
-	stat.hist    = ndops.hist(stat.imag);
+	stat.hist = ndops.hist(stat.imag);
+	stat.hist.sum  = ndops.sum(stat.hist.data)
+
+
 	stat.xproj   = ndops.proj(stat.imag, 1);
 	stat.yproj   = ndops.proj(stat.imag, 0);
 	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
