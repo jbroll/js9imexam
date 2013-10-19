@@ -46,8 +46,6 @@ function surface(div, data, normalize) {
     var height = div.offsetHeight;
     var width  = div.offsetWidth;
 
-    console.log(minvalue)
-
     for (var i = 0; i < numRows; i++) {
 	for (var j = 0; j < numCols; j++) {
 	    var value = data.get(i, j);
