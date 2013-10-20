@@ -32,7 +32,7 @@
 
   <script type="text/javascript" src="js/imexam/surface.js"></script>
 
-    <script type="text/template" id="imstat-template">
+    <script type="text/template" id="imstat-stats-template">
     <table width=100%>
 	 <tr><td align=right>Position X</td><td align=right>{reg.pos.x%.2f}</td>
 	     <td align=right>Y</td>	    <td align=right>{reg.pos.y%.2f}</td></tr>
@@ -61,6 +61,14 @@
 	</div>
     </script>
 
+    <script type="text/template" id="imstat-histo-template">
+    	<div style='position:absolute;right: 10px;top:10px'>
+	 <select>
+	 	<option>sum</option>
+	 	<option>avg</option>
+	 	<option>med</option>
+	</select>
+    </script>
 
     <script type="text/template" id="imexam-box-template">
     <form>
@@ -70,10 +78,10 @@
 		<option value="stats"> Regions Stats</option>
 		<option value="rproj"> Radial Profile</option>
 		<option value="3plot"> 3d Plot</option>
-		<option value="hxrg-stack"> HxRG Pixel Stack</option>
 		<option value="xproj"> X Projection</option>
 		<option value="yproj"> Y Projection</option>
 		<option value="histo"> Histogram</option>
+		<option value="hxrg-stack"> HxRG Pixel Stack</option>
 	</select>
     </form>
     <div id="imexam-box-display" style="height:250px; width:280px"> </div>
@@ -204,7 +212,7 @@
 
 	switch ( type ) {
 	 case "stats" : {
-	    box[0].innerHTML = template("imstat-template", imstat);
+	    box[0].innerHTML = template("imstat-stats-template", imstat);
 	    break;
 	 }
 	 case "rproj" : {
@@ -261,6 +269,8 @@
 	    }
 	
 	    $.plot(box, [imstat.hdata]);
+
+	    box.append(template("imstat-histo-template", imstat));
 	    break;
 	 }
 	 case "hxrg-stack" : {
@@ -286,8 +296,6 @@
     }
 
     function dispImExam(im, xreg, imstat) {
-        $("#region-info").css("visibility", "visible");
-
 	$(".imexam-box").each(function(i, obj) { imexamUpdate(im, obj, imstat); });
     }
 
@@ -295,26 +303,29 @@
 
 <table>
 <tr>
-<td>
-	<A href="javascript:Fitsy.fetchURL('gauss.fits', window.JS9.Load)">gauss.fits</A>
+<td valign=top>
     <div class="JS9Menubar"></div>
     <div class="JS9"></div>
+	<A href="javascript:Fitsy.fetchURL('gauss.fits', window.JS9.Load)">gauss.fits</A>
 </td>
 <td>
-  <div id="region-info" style="visibility:visible">
-
-      <table>
-	<tr>
-	    <td> <div class="imexam-box" style="height:270px; width:300px"> </div></td>
-	    <td> <div class="imexam-box" style="height:270px; width:300px"> </div></td>
-	</tr>
-
-	<tr>
-	    <td> <div class="imexam-box" style="height:270px; width:300px"></div></td>
-	    <td> <div class="imexam-box" style="height:270px; width:300px"></div></td>
-	</tr>
-      </table>
-    </div>
+  <div id="region-info">
+      <div>JS9 ImExam <div style="float:right">
+      			<input type="button" value="+">
+      			<input type="button" value="-">
+      			<input type="button" value="grid">
+      			<input type="button" value="row">
+      			<input type="button" value="col">
+      			<input type="button" value="print">
+      		      </div>
+      </div>
+      <div style="clear:right"></div>
+      <div>
+	    <div class="imexam-box" style="float:left; height:270px; width:300px"> Create a circle region to activate region analysis</div>
+	    <div class="imexam-box" style="float:left;height:270px; width:300px"></div>
+	    <div class="imexam-box" style="float:left;height:270px; width:300px"></div>
+	    <div class="imexam-box" style="float:left;height:270px; width:300px"></div>
+      </div>
   </div>
 </td>
 </tr>
