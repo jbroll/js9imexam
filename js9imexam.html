@@ -33,18 +33,32 @@
   <script type="text/javascript" src="js/imexam/surface.js"></script>
 
     <script type="text/template" id="imstat-template">
-    <table>
-	 <tr><td>Region at</td><td align=right>{reg.pos.x%.2f} , {reg.pos.y%.2f}</td></tr>
-	 <tr><td align=right>Size</td>      <td align=right>{reg.size.width%.2f} , {reg.size.height%.2f}</td></tr>
-	 <tr><td align=right>Min</td>       <td align=right>{min%.2f}	</tr>
-	 <tr><td align=right>Max</td>       <td align=right>{max%.2f}	</tr>
-	 <tr><td align=right>Counts</td>    <td align=right>{counts%.2f}	</tr>
-	 <tr><td align=right>Background</td><td align=right>{backgr%.2f}</td>	</tr>
-	 <tr><td align=right>Noise</td>     <td align=right>{noise%.2f}</td>	</tr>
-	 <tr><td align=right>Centroid</td>  <td align=right>{centroid.cenx%.2f}, {centroid.ceny%.2f}</td>	</tr>
-	 <tr><td align=right>FWHM</td>      <td align=right>{centroid.fwhm%.2f}</td></tr>
-	 <tr><td align=right>EE80</td>      <td align=right>{ee80%.2f}</td></tr>
+    <table width=100%>
+	 <tr><td align=right>Position X</td><td align=right>{reg.pos.x%.2f}</td>
+	     <td align=right>Y</td>	    <td align=right>{reg.pos.y%.2f}</td></tr>
+	 <tr><td align=right>width</td>     <td align=right>{reg.size.width%.2f}</td>
+	     <td align=right>height</td>    <td align=right>{reg.size.height%.2f}</td></tr>
+	 <tr><td align=right>min</td>       <td align=right>{min%.2f}		 </td>	
+	     <td align=right>max</td>       <td align=right>{max%.2f}		 </td></tr>
+	 <tr><td align=right>Counts</td>    <td align=right colspan=3>{counts%.2f}</tr>
+	 <tr><td align=right>backgr</td>    <td align=right>{backgr%.2f}	</td>
+	     <td align=right>rms</td>       <td align=right>{noise%.2f}		</td></tr>
+	 <tr><td align=right>Centroid X</td><td align=right>{centroid.cenx%.2f} </td>
+	     <td align=right>Y</td>	    <td align=right>{centroid.ceny%.2f}</td></tr>
+	 <tr><td align=right>FWHM</td>      <td align=right>{centroid.fwhm%.2f}</td>
+	     <td align=right>EE80</td>      <td align=right>{ee80%.2f}</td></tr>
     </table>
+    </script>
+
+    <script type="text/template" id="imstat-rproj-template">
+    	<div style='position:absolute;right: 10px;top:10px'>
+        <table>
+	<tr><td>peak	</td><td align=right>{rproj.fit.a%.2f}</td><tr>
+	<tr><td>decenter</td><td align=right>{rproj.fit.b%.2f}</td><tr>
+	<tr><td>sigma	</td><td align=right>{rproj.fit.c%.2f}</td><tr>
+	<tr><td>bias	</td><td align=right>{rproj.fit.d%.2f}</td><tr>
+        </table>
+	</div>
     </script>
 
 
@@ -186,11 +200,11 @@
 	    $(el).data("im"    , im)
 	}
 
-	var box = $(el).find("#imexam-box-display")[0];
+	var box = $(el).find("#imexam-box-display");
 
 	switch ( type ) {
 	 case "stats" : {
-	    box.innerHTML = template("imstat-template", imstat);
+	    box[0].innerHTML = template("imstat-template", imstat);
 	    break;
 	 }
 	 case "rproj" : {
@@ -204,6 +218,9 @@
 	    }
 
 	    $.plot(box, [{ data: imstat.rdata, points: { radius: 1, show: true } }, { data: imstat.rfdat }])
+
+	    box.append(template("imstat-rproj-template", imstat));
+
 	    break;
 	 }
 	 case "xproj" : {
@@ -260,7 +277,7 @@
 	    break;
 	 }
 	 case "3plot" : {
-	    surface(box, imstat.imag);
+	    surface(box[0], imstat.imag);
 	    break;
 	 }
 	 default:

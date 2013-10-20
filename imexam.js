@@ -448,10 +448,12 @@ imops.imstat = function (image, section, type) {
 	stat.yproj   = ndops.proj(stat.imag, 0);
 	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
 
-	stat.rproj.fit = ndops.gsfit1d(stat.rproj.radi, stat.rproj.data
+	var fit = ndops.gsfit1d(stat.rproj.radi, stat.rproj.data
 				  , [stat.max, 0, stat.centroid.fwhm/2.355, stat.backgr]);
+	stat.rproj.modl = ndops.gauss1d(stat.rproj.radi, fit)
 
-	stat.rproj.modl = ndops.gauss1d(stat.rproj.radi, stat.rproj.fit)
+	stat.rproj.fit = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
+
 
 	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
 
