@@ -61,7 +61,7 @@
 	</div>
     </script>
 
-    <script type="text/template" id="imstat-histo-template">
+    <script type="text/template" id="imstat-xproj-template">
     	<div style='position:absolute;right: 10px;top:10px'>
 	 <select>
 	 	<option>sum</option>
@@ -238,6 +238,8 @@
 	    }
 
 	    $.plot(box, [imstat.xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
+
+	    box.append(template("imstat-xproj-template", imstat));
 	    break;
 	 }
 	 case "yproj" : {
@@ -247,6 +249,8 @@
 	    }
 
 	    $.plot(box, [imstat.ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
+
+	    box.append(template("imstat-xproj-template", imstat));
 	    break;
 	 }
 	 case "histo" : {
@@ -270,7 +274,6 @@
 	
 	    $.plot(box, [imstat.hdata]);
 
-	    box.append(template("imstat-histo-template", imstat));
 	    break;
 	 }
 	 case "hxrg-stack" : {
