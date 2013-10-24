@@ -222,7 +222,9 @@
 
 	    for ( r = 0;  r < imstat.rproj.radi.shape[0]; r++ ) {
 		imstat.rdata[r] = [imstat.rproj.radi.get(r), imstat.rproj.data.get(r)]
-		imstat.rfdat[r] = [imstat.rproj.radi.get(r), imstat.rproj.modl.get(r)]
+	    }
+	    for ( r = 0;  r < imstat.rproj.modl.shape[0]; r++ ) {
+		imstat.rfdat[r] = [imstat.rproj.samp.get(r), imstat.rproj.modl.get(r)]
 	    }
 
 	    $.plot(box, [{ data: imstat.rdata, points: { radius: 1, show: true } }, { data: imstat.rfdat }])
