@@ -465,9 +465,9 @@ imops.imstat = function (image, section, type) {
 	var fit = ndops.gsfit1d(stat.rproj.radi, stat.rproj.data
 				  , [stat.max, 0, stat.centroid.fwhm/2.355, stat.backgr]);
 
-	stat.rproj.samp = ndops.ndarray([stat.rproj.radius])
+	stat.rproj.samp = ndops.ndarray([stat.rproj.radius*2])
 
-	ndops.fill(stat.rproj.samp, function(r) { return r; })
+	ndops.fill(stat.rproj.samp, function(r) { return r/2; })
 
 	stat.rproj.modl = ndops.gauss1d(stat.rproj.samp, fit)
 
