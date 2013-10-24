@@ -130,7 +130,11 @@ ndops._proj = cwise({
 	  }
 });
 ndops.proj = function(a, axis, length) {
-	return ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
+	var proj = ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
+
+	proj.n = a.shape[axis === 1 ? 0 : 1]
+
+	return proj;
 }
 
 ndops.qcenter = cwise({

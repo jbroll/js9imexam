@@ -63,7 +63,7 @@
 
     <script type="text/template" id="imstat-xproj-template">
     	<div style='position:absolute;right: 10px;top:10px'>
-	 <select>
+	 <select class="xproj-menu" onchange='imexamUpdate(undefined, $(this).parents(".imexam-box")[0]);'>
 	 	<option>sum</option>
 	 	<option>avg</option>
 	 	<option>med</option>
@@ -235,24 +235,59 @@
 	 }
 	 case "xproj" : {
 	    imstat.xdata = [];
+	    var n = 1
+		
+	    var xmenu = $(el).find(".xproj-menu")[0];
+
+	    if ( xmenu === undefined ) {
+		proj_type = "sum"
+	    } else {
+		var proj_indx = xmenu.selectedIndex;
+		var proj_type = xmenu.options[xmenu.selectedIndex].value;
+
+	    }
+	    if ( proj_type === "avg" ) {
+		n = imstat.xproj.n;
+	    }
+
 	    for ( var x = 0;  x < imstat.xproj.shape[0]; x++ ) {
-		imstat.xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
+		imstat.xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)/n]
 	    }
 
 	    $.plot(box, [imstat.xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
 
 	    box.append(template("imstat-xproj-template", imstat));
+	    xmenu = $(el).find(".xproj-menu")[0];
+	    xmenu.selectedIndex = proj_indx;
 	    break;
 	 }
 	 case "yproj" : {
 	    imstat.ydata = [];
+	    var n = 1
+		
+	    var xmenu = $(el).find(".xproj-menu")[0];
+
+	    if ( xmenu === undefined ) {
+		proj_type = "sum"
+	    } else {
+		var proj_indx = xmenu.selectedIndex;
+		var proj_type = xmenu.options[xmenu.selectedIndex].value;
+
+	    }
+
+	    if ( proj_type === "avg" ) {
+		n = imstat.yproj.n;
+	    }
+
 	    for ( var x = 0;  x < imstat.yproj.shape[0]; x++ ) {
-		imstat.ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
+		imstat.ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)/n]
 	    }
 
 	    $.plot(box, [imstat.ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
 
 	    box.append(template("imstat-xproj-template", imstat));
+	    xmenu = $(el).find(".xproj-menu")[0];
+	    xmenu.selectedIndex = proj_indx;
 	    break;
 	 }
 	 case "histo" : {
