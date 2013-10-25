@@ -56,7 +56,7 @@ ndops.print = function(a, width, prec) {
 	line = ""
 	for (x=0;x<a.shape[0];++x) {
 	    line += a.get(x).toFixed(prec) + " ";
-	    if ( x > 17 ) { break;}
+	    //if ( x > 17 ) { break;}
 	}
 	console.log(line)
     } else {
@@ -148,9 +148,9 @@ ndops.proj = function(a, axis, length) {
 		sect = ndops.section(copy, 0, proj.n, i, i+1)
 	    }
 
-	    ndops.print(sect)
+	    //ndops.print(sect)
 
-	    console.log(ndops.median(sect));
+	    //console.log(ndops.median(sect));
 
 	    proj.med.set(i, ndops.median(sect));
 	}
@@ -485,12 +485,7 @@ imops.imstat = function (image, section, type) {
 
 	var fit = ndops.gsfit1d(stat.rproj.radi, stat.rproj.data
 				  , [stat.max, 0, stat.centroid.fwhm/2.355, stat.backgr]);
-
-	stat.rproj.samp = ndops.ndarray([stat.rproj.radius*2])
-
-	ndops.fill(stat.rproj.samp, function(r) { return r/2; })
-
-	stat.rproj.modl = ndops.gauss1d(stat.rproj.samp, fit)
+	stat.rproj.fitv = fit;
 
 	stat.rproj.fit = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
 

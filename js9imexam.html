@@ -223,6 +223,19 @@
 	    for ( r = 0;  r < imstat.rproj.radi.shape[0]; r++ ) {
 		imstat.rdata[r] = [imstat.rproj.radi.get(r), imstat.rproj.data.get(r)]
 	    }
+
+	    console.log(box[0])
+	    console.log(box[0].offsetWidth/2)
+
+	    imstat.rproj.samp = imexam.ndops.ndarray([box[0].offsetWidth/2])
+	    imexam.ndops.print(imstat.rproj.samp)
+
+	    imexam.ndops.fill(imstat.rproj.samp, function(r) { return imstat.rproj.radius*r/(box[0].offsetWidth/2); })
+	    imexam.ndops.print(imstat.rproj.samp)
+
+
+	    imstat.rproj.modl = imexam.ndops.gauss1d(imstat.rproj.samp, imstat.rproj.fitv)
+
 	    for ( r = 0;  r < imstat.rproj.modl.shape[0]; r++ ) {
 		imstat.rfdat[r] = [imstat.rproj.samp.get(r), imstat.rproj.modl.get(r)]
 	    }
