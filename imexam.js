@@ -129,10 +129,31 @@ ndops._proj = cwise({
 	    return this.proj;
 	  }
 });
-ndops.proj = function(a, axis, length) {
-	var proj = ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
 
-	proj.n = a.shape[axis === 1 ? 0 : 1]
+ndops.proj = function(a, axis, length) {
+        var sect;
+
+	var proj = ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
+	
+	proj.n   = a.shape[axis === 1 ? 0 : 1]
+
+	proj.med = ndops.ndarray([proj.n]);
+
+	var copy = ndops.assign(ndops.ndarray(a.shape), a)
+
+	for ( i = 0; i < proj.n; i++ ) {
+	    if ( axis == 0 ) {
+		sect = ndops.section(copy, i, i+1, 0, proj.n)
+	    } else {
+		sect = ndops.section(copy, 0, proj.n, i, i+1)
+	    }
+
+	    ndops.print(sect)
+
+	    console.log(ndops.median(sect));
+
+	    proj.med.set(i, ndops.median(sect));
+	}
 
 	return proj;
 }

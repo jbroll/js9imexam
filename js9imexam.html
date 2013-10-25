@@ -25,12 +25,12 @@
 
   <script type="text/javascript" src="js/imexam/template.js"></script>
   <script type="text/javascript" src="js/imexam/imexam.js"></script>
+  <script type="text/javascript" src="js/imexam/surface.js"></script>
 
   <!--[if IE]><script type="text/javascript" src="javascript/excanvas.js"></script><![endif]-->
   <script type="text/javascript" src="js/imexam/JSSurfacePlot/javascript/SurfacePlot.js"></script>
   <script type="text/javascript" src="js/imexam/JSSurfacePlot/javascript/ColourGradient.js"></script>
 
-  <script type="text/javascript" src="js/imexam/surface.js"></script>
 
     <script type="text/template" id="imstat-stats-template">
     <table width=100%>
@@ -236,6 +236,7 @@
 	 case "xproj" : {
 	    imstat.xdata = [];
 	    var n = 1
+	    var data = imstat.xproj;
 		
 	    var xmenu = $(el).find(".xproj-menu")[0];
 
@@ -249,9 +250,13 @@
 	    if ( proj_type === "avg" ) {
 		n = imstat.xproj.n;
 	    }
+	    if ( proj_type === "med" ) {
+		data = imstat.xproj.med
+	    }
+
 
 	    for ( var x = 0;  x < imstat.xproj.shape[0]; x++ ) {
-		imstat.xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)/n]
+		imstat.xdata[x] = [x+imstat.sect[0][0], data.get(x)/n]
 	    }
 
 	    $.plot(box, [imstat.xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
@@ -344,9 +349,9 @@
 <table>
 <tr>
 <td valign=top>
+	<A href="javascript:Fitsy.fetchURL('gauss.fits', window.JS9.Load)">gauss.fits</A>
     <div class="JS9Menubar"></div>
     <div class="JS9"></div>
-	<A href="javascript:Fitsy.fetchURL('gauss.fits', window.JS9.Load)">gauss.fits</A>
 </td>
 <td>
   <div id="region-info">
