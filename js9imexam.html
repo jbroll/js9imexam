@@ -228,10 +228,8 @@
 	    console.log(box[0].offsetWidth/2)
 
 	    imstat.rproj.samp = imexam.ndops.ndarray([box[0].offsetWidth/2])
-	    imexam.ndops.print(imstat.rproj.samp)
 
 	    imexam.ndops.fill(imstat.rproj.samp, function(r) { return imstat.rproj.radius*r/(box[0].offsetWidth/2); })
-	    imexam.ndops.print(imstat.rproj.samp)
 
 
 	    imstat.rproj.modl = imexam.ndops.gauss1d(imstat.rproj.samp, imstat.rproj.fitv)
