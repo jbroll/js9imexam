@@ -7,7 +7,6 @@ all: 	$(JS9)/js9imexam.html	\
 	$(JS9JS)/imexam.js	\
 	$(JS9JS)/surface.js	\
 	$(JS9JS)/template.js	\
-	$(JS9JS)/fitsypixel.js	\
 	$(JS9JS)/pinned.png	\
 	$(JS9JS)/unpinned.png
 
@@ -23,9 +22,6 @@ $(JS9JS)/surface.js: surface.js
 
 $(JS9JS)/template.js: template.js
 	cp -p template.js $(JS9JS)/template.js
-
-$(JS9JS)/fitsypixel.js: fitsypixel.js
-	cp -p fitsypixel.js $(JS9JS)/fitsypixel.js
 
 $(JS9JS)/unpinned.png: unpinned.png
 	cp -p unpinned.png $(JS9JS)/unpinned.png
