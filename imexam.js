@@ -56,7 +56,7 @@ ndops.print = function(a, width, prec) {
 	line = ""
 	for (x=0;x<a.shape[0];++x) {
 	    line += a.get(x).toFixed(prec) + " ";
-	    if ( x > 17 ) { break;}
+	    //if ( x > 17 ) { break;}
 	}
 	console.log(line)
     } else {
@@ -129,8 +129,33 @@ ndops._proj = cwise({
 	    return this.proj;
 	  }
 });
+
 ndops.proj = function(a, axis, length) {
-	return ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
+        var sect;
+
+	var proj = ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
+	
+	proj.n   = a.shape[axis === 1 ? 0 : 1]
+
+	proj.med = ndops.ndarray([proj.n]);
+
+	var copy = ndops.assign(ndops.ndarray(a.shape), a)
+
+	for ( i = 0; i < proj.n; i++ ) {
+	    if ( axis == 0 ) {
+		sect = ndops.section(copy, i, i+1, 0, proj.n)
+	    } else {
+		sect = ndops.section(copy, 0, proj.n, i, i+1)
+	    }
+
+	    //ndops.print(sect)
+
+	    //console.log(ndops.median(sect));
+
+	    proj.med.set(i, ndops.median(sect));
+	}
+
+	return proj;
 }
 
 ndops.qcenter = cwise({
@@ -323,37 +348,47 @@ imops.mksection = function(x, y, w, h) {
 }
 
 imops._rproj = cwise({
-	  args: ["array", "scalar", "scalar", "scalar", "index"]
-	, pre: function(a, cy, cy, length) {
+	  args: ["array", "scalar", "scalar", "scalar", "scalar", "index"]
+	, pre: function(a, cy, cy, radius, length) {
 	        this.reply = new Float64Array(length*2);
+		this.r = Math.sqrt(radius*radius)
 		this.i = 0
 	  }
-	, body: function(a, cx, cy, length, index) {
-		this.reply[this.i*2  ] = Math.sqrt((index[0]-cx)*(index[0]-cx) + (index[1]-cy)*(index[1]-cy))
-		this.reply[this.i*2+1] = a
+	, body: function(a, cx, cy, radius, length, index) {
+		var d = Math.sqrt((index[0]-cx)*(index[0]-cx) + (index[1]-cy)*(index[1]-cy));
 
-		this.i++;
+		if ( d <= this.r ) { 
+		    this.reply[this.i*2  ] = d
+		    this.reply[this.i*2+1] = a
+
+		    this.i++;
+		}
 	  }
 	, post: function() {
-		return this.reply;
+		return [this.reply, this.i];
 	}
 })
 
 imops.rproj = function(im, center) {
-    var reply = ndarray(imops._rproj(im, center[0], center[1], im.size), [im.size, 2])
+    var radius = (im.shape[0]/2 + im.shape[1]/2) / 2;
 
-    ndops.sort(reply)
+    var raw = imops._rproj(im, center[0], center[1], radius, im.size)
+    var vect = raw[0]
+    var n    = raw[1]
 
-    var radi = ndops.ndarray([im.size]);
-    var data = ndops.ndarray([im.size]);
+    var raw2d = ndarray(vect, [n, 2])
+
+    ndops.sort(raw2d)
+
+    var radi = ndops.ndarray([n]);
+    var data = ndops.ndarray([n]);
 
     for ( i = 0; i < im.size; i++ ) {
-	radi.set(i, reply.get(i, 0))
-	data.set(i, reply.get(i, 1))
+	radi.set(i, raw2d.get(i, 0))
+	data.set(i, raw2d.get(i, 1))
     }
 
-
-    return { radi: radi, data: data };
+    return { radi: radi, data: data, radius: radius };
 }
 
 ndops.gauss1d = function(radi, x0) {
@@ -455,7 +490,7 @@ imops.imstat = function (image, section, type) {
 
 	var fit = ndops.gsfit1d(stat.rproj.radi, stat.rproj.data
 				  , [stat.max, 0, stat.centroid.fwhm/2.355, stat.backgr]);
-	stat.rproj.modl = ndops.gauss1d(stat.rproj.radi, fit)
+	stat.rproj.fitv = fit;
 
 	stat.rproj.fit = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
 

@@ -25,13 +25,13 @@
   <script type="text/javascript" src="js9.js"></script>
 
   <script type="text/javascript" src="js/imexam/template.js"></script>
+  <script type="text/javascript" src="js/imexam/surface.js"></script>
   <script type="text/javascript" src="js/imexam/imexam.js"></script>
 
   <!--[if IE]><script type="text/javascript" src="javascript/excanvas.js"></script><![endif]-->
   <script type="text/javascript" src="js/imexam/JSSurfacePlot/javascript/SurfacePlot.js"></script>
   <script type="text/javascript" src="js/imexam/JSSurfacePlot/javascript/ColourGradient.js"></script>
 
-  <script type="text/javascript" src="js/imexam/surface.js"></script>
 
     <script type="text/template" id="imstat-stats-template">
     <table width=100%>
@@ -64,18 +64,18 @@
 
     <script type="text/template" id="imstat-xproj-template">
     	<div style='position:absolute;right: 10px;top:10px'>
-	 <select>
+	 <select class="xproj-menu" onchange='imexamUpdate(undefined, $(this).parents(".js9imexam-box")[0]);'>
 	 	<option>sum</option>
 	 	<option>avg</option>
 	 	<option>med</option>
 	</select>
     </script>
 
-    <script type="text/template" id="imexam-box-template">
+    <script type="text/template" id="js9imexam-box-template">
     <form>
-	<input type=image class="imexam-pin" src="js/imexam/unpinned.png"
-		onclick='imexamPin($(this).parents(".imexam-box")[0]); return false;'>
-	<select class="imexam-menu" onchange='imexamUpdate(undefined, $(this).parents(".imexam-box")[0], undefined, this.options[this.selectedIndex].value);'>
+	<input type=image class="js9imexam-pin" src="js/imexam/unpinned.png"
+		onclick='imexamPin($(this).parents(".js9imexam-box")[0]); return false;'>
+	<select class="js9imexam-menu" onchange='imexamUpdate(undefined, $(this).parents(".js9imexam-box")[0], undefined, this.options[this.selectedIndex].value);'>
 		<option value="stats"> Regions Stats</option>
 		<option value="rproj"> Radial Profile</option>
 		<option value="3plot"> 3d Plot</option>
@@ -85,7 +85,7 @@
 		<option value="hxrg-stack"> HxRG Pixel Stack</option>
 	</select>
     </form>
-    <div id="imexam-box-display" style="height:250px; width:280px"> </div>
+    <div id="js9imexam-box-display" style="height:250px; width:280px"> </div>
     </script>
 
 </head>
@@ -171,7 +171,7 @@
 	    img = "js/imexam/unpinned.png"
 	}
 	
-	$(el).find(".imexam-pin")[0].setAttribute("src", img);
+	$(el).find(".js9imexam-pin")[0].setAttribute("src", img);
 	$(el).data("pinned", pinned);
 	
     }
@@ -182,9 +182,9 @@
 	    type = $(el).data("type")
 
 	    if ( type === undefined ) {
-		el.innerHTML = template("imexam-box-template", null);
+		el.innerHTML = template("js9imexam-box-template", null);
 
-		var menu = $(el).find(".imexam-menu")[0];
+		var menu = $(el).find(".js9imexam-menu")[0];
 
 		menu.selectedIndex = NextType;
 		type = menu.options[NextType].value;
@@ -209,7 +209,7 @@
 	    $(el).data("im"    , im)
 	}
 
-	var box = $(el).find("#imexam-box-display");
+	var box = $(el).find("#js9imexam-box-display");
 
 	switch ( type ) {
 	 case "stats" : {
@@ -223,7 +223,20 @@
 
 	    for ( r = 0;  r < imstat.rproj.radi.shape[0]; r++ ) {
 		imstat.rdata[r] = [imstat.rproj.radi.get(r), imstat.rproj.data.get(r)]
-		imstat.rfdat[r] = [imstat.rproj.radi.get(r), imstat.rproj.modl.get(r)]
+	    }
+
+	    console.log(box[0])
+	    console.log(box[0].offsetWidth/2)
+
+	    imstat.rproj.samp = imexam.ndops.ndarray([box[0].offsetWidth/2])
+
+	    imexam.ndops.fill(imstat.rproj.samp, function(r) { return imstat.rproj.radius*r/(box[0].offsetWidth/2); })
+
+
+	    imstat.rproj.modl = imexam.ndops.gauss1d(imstat.rproj.samp, imstat.rproj.fitv)
+
+	    for ( r = 0;  r < imstat.rproj.modl.shape[0]; r++ ) {
+		imstat.rfdat[r] = [imstat.rproj.samp.get(r), imstat.rproj.modl.get(r)]
 	    }
 
 	    $.plot(box, [{ data: imstat.rdata, points: { radius: 1, show: true } }, { data: imstat.rfdat }])
@@ -234,24 +247,64 @@
 	 }
 	 case "xproj" : {
 	    imstat.xdata = [];
+	    var n = 1
+	    var data = imstat.xproj;
+		
+	    var xmenu = $(el).find(".xproj-menu")[0];
+
+	    if ( xmenu === undefined ) {
+		proj_type = "sum"
+	    } else {
+		var proj_indx = xmenu.selectedIndex;
+		var proj_type = xmenu.options[xmenu.selectedIndex].value;
+
+	    }
+	    if ( proj_type === "avg" ) {
+		n = imstat.xproj.n;
+	    }
+	    if ( proj_type === "med" ) {
+		data = imstat.xproj.med
+	    }
+
+
 	    for ( var x = 0;  x < imstat.xproj.shape[0]; x++ ) {
-		imstat.xdata[x] = [x+imstat.sect[0][0], imstat.xproj.get(x)]
+		imstat.xdata[x] = [x+imstat.sect[0][0], data.get(x)/n]
 	    }
 
 	    $.plot(box, [imstat.xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
 
 	    box.append(template("imstat-xproj-template", imstat));
+	    xmenu = $(el).find(".xproj-menu")[0];
+	    xmenu.selectedIndex = proj_indx;
 	    break;
 	 }
 	 case "yproj" : {
 	    imstat.ydata = [];
+	    var n = 1
+		
+	    var xmenu = $(el).find(".xproj-menu")[0];
+
+	    if ( xmenu === undefined ) {
+		proj_type = "sum"
+	    } else {
+		var proj_indx = xmenu.selectedIndex;
+		var proj_type = xmenu.options[xmenu.selectedIndex].value;
+
+	    }
+
+	    if ( proj_type === "avg" ) {
+		n = imstat.yproj.n;
+	    }
+
 	    for ( var x = 0;  x < imstat.yproj.shape[0]; x++ ) {
-		imstat.ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)]
+		imstat.ydata[x] = [x+imstat.sect[1][0], imstat.yproj.get(x)/n]
 	    }
 
 	    $.plot(box, [imstat.ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
 
 	    box.append(template("imstat-xproj-template", imstat));
+	    xmenu = $(el).find(".xproj-menu")[0];
+	    xmenu.selectedIndex = proj_indx;
 	    break;
 	 }
 	 case "histo" : {
@@ -300,7 +353,7 @@
     }
 
     function dispImExam(im, xreg, imstat) {
-	$(".imexam-box").each(function(i, obj) { imexamUpdate(im, obj, imstat); });
+	$(".js9imexam-box").each(function(i, obj) { imexamUpdate(im, obj, imstat); });
     }
 
     </script>
@@ -308,27 +361,29 @@
 <table>
 <tr>
 <td valign=top>
+	<A href="javascript:Fitsy.fetchURL('gauss.fits', window.JS9.Load)">gauss.fits</A>
     <div class="JS9Menubar"></div>
     <div class="JS9"></div>
-	<A href="javascript:Fitsy.fetchURL('gauss.fits', window.JS9.Load)">gauss.fits</A>
 </td>
 <td>
   <div id="region-info">
       <div>JS9 ImExam <div style="float:right">
-      			<input type="button" value="+">
-      			<input type="button" value="-">
-      			<input type="button" value="grid">
-      			<input type="button" value="row">
-      			<input type="button" value="col">
-      			<input type="button" value="print">
+                             <input type="button" value="+" onClick="addGrid();">
+                             <input type="button" value="-" onClick="delGrid();">
+                             <select>
+                                     <option value="grid">single</option>
+                                     <option value="grid">grid</option>
+                                     <option value="row"> row</option>
+                                     <option value="col"> col</option>
+                             </select>
       		      </div>
       </div>
       <div style="clear:right"></div>
       <div>
-	    <div class="imexam-box" style="float:left; height:270px; width:300px"> Create a circle region to activate region analysis</div>
-	    <div class="imexam-box" style="float:left;height:270px; width:300px"></div>
-	    <div class="imexam-box" style="float:left;height:270px; width:300px"></div>
-	    <div class="imexam-box" style="float:left;height:270px; width:300px"></div>
+	    <div class="js9imexam-box" style="float:left; height:270px; width:300px"> Create a circle region to activate region analysis</div>
+	    <div class="js9imexam-box" style="float:left;height:270px; width:300px"></div>
+	    <div class="js9imexam-box" style="float:left;height:270px; width:300px"></div>
+	    <div class="js9imexam-box" style="float:left;height:270px; width:300px"></div>
       </div>
   </div>
 </td>
