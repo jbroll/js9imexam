@@ -375,15 +375,20 @@ ndops.gauss1d = function(radi, x0) {
 }
 
 ndops.gsfit1d = function(radi, data, x0) {
-    return numeric.uncmin(function(x) {
-	var modl = ndops.gauss1d(radi, x);
+    try {
+	return numeric.uncmin(function(x) {
+	    var modl = ndops.gauss1d(radi, x);
 
-	ndops.sub(modl, modl, data)
-	ndops.mul(modl, modl, modl)
+	    ndops.sub(modl, modl, data)
+	    ndops.mul(modl, modl, modl)
 
-	return ndops.sum(modl)
+	    return ndops.sum(modl)
 
-    }, x0, .00001).solution
+	}, x0, .00001).solution
+    }
+    catch(err) {
+	return x0
+    }
 }
 
 
