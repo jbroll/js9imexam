@@ -11,7 +11,7 @@ ndops.fill    = require("ndarray-fill")
 ndops.sort    = require("ndarray-sort")
 ndops.moments = require("ndarray-moments")
 
-//numeric       = require("numeric")
+numeric       = require("numeric")
 
 
 
@@ -56,6 +56,7 @@ ndops.print = function(a, width, prec) {
 	line = ""
 	for (x=0;x<a.shape[0];++x) {
 	    line += a.get(x).toFixed(prec) + " ";
+	    //if ( x > 17 ) { break;}
 	}
 	console.log(line)
     } else {
@@ -128,8 +129,33 @@ ndops._proj = cwise({
 	    return this.proj;
 	  }
 });
+
 ndops.proj = function(a, axis, length) {
-	return ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
+        var sect;
+
+	var proj = ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
+	
+	proj.n   = a.shape[axis === 1 ? 0 : 1]
+
+	proj.med = ndops.ndarray([proj.n]);
+
+	var copy = ndops.assign(ndops.ndarray(a.shape), a)
+
+	for ( i = 0; i < proj.n; i++ ) {
+	    if ( axis == 0 ) {
+		sect = ndops.section(copy, i, i+1, 0, proj.n)
+	    } else {
+		sect = ndops.section(copy, 0, proj.n, i, i+1)
+	    }
+
+	    //ndops.print(sect)
+
+	    //console.log(ndops.median(sect));
+
+	    proj.med.set(i, ndops.median(sect));
+	}
+
+	return proj;
 }
 
 ndops.qcenter = cwise({
@@ -322,64 +348,82 @@ imops.mksection = function(x, y, w, h) {
 }
 
 imops._rproj = cwise({
-	  args: ["array", "scalar", "scalar", "scalar", "index"]
-	, pre: function(a, cy, cy, length) {
+	  args: ["array", "scalar", "scalar", "scalar", "scalar", "index"]
+	, pre: function(a, cy, cy, radius, length) {
 	        this.reply = new Float64Array(length*2);
+		this.r = Math.sqrt(radius*radius)
 		this.i = 0
 	  }
-	, body: function(a, cx, cy, length, index) {
-		this.reply[this.i*2  ] = Math.sqrt((index[0]-cx)*(index[0]-cx) + (index[1]-cy)*(index[1]-cy))
-		this.reply[this.i*2+1] = a
+	, body: function(a, cx, cy, radius, length, index) {
+		var d = Math.sqrt((index[0]-cx)*(index[0]-cx) + (index[1]-cy)*(index[1]-cy));
 
-		this.i++;
+		if ( d <= this.r ) { 
+		    this.reply[this.i*2  ] = d
+		    this.reply[this.i*2+1] = a
+
+		    this.i++;
+		}
 	  }
 	, post: function() {
-		return this.reply;
+		return [this.reply, this.i];
 	}
 })
 
 imops.rproj = function(im, center) {
-    var reply = ndarray(imops._rproj(im, center[0], center[1], im.size), [im.size, 2])
+    var radius = (im.shape[0]/2 + im.shape[1]/2) / 2;
 
-    ndops.sort(reply)
+    var raw = imops._rproj(im, center[0], center[1], radius, im.size)
+    var vect = raw[0]
+    var n    = raw[1]
 
-    return reply;
+    var raw2d = ndarray(vect, [n, 2])
+
+    ndops.sort(raw2d)
+
+    var radi = ndops.ndarray([n]);
+    var data = ndops.ndarray([n]);
+
+    for ( i = 0; i < im.size; i++ ) {
+	radi.set(i, raw2d.get(i, 0))
+	data.set(i, raw2d.get(i, 1))
+    }
+
+    return { radi: radi, data: data, radius: radius };
 }
 
-ndops.gauss1d = function(data, x0) {
-    var reply = ndops.ndarray(data.shape)
+ndops.gauss1d = function(radi, x0) {
+    var reply = ndops.ndarray(radi.shape);
 
-    ndops.fill(reply, function(x) {
-	var a = x0[0]
-	var b = x0[1]
-	var c = x0[2]
-	var d = x0[3]
+    var a = x0[0];
+    var b = x0[1];
+    var c = x0[2];
+    var d = x0[3];
 
-	return a * Math.pow(2.71828, - ((data.get(x)-b)*(x*b) / 2*c*c)) + d;
-    });
+
+    ndops.fill(reply, function(i) {
+	var x = radi.data[i]-b;
+
+	return a * Math.pow(2.71828, - x*x / (2*c*c)) + d
+    })
 
     return reply;    
 }
 
-ndops.gsfit1d = function(data, x0) {
-    return numeric.uncmin(function(x) {
-	var here = ndops.ndarray(data.shape);
-	var modl = ndops.gauss1d(data, x);
+ndops.gsfit1d = function(radi, data, x0) {
+    try {
+	return numeric.uncmin(function(x) {
+	    var modl = ndops.gauss1d(radi, x);
 
-ndops.print(data)
-ndops.print(modl)
+	    ndops.sub(modl, modl, data)
+	    ndops.mul(modl, modl, modl)
 
+	    return ndops.sum(modl)
 
-
-	ndops.sub(here, modl, data)
-	ndops.mul(here, here, here)
-
-	var sum = ndops.sum(here)
-
-	console.log(sum)
-
-	return sum;
-    }, x0, .0001).solution
+	}, x0, .00001).solution
+    }
+    catch(err) {
+	return x0
+    }
 }
 
 
@@ -396,8 +440,6 @@ imops.eener = function(fraction, imag, center, counts, fwhm) {
 	    //ndops.print(mask)
 
 	    var eener = ndops.sum_wt(imag, mask);
-
-	    console.log(counts, x[0], eener);
 
 	    return counts*fraction-eener;
 
@@ -445,7 +487,13 @@ imops.imstat = function (image, section, type) {
 	stat.xproj   = ndops.proj(stat.imag, 1);
 	stat.yproj   = ndops.proj(stat.imag, 0);
 	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
-//	stat.rpfit   = imops.rpfit(stat.rproj);
+
+	var fit = ndops.gsfit1d(stat.rproj.radi, stat.rproj.data
+				  , [stat.max, 0, stat.centroid.fwhm/2.355, stat.backgr]);
+	stat.rproj.fitv = fit;
+
+	stat.rproj.fit = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
+
 
 	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
 
@@ -457,7 +505,7 @@ imops.imstat = function (image, section, type) {
 	return stat;
 }
 
-//exports.numeric = numeric
+exports.numeric = numeric
 exports.ndarray = ndarray
 exports.ndops   = ndops
 exports.imops   = imops
