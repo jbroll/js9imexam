@@ -146,8 +146,6 @@
 		return;
         }
 	
-	console.log([im.raw.width, im.raw.height])
-
 	var im_2d  = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 	var imstat = imexam.imops.imstat(im_2d
 		, imexam.imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height)
