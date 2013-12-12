@@ -230,9 +230,6 @@
 		imstat.rdata[r] = [imstat.rproj.radi.get(r), imstat.rproj.data.get(r)]
 	    }
 
-	    //console.log(box[0])
-	    //console.log(box[0].offsetWidth/2)
-
 	    imstat.rproj.samp = imexam.ndops.ndarray([box[0].offsetWidth/2])
 
 	    imexam.ndops.fill(imstat.rproj.samp, function(r) { return imstat.rproj.radius*r/(box[0].offsetWidth/2); })
@@ -351,6 +348,15 @@
 	 case "3plot" : {
 	    surface(box[0], imstat.imag);
 	    break;
+	 }
+	 case "eenergy" : {
+
+		var data = imstat.data
+
+		console.log(imstat.centroid.rmom);
+
+		
+	    
 	 }
 	 default:
 	    console.log("None")

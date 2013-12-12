@@ -14,6 +14,8 @@ ndops.moments = require("ndarray-moments")
 numeric       = require("numeric")
 
 
+var imops = new Object();
+
 
 ndops.maxvalue = ndops.sup
 ndops.minvalue = ndops.inf
@@ -41,8 +43,13 @@ ndops.reshape = function(a, shape) {
     return ndarray(a.data, shape);
 }
 
-ndops.section = function(a, x1, x2, y1, y2) {
-	return a.lo(x1, y1).hi(x2-x1, y2-y1)
+ndops.section = function(a, sect) {
+	var x1 = sect[0][0]
+	var x2 = sect[0][1]
+	var y1 = sect[1][0]
+	var y2 = sect[1][1]
+
+	return a.lo(y1, x1).hi(y2-y1, x2-x1)
 }
 
 ndops.print = function(a, width, prec) {
@@ -143,9 +150,9 @@ ndops.proj = function(a, axis, length) {
 
 	for ( i = 0; i < proj.n; i++ ) {
 	    if ( axis == 0 ) {
-		sect = ndops.section(copy, i, i+1, 0, proj.n)
+		sect = ndops.section(copy, [[i, i+1], [0, proj.n]])
 	    } else {
-		sect = ndops.section(copy, 0, proj.n, i, i+1)
+		sect = ndops.section(copy, [[0, proj.n], [i, i+1]])
 	    }
 
 	    //ndops.print(sect)
@@ -186,57 +193,6 @@ ndops.qcenter = cwise({
 });
 
 
-// Recursive function to compute the area of a pixel at x,y that falls with in
-// radius r.
-//
-function pixwt(r, x, y, D) {
-	var d;
-
-    if ( x < 0 || y < 0 ) {
-	return pixwt(r, Math.abs(x), Math.abs(y), D);
-    }
-
-    if ( D === undefined ) {
-	D = 1;
-    }
-
-    if ( D < .001 ) {					// Just stop after a while.
-	return 0;
-    }
-
-    d = D / 2.0;
-
-
-    if ( (x+d)*(x+d) + (y+d)*(y+d)        <= r*r ) {	// Outside corner is inside circle
-	return D*D;
-    } else if ( (x-d)*(x-d) + (y-d)*(y-d) >= r*r ) {	// Inside corner is outside circle
-	return 0;
-    } else {
-	d = D/4.0;
-	D = D/2.0;
-
-	var reply =
-		pixwt(r, x+d, y+0, D) +
-	       	pixwt(r, x+0, y+d, D) +
-	       	pixwt(r, x-d, y-0, D) +
-	      	pixwt(r, x-0, y-d, D);
-
-	return reply;
-    }
-}
-
-
-var imops = new Object();
-
-imops.circle_mask = function(nx, ny, x, y, r) {
-
-    return ndops.fill(ndops.ndarray([nx, ny]), function(i, j) {
-
-	    return pixwt(r, i-nx+x, j-ny+y);
-    });
-}
-
-
 ndops.sum_wt = cwise({
 	  args: ["array", "array", "index"]
 	, pre: function() {
@@ -250,6 +206,38 @@ ndops.sum_wt = cwise({
 	  }
 	});
 
+ndops._rms = cwise({
+	  args: ["array", "scalar", "scalar", "scalar", "scalar", "index"]
+	, pre: function(a, cx, cy, nx, ny) {
+		this.rmsq = 0;
+		this.n    = 0;
+
+		this.r = nx*nx+ny*ny
+	  }
+	, body: function(a, cx, cy, nx, ny, index) {
+		if ( a > 0 && index[0]*index[0] + index[1]*index[1] < this.r ) {
+		    cy = (index[0] - cx) * a;
+		    cx = (index[1] - cy) * a;
+		    
+		    this.rmsq += cx*cx + cy*cy;
+		    this.n += 1;
+		}
+	  }
+	, post: function() {
+		if ( this.n !== 0 ) {
+		    return 2.0*Math.sqrt(this.rmsq/this.n-1);
+		} else {
+		    return 0;
+		}
+	}
+})
+
+ndops.rms = function(a, cx, cy) {
+    var reply = ndops._rms(a, cx, cy, a.shape[0], a.shape[1]);
+
+    return(reply);
+}
+
 ndops._centroid = cwise({
 	  args: ["array", "scalar", "scalar", "index"]
 	, pre: function(a, nx, ny) {
@@ -261,9 +249,11 @@ ndops._centroid = cwise({
 
 		this.nx = nx;
 		this.ny = ny;
+
+		this.r = nx*nx+ny*ny
 	  }
 	, body: function(a, nx, ny, index) {
-		if ( a > 0 ) {
+		if ( a > 0 && index[0]*index[0] + index[1]*index[1] < this.r ) {
 		    this.sum	+= a
 		    this.sumx	+= a * index[1]
 		    this.sumxx	+= a * index[1] * index[1]
@@ -278,12 +268,12 @@ ndops._centroid = cwise({
 		reply.cenx = this.sumx/this.sum;
 		reply.ceny = this.sumy/this.sum;
 
-		var rmom = ( this.sumxx - this.sumx * this.sumx / this.sum + this.sumyy - this.sumy * this.sumy / this.sum ) / this.sum;
+		reply.rmom = ( this.sumxx - this.sumx * this.sumx / this.sum + this.sumyy - this.sumy * this.sumy / this.sum ) / this.sum;
 
-		if ( rmom <= 0 ) {
+		if ( reply.rmom <= 0 ) {
 		    reply.fwhm = -1.0;
 		} else {
-		    reply.fwhm = Math.sqrt(rmom)  * 2.354 / Math.sqrt(2.0);
+		    reply.fwhm = Math.sqrt(reply.rmom)  * 2.354 / Math.sqrt(2.0);
 		}
 
 		return reply;
@@ -329,10 +319,10 @@ imops.backgr = function(data, width) {
 	var back = new Object();
 
 
-	var pixels = ndops.flatten(ndops.section(data, 0, width, 0, data.shape[1])
-			   , ndops.section(data, data.shape[0]-width, data.shape[0], 0, data.shape[1])
-			   , ndops.section(data, width, data.shape[0]-width, 0, width)
-			   , ndops.section(data, width, data.shape[0]-width, data.shape[1]-width, data.shape[1]))
+	var pixels = ndops.flatten(ndops.section(data, [[0, width], [0, data.shape[1]]])
+			   , ndops.section(data, [[data.shape[0]-width, data.shape[0]], [0, data.shape[1]]])
+			   , ndops.section(data, [[width, data.shape[0]-width], [0, width]])
+			   , ndops.section(data, [[width, data.shape[0]-width], [data.shape[1]-width, data.shape[1]]]))
 
 
 	var moment = ndops.moments(2, pixels);
@@ -426,44 +416,15 @@ ndops.gsfit1d = function(radi, data, x0) {
     }
 }
 
-
-imops.eener = function(fraction, imag, center, counts, fwhm) {
-	return numeric.uncmin(function(x) {
-
-	    if ( x[0] <= 0 ) { return 0; }
-
-	    var mask = imops.circle_mask(imag.shape[0], imag.shape[1]
-		, center[1], center[0]
-		, x[0]);
-
-	    //ndops.print(imag)
-	    //ndops.print(mask)
-
-	    var eener = ndops.sum_wt(imag, mask);
-
-	    return counts*fraction-eener;
-
-	}, [fwhm], .01).solution;
-}
-
 imops.imstat = function (image, section, type) {
 	var stat = new Object();
 
 	// Select a chunk of data contained in the region.
 	//
 	stat.sect = section
-	stat.imag = ndops.section(image, section[1][0],  section[1][1], section[0][0], section[0][1]);
+	stat.imag = ndops.section(image, section);
 
-	// Make a mask of the pixel weight for each pixel in/out of the region.
-	//
-	if ( type === "circle" ) {
-	    stat.mask = imops.circle_mask(stat.imag.shape[0],   stat.imag.shape[1]
-				        , stat.imag.shape[0]/2, stat.imag.shape[1]/2
-					, Math.min(stat.imag.shape[0]/2, stat.imag.shape[1]/2));
-	} else {
-	    stat.mask = ndops.ndarray([stat.imag.shape[0], stat.imag.shape[1]]);
-	    ndops.assigns(stat.mask, 1);
-	}
+	nx = section[1][0] - section[1][0]
 
 	stat.min = ndops.minvalue(stat.imag)
 	stat.max = ndops.maxvalue(stat.imag)
@@ -473,12 +434,14 @@ imops.imstat = function (image, section, type) {
 	stat.backgr = backgr.value
 	stat.noise  = backgr.noise
 
+	stat.data = ndops.section(image, section);
 
 	stat.data = ndops.ndarray(stat.imag.shape);
 	ndops.subs(stat.data, stat.imag, stat.backgr);
 	
 
 	stat.centroid = ndops.centroid(stat.data, ndops.qcenter(stat.data));
+	stat.rms      = ndops.rms(stat.data, ndops.qcenter(stat.data));
 
 	stat.hist = ndops.hist(stat.imag);
 	stat.hist.sum  = ndops.sum(stat.hist.data)
@@ -495,7 +458,7 @@ imops.imstat = function (image, section, type) {
 	stat.rproj.fit = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
 
 
-	stat.counts  = ndops.sum_wt(stat.data, stat.mask)
+	stat.counts  = ndops.sum(stat.data)
 
 	//stat.ee80    = imops.eener(.8, stat.data, [stat.centroid.ceny, stat.centroid.cenx], stat.counts-stat.backgr, stat.centroid.fwhm)[0];
 
