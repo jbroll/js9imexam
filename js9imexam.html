@@ -146,7 +146,9 @@
 		return;
         }
 	
-	var im_2d  = imexam.ndarray(im.raw.data, [im.raw.width, im.raw.height]);
+	console.log([im.raw.width, im.raw.height])
+
+	var im_2d  = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 	var imstat = imexam.imops.imstat(im_2d
 		, imexam.imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height)
 		, xreg.shape);
@@ -228,8 +230,8 @@
 		imstat.rdata[r] = [imstat.rproj.radi.get(r), imstat.rproj.data.get(r)]
 	    }
 
-	    console.log(box[0])
-	    console.log(box[0].offsetWidth/2)
+	    //console.log(box[0])
+	    //console.log(box[0].offsetWidth/2)
 
 	    imstat.rproj.samp = imexam.ndops.ndarray([box[0].offsetWidth/2])
 
@@ -364,7 +366,6 @@
 <table>
 <tr>
 <td valign=top>
-	<A href="javascript:Fitsy.fetchURL('gauss.fits', window.JS9.Load)">gauss.fits</A>
     <div class="JS9Menubar"></div>
     <div class="JS9"></div>
 </td>
