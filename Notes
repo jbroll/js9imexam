@@ -2,8 +2,6 @@
  Test region stats
 
  Projection
-	sum
-	average
 	median
 
 	rotation
