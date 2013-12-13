@@ -303,8 +303,8 @@
 		data = imstat.yproj.med
 	    }
 
-	    for ( var x = 0;  x < imstat.yproj.shape[0]; x++ ) {
-		imstat.ydata[x] = [x+imstat.sect[0][0], data.get(x)]
+	    for ( var y = 0;  y < imstat.yproj.shape[0]; y++ ) {
+		imstat.ydata[y] = [y+imstat.sect[1][0], data.get(y)]
 	    }
 
 	    $.plot(box, [imstat.ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
