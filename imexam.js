@@ -144,6 +144,8 @@ ndops.proj = function(a, axis, length) {
 	
 	proj.n   = a.shape[axis === 1 ? 0 : 1]
 
+	proj.sum = ndops.ndarray([proj.n]);
+	proj.avg = ndops.ndarray([proj.n]);
 	proj.med = ndops.ndarray([proj.n]);
 
 	var copy = ndops.assign(ndops.ndarray(a.shape), a)
@@ -155,10 +157,8 @@ ndops.proj = function(a, axis, length) {
 		sect = ndops.section(copy, [[0, proj.n], [i, i+1]])
 	    }
 
-	    //ndops.print(sect)
-
-	    //console.log(ndops.median(sect));
-
+	    proj.sum.set(i, ndops.sum(sect));
+	    proj.avg.set(i, ndops.sum(sect)/proj.n);
 	    proj.med.set(i, ndops.median(sect));
 	}
 
@@ -264,7 +264,7 @@ ndops._centroid = cwise({
 	, post: function() {
 	    	var reply = new Object;
 
-		reply.sum = this.sum;
+		reply.sum  = this.sum;
 		reply.cenx = this.sumx/this.sum;
 		reply.ceny = this.sumy/this.sum;
 
@@ -307,19 +307,23 @@ ndops.flatten = function() {
 }
 
 ndops.median = function(a) {
-	ndops.sort(a);
+	var data = ndops.assign(ndops.ndarray(a.shape), a);
 
-	return a.get(a.size/2);
+	data = ndops.reshape(data, [a.size])
+
+	ndops.sort(data);
+
+	var reply = data.get(Math.round(data.size/2.0))
+
+	return reply;
 }
-
-
 
 
 imops.backgr = function(data, width) {
 	var back = new Object();
 
-
-	var pixels = ndops.flatten(ndops.section(data, [[0, width], [0, data.shape[1]]])
+	var pixels = ndops.flatten(
+			     ndops.section(data, [[0, width], [0, data.shape[1]]])
 			   , ndops.section(data, [[data.shape[0]-width, data.shape[0]], [0, data.shape[1]]])
 			   , ndops.section(data, [[width, data.shape[0]-width], [0, width]])
 			   , ndops.section(data, [[width, data.shape[0]-width], [data.shape[1]-width, data.shape[1]]]))
