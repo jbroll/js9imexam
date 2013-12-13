@@ -4,15 +4,12 @@
  Projection
 	median
 
-	rotation
-
  Histogram
 	stats
 
-
  Graphs
 	Zoom stack
-	horizontal & vertocal selection
+	horizontal & vertical selection
 
 
 
