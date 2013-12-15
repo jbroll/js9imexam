@@ -19,8 +19,17 @@ function surface(div, data, normalize) {
         return this.get(i, j).toString(); 
       } 
 
-    var surfacePlot = new greg.ross.visualisation.SurfacePlot(div);
-    
+
+    var surfacePlot = $(div).data("surfplot");
+
+    if ( surfacePlot === undefined ) {
+        div.innerHTML = "";
+
+	surfacePlot = new greg.ross.visualisation.SurfacePlot(div);
+
+        $(div).data("surfplot", surfacePlot);
+    }
+
     // Don't fill polygons in IE. It's too slow.
     var fillPly = true;
     
@@ -60,6 +69,5 @@ function surface(div, data, normalize) {
     var options = {xPos: 0, yPos: 0, width: width, height: height, colourGradient: colours, fillPolygons: fillPly,
 	    tooltips: tooltipStrings, xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader, restrictXRotation: false};
 
-    div.innerHTML = "";
     surfacePlot.draw(surf, options);
 }
