@@ -24,6 +24,35 @@
   <script type="text/javascript" src="js/fitsy.js"></script>
   <script type="text/javascript" src="js9.js"></script>
 
+  <script>
+  $(document).ready(function() {
+
+      $(".JS9").attr('tabindex', 1);
+
+      $(".JS9").keydown(function(evt) {
+
+	  var im = JS9.GetImage(this);
+
+	  switch(evt.which) {
+	  case 37: // left
+
+	  break;
+
+	  case 38: // up
+	  break;
+
+	  case 39: // right
+	  break;
+
+	  case 40: // down
+	  break;
+
+	  default: return; // exit this handler for other keys
+	  }
+	  evt.preventDefault(); // prevent the default action (scroll / move caret)
+      });
+  })
+</script>
   <script type="text/javascript" src="js/imexam/template.js"></script>
   <script type="text/javascript" src="js/imexam/surface.js"></script>
   <script type="text/javascript" src="js/imexam/imexam.js"></script>
