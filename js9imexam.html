@@ -208,6 +208,7 @@
     }
 
     function imexamUpdate(im, el, imstat, type) {
+	var change = 0;
 
 	if ( type === undefined ) {
 	    type = $(el).data("type")
@@ -226,6 +227,8 @@
 	    }
 	} else {
 	    $(el).data("type", type)
+
+	    change = 1;
 	}
 
 	if ( imstat === undefined ) {
@@ -241,6 +244,10 @@
 	}
 
 	var box = $(el).find("#js9imexam-box-display");
+
+	if ( change ) {
+	    $(box[0]).removeData();
+	}
 
 	switch ( type ) {
 	 case "stats" : {
@@ -405,8 +412,8 @@
     Here are a couple of FITS images to try:
 
     <ul>
-    <li><A href="javascript:Fitsy.fetchURL('fits/1212.fits', window.JS9.Load)">DSS 12:0:0 12:0:0</A></li>
-    <li><A href="javascript:Fitsy.fetchURL('fits/STAR1_3.fits', window.JS9.Load)">FLWO 48 Inch Shack Hartman WFS Image</A></li>
+    <li><A href="javascript:Fitsy.fetchURL('1212.fits', 'fits/1212.fits', undefined, window.JS9.Load)">DSS 12:0:0 12:0:0</A></li>
+    <li><A href="javascript:Fitsy.fetchURL('STAR1_3.fits', 'fits/STAR1_3.fits', undefined, window.JS9.Load)">FLWO 48 Inch Shack Hartman WFS Image</A></li>
     </ul>
 
 <table>
