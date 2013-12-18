@@ -248,8 +248,10 @@ ndops._centroid = cwise({
 
 		if ( reply.rmom <= 0 ) {
 		    reply.fwhm = -1.0;
+		    reply.rms  = -1.0;
 		} else {
-		    reply.fwhm = Math.sqrt(reply.rmom)  * 2.354 / Math.sqrt(2.0);
+		    reply.rms  = Math.sqrt(reply.rmom)
+		    reply.fwhm = reply.rms  * 2.354 / Math.sqrt(2.0);
 		}
 
 		return reply;
