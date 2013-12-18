@@ -72,11 +72,11 @@
 	     <td align=right>max</td>       <td align=right>{max%.2f}		 </td></tr>
 	 <tr><td align=right>Counts</td>    <td align=right colspan=3>{counts%.2f}</tr>
 	 <tr><td align=right>backgr</td>    <td align=right>{backgr%.2f}	</td>
-	     <td align=right>rms</td>       <td align=right>{noise%.2f}		</td></tr>
+	     <td align=right>noise</td>     <td align=right>{noise%.2f}		</td></tr>
 	 <tr><td align=right>Centroid X</td><td align=right>{centroid.cenx%.2f} </td>
 	     <td align=right>Y</td>	    <td align=right>{centroid.ceny%.2f}</td></tr>
 	 <tr><td align=right>FWHM</td>      <td align=right>{centroid.fwhm%.2f}</td>
-	     <td align=right>EE80</td>      <td align=right>{ee80%.2f}</td></tr>
+	     <td align=right>RMS</td>      <td align=right>{centroid.rmom%.2f}</td></tr>
     </table>
     </script>
 
@@ -107,6 +107,7 @@
 	<select class="js9imexam-menu" onchange='imexamUpdate(undefined, $(this).parents(".js9imexam-box")[0], undefined, this.options[this.selectedIndex].value);'>
 		<option value="stats"> Regions Stats</option>
 		<option value="rproj"> Radial Profile</option>
+		<option value="encen"> Encircled Energy</option>
 		<option value="3plot"> 3d Plot</option>
 		<option value="xproj"> X Projection</option>
 		<option value="yproj"> Y Projection</option>
@@ -350,6 +351,17 @@
 	    xmenu.selectedIndex = proj_indx;
 	    break;
 	 }
+	 case "encen" : {
+	    imstat.edata = [];
+
+	    for ( var i = 0;  i < imstat.encen.shape[0]; i++ ) {
+		imstat.edata[i] = [i, imstat.encen.get(i)]
+	    }
+
+	    $.plot(box, [imstat.edata]);
+
+	    break;
+	 }
 	 case "histo" : {
 	    imstat.hdata = [];
 
@@ -390,17 +402,9 @@
 	    surface(box[0], imstat.imag);
 	    break;
 	 }
-	 case "eenergy" : {
 
-		var data = imstat.data
-
-		console.log(imstat.centroid.rmom);
-
-		
-	    
-	 }
 	 default:
-	    console.log("None")
+	    console.log("Unknown ImExam Display Type")
 	}
     }
 

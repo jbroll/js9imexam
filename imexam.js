@@ -203,11 +203,14 @@ ndops._centroid = cwise({
 		this.sumxx = 0;
 		this.sumyy = 0;
 
-		this.rsq = cx*cx+cy*cy;
+		this.cx = cx
+		this.cy = cy
+
+		this.rsq = nx/2.0*nx/2.0+ny/2.0*ny/2.0;
 	  }
 	, body: function(a, nx, ny, cx, cy, index) {
-		var x = cx - index[1];
-		var y = cy - index[0];
+		var x = index[1] - cx;
+		var y = index[0] - cy;
 
 		if ( a > 0 && x*x+y*y < this.rsq ) {
 		    this.sum	+= a
@@ -221,8 +224,13 @@ ndops._centroid = cwise({
 	    	var reply = new Object;
 
 		reply.sum  = this.sum;
-		reply.cenx = this.sumx/this.sum;
-		reply.ceny = this.sumy/this.sum;
+		reply.cenx = this.sumx/this.sum + this.cx;
+		reply.ceny = this.sumy/this.sum + this.cy;
+
+		    reply.sumx	= this.sumx	
+		    reply.sumxx	= this.sumxx	
+		    reply.sumy	= this.sumy	
+		    reply.sumyy	= this.sumyy	
 
 		reply.rmom = ( this.sumxx - this.sumx * this.sumx / this.sum + this.sumyy - this.sumy * this.sumy / this.sum ) / this.sum;
 
@@ -341,19 +349,22 @@ imops.rproj = function(im, center) {
     return { radi: radi, data: data, radius: radius };
 }
 
-imops._ee = cwise({
+imops._encen = cwise({
 	  args: ["array", "scalar", "scalar", "scalar", "index"]
 	, pre: function(a, cx, cy, radius) {
 	        this.reply = new Float64Array(radius);
 		this.sum = 0
-		this.r = radius
+		this.r   = radius
+		this.rsq = radius*radius
 	  }
 	, body: function(a, cx, cy, radius, index) {
-		var d = Math.sqrt((index[0]-cx)*(index[0]-cx) + (index[1]-cy)*(index[1]-cy));
+		var x = index[1] - cx;
+		var y = index[0] - cy;
 
-		if ( a > 0 && d <= this.r ) { 
-		console.log("D", cx, cy, d, Math.round(d))
-		    this.reply[Math.round(d)] += a
+		var rsq = x*x+y*y;
+
+		if ( a > 0 && rsq < this.rsq ) { 
+		    this.reply[Math.round(Math.sqrt(rsq))] += a
 		    this.sum += a;
 		}
 	  }
@@ -363,7 +374,6 @@ imops._ee = cwise({
 
 		for ( i = this.r - 1; i >= 0; i-- ) {
 		    tot += this.reply[i]
-			console.log(this.sum, tot)
 
 		    this.reply[i] = tot / this.sum;
 		}
@@ -372,12 +382,10 @@ imops._ee = cwise({
 	}
 })
 
-imops.ee = function(im, center) {
-    var radius = (im.shape[0]/2 + im.shape[1]/2) / 2;
+imops.encen = function(im, center, radius) {
+    var reply = imops._encen(im, center[1], center[0], radius)
 
-    var reply = imops._ee(im, center[0], center[1], radius)
-
-    return reply;
+    return ndarray(reply, [reply.length]);
 }
 
 ndops.gauss1d = function(radi, x0) {
@@ -423,7 +431,7 @@ imops.imstat = function (image, section, type) {
 	stat.sect = section
 	stat.imag = ndops.section(image, section);
 
-	nx = section[1][0] - section[1][0]
+	var nx = section[0][1] - section[0][0]
 
 	stat.min = ndops.minvalue(stat.imag)
 	stat.max = ndops.maxvalue(stat.imag)
@@ -440,30 +448,24 @@ imops.imstat = function (image, section, type) {
 	stat.centroid = ndops.centroid(stat.data, ndops.qcenter(stat.data));
 	stat.counts   = stat.centroid.sum
 
-	//stat.centroid.cenx += section[0][0]
-	//stat.centroid.ceny += section[1][0]
 
 	stat.hist = ndops.hist(stat.imag);
 	stat.hist.sum  = ndops.sum(stat.hist.data)
 
 
-	stat.xproj   = ndops.proj(stat.imag, 1);
-	stat.yproj   = ndops.proj(stat.imag, 0);
-	stat.rproj   = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
+	stat.xproj = ndops.proj(stat.imag, 0);
+	stat.yproj = ndops.proj(stat.imag, 1);
+	stat.rproj = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
+
+	stat.encen = imops.encen(stat.data, [stat.centroid.ceny, stat.centroid.cenx], nx/2);
 
 	var fit = ndops.gsfit1d(stat.rproj.radi, stat.rproj.data
 				  , [stat.max, 0, stat.centroid.fwhm/2.355, stat.backgr]);
 	stat.rproj.fitv = fit;
-
 	stat.rproj.fit = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
 
-	stat.ee = imops.ee(stat.data, [stat.centroid.ceny, stat.centroid.cenx]);
-
-	console.log("bk", stat.backgr);
-	console.log("cx", [stat.centroid.ceny, stat.centroid.cenx])
-
-
-	console.log(stat.ee)
+	stat.centroid.cenx += section[0][0]
+	stat.centroid.ceny += section[1][0]
 
 	return stat;
 }
