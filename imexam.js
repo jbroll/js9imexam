@@ -13,7 +13,6 @@ ndops.moments = require("ndarray-moments")
 
 numeric       = require("numeric")
 
-
 var imops = new Object();
 
 
@@ -77,6 +76,19 @@ ndops.print = function(a, width, prec) {
 	}
 	console.log("\n")
     }
+}
+
+ndops.indexof = function(a, x) {
+    for ( var i = 0; i < a.shape[0]; i++ ) {
+	console.log(x, a[i]);
+
+	if ( x > a.get(i) ) { break } 
+    }
+
+    if ( i === 0          ) { return 0; }
+    if ( i === a.shape[0] ) { return a.shape[0]; }
+
+    return i-1 + (a.get(i-1) - x)/(a.get(i-1) - a.get(i))
 }
 
 ndops._hist = cwise({
@@ -458,6 +470,9 @@ imops.imstat = function (image, section, type) {
 	stat.rproj = imops.rproj(stat.imag, [stat.centroid.ceny, stat.centroid.cenx]);
 
 	stat.encen = imops.encen(stat.data, [stat.centroid.ceny, stat.centroid.cenx], nx/2);
+
+	stat.ee80  = ndops.indexof(stat.encen, .80)
+	stat.ee50  = ndops.indexof(stat.encen, .50)
 
 	var fit = ndops.gsfit1d(stat.rproj.radi, stat.rproj.data
 				  , [stat.max, 0, stat.centroid.fwhm/2.355, stat.backgr]);

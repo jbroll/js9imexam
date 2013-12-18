@@ -91,6 +91,15 @@
 	</div>
     </script>
 
+    <script type="text/template" id="imstat-encen-template">
+    	<div style='position:absolute;right: 10px;top:10px'>
+        <table>
+	<tr><td>ee80</td><td align=right>{ee80%.2f}</td><tr>
+	<tr><td>ee50</td><td align=right>{ee50%.2f}</td><tr>
+        </table>
+	</div>
+    </script>
+
     <script type="text/template" id="imstat-xproj-template">
     	<div style='position:absolute;right: 10px;top:10px'>
 	 <select class="xproj-menu" onchange='imexamUpdate(undefined, $(this).parents(".js9imexam-box")[0]);'>
@@ -359,6 +368,9 @@
 	    }
 
 	    $.plot(box, [imstat.edata]);
+
+	    box.append(template("imstat-encen-template", imstat));
+
 
 	    break;
 	 }
