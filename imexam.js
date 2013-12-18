@@ -82,13 +82,13 @@ ndops.indexof = function(a, x) {
     for ( var i = 0; i < a.shape[0]; i++ ) {
 	console.log(x, a[i]);
 
-	if ( x > a.get(i) ) { break } 
+	if ( x < a.get(i) ) { break } 
     }
 
     if ( i === 0          ) { return 0; }
     if ( i === a.shape[0] ) { return a.shape[0]; }
 
-    return i-1 + (a.get(i-1) - x)/(a.get(i-1) - a.get(i))
+    return i + (x - a.get(i))/(a.get(i) - a.get(i-1))
 }
 
 ndops._hist = cwise({
@@ -386,7 +386,7 @@ imops._encen = cwise({
 		var tot = 0;
 		var i;
 
-		for ( i = this.r - 1; i >= 0; i-- ) {
+		for ( i = 0; i < this.r; i++ ) {
 		    tot += this.reply[i]
 
 		    this.reply[i] = tot / this.sum;
