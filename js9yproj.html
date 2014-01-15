@@ -1,0 +1,69 @@
+<html>
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
+      <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+      <link type="text/css" rel="stylesheet" href="css/jquery.contextMenu.css">
+      <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
+      <link type="text/css" rel="stylesheet" href="js9.css">
+      <script type="text/javascript" src="js/jquery.min.js"></script>
+      <script type="text/javascript" src="js/kinetic.min.js"></script>
+      <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.errorbars.min.js"></script>
+      <script type="text/javascript" src="js/sprintf.min.js"></script>
+      <script type="text/javascript" src="js/dhtmlwindow.min.js">	
+      /***********************************************
+      * DHTML Window Widget- © Dynamic Drive (www.dynamicdrive.com)
+      * This notice must stay intact for legal use.
+      * Visit http://www.dynamicdrive.com/ for full source code
+      ***********************************************/
+      </script>
+
+      <script type="text/javascript" src="js/fitsy.js"></script>
+      <script type="text/javascript" src="js/astrolib.js"></script>
+      <script type="text/javascript" src="js9.js"></script>
+
+      <script>
+      JS9.Plugins = []
+      JS9.RegisterPlugin = function (plugin) {
+	 	 JS9.Plugins.push(plugin)
+      }
+
+	  function xeqonchange_plugins(im, xreg) {
+		$.each(JS9.Plugins, function(i, plugin) {
+			if (plugin.onChange !== undefined) {
+				var el = $("." + plugin.category + "_" + plugin.name);
+				el.each(function(i, element) {
+					plugin.onChange(im, xreg, element);
+				});
+			}
+		});
+	  }
+
+				
+
+      $(document).ready(function() {
+
+	$.each(JS9.Plugins, function(i, plugin) {
+	      var el = $(plugin.cls)
+		  
+	      el.each(function(i, element) {
+		      plugin.init(element);
+	      })
+	  })
+      });
+
+	  JS9.regionOpts.xeqonchange = "xeqonchange_plugins";
+
+      </script>
+      <script type="text/javascript" src="js/imexam_modules/js9imexam_yproj.js"></script>
+
+    </head>
+    <body>
+	<A href="javascript:Fitsy.fetchURL('1212.fits', 'fits/1212.fits', undefined, window.JS9.Load)">DSS 12:0:0 12:0:0</A>
+    <div class="JS9Menubar"></div>
+    <div class="JS9"></div>
+	<div class="imexam_yproj" style="height:256; width:256"></div>
+    </body>
+</html>
