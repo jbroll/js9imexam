@@ -13,6 +13,8 @@ ndops.moments = require("ndarray-moments")
 
 numeric       = require("numeric")
 
+template      = require("./template")
+
 
 var imops = new Object();
 
@@ -472,8 +474,32 @@ imops.imstat = function (image, section, type) {
 	return stat;
 }
 
-exports.numeric = numeric
-exports.ndarray = ndarray
-exports.ndops   = ndops
-exports.imops   = imops
+exports.reg2section = function(xreg) {
+    switch ( xreg.shape ) {
+	   case "box":
+	      w = xreg.size.width;
+	      h = xreg.size.height;
+
+	      break;
+	  case "circle":
+	      xreg.size = new Object();
+
+	      xreg.size.width  = xreg.radius*2;
+	      xreg.size.height = xreg.radius*2;
+
+	      break;
+
+	  default:
+		return;
+      }
+
+	  return imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height);
+}
+
+exports.template = template
+
+exports.numeric  = numeric
+exports.ndarray  = ndarray
+exports.ndops    = ndops
+exports.imops    = imops
 

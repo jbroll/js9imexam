@@ -1,55 +1,31 @@
 JS9   = ../js9
-JS9JS = $(JS9)/js/imexam_modules
+JS9JS = $(JS9)/plugins/imexam
 
-first: $(JS9)/js9yproj.html $(JS9JS)/js9imexam_yproj.js $(JS9)/js9rproj.html $(JS9JS)/js9imexam_rproj.js $(JS9)/js9xproj.html $(JS9JS)/js9imexam_xproj.js $(JS9)/js93plot.html $(JS9JS)/js9imexam_3plot.js
+all:	$(JS9)/js9imexam.html		\
+	$(JS9JS)/imexam.js		\
+	$(JS9JS)/xyproj.js	\
+	$(JS9JS)/r_proj.js
 
-$(JS9)/js9yproj.html: js9yproj.html
-	cp -p js9yproj.html $(JS9)/js9yproj.html
-
-$(JS9JS)/js9imexam_yproj.js: js9imexam_yproj.js imexam_yproj.js
+$(JS9JS)/imexam.js : imexam.js
 	mkdir -p $(JS9JS)
-	browserify -r ./imexam_yproj > $(JS9JS)/js9imexam_yproj.js
-	cat js9imexam_yproj.js >> $(JS9JS)/js9imexam_yproj.js
+	browserify -r ./imexam > $(JS9JS)/imexam.js
 
-$(JS9)/js9xproj.html: js9xproj.html
-	cp -p js9xproj.html $(JS9)/js9xproj.html
-
-$(JS9JS)/js9imexam_xproj.js: js9imexam_xproj.js imexam_xproj.js
+$(JS9JS)/xyproj.js: xyproj.js 
 	mkdir -p $(JS9JS)
-	browserify -r ./imexam_xproj > $(JS9JS)/js9imexam_xproj.js
-	cat js9imexam_xproj.js >> $(JS9JS)/js9imexam_xproj.js
+	cp -p xyproj.js $(JS9JS)/xyproj.js
 
-$(JS9)/js9rproj.html: js9rproj.html
-	cp -p js9rproj.html $(JS9)/js9rproj.html
-
-$(JS9JS)/js9imexam_rproj.js: js9imexam_rproj.js imexam_rproj.js
+$(JS9JS)/r_proj.js: r_proj.js 
 	mkdir -p $(JS9JS)
-	browserify -r ./imexam_rproj > $(JS9JS)/js9imexam_rproj.js
-	cat js9imexam_rproj.js >> $(JS9JS)/js9imexam_rproj.js
+	cp -p r_proj.js $(JS9JS)/r_proj.js
 
-$(JS9)/js93plot.html: js93plot.html
-	cp -p js93plot.html $(JS9)/js93plot.html
-
-$(JS9JS)/js9imexam_3plot.js: js9imexam_3plot.js imexam_3plot.js
+$(JS9JS)/3dplot.js: 3dplot.js
 	mkdir -p $(JS9JS)
-	browserify -r ./imexam_3plot > $(JS9JS)/js9imexam_3plot.js
+	browserify -x ./imexam -r ./imexam_3plot > $(JS9JS)/js9imexam_3plot.js
 	cat js9imexam_3plot.js >> $(JS9JS)/js9imexam_3plot.js
-
-all: 	$(JS9)/js9imexam.html	\
-	$(JS9JS)/imexam.js	\
-	$(JS9JS)/surface.js	\
-	$(JS9JS)/template.js	\
-	$(JS9JS)/pinned.png	\
-	$(JS9JS)/unpinned.png
 
 $(JS9)/js9imexam.html: js9imexam.html
 	mkdir -p $(JS9JS)
 	cp -p js9imexam.html $(JS9)/js9imexam.html
-
-$(JS9JS)/imexam.js: imexam.js
-	#browserify -r ./imexam | uglifyjs > $(JS9JS)/imexam.js
-	mkdir -p $(JS9JS)
-	browserify -r ./imexam 		  > $(JS9JS)/imexam.js
 
 $(JS9JS)/surface.js: surface.js
 	mkdir -p $(JS9JS)

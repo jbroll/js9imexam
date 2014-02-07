@@ -48,3 +48,5 @@ function template(templateid,data){
 	return "";
     }
 }
+
+module.exports = template;
