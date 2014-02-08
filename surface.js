@@ -1,5 +1,5 @@
 
-function surface(div, data, normalize) {
+function surface(div, data, offset) {
 
     var surf = imexam.ndops.ndarray(data.shape);
 
@@ -61,7 +61,7 @@ function surface(div, data, normalize) {
 
 	    surf.set(j, i, (value-minvalue)/(range*2.25))
 
-	    tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value.toFixed(2);
+	    tooltipStrings[idx] = "x:" + (i+offset[0]) + ", y:" + (j+offset[1]) + " = " + value.toFixed(2);
 	    idx++;
 	}
     }

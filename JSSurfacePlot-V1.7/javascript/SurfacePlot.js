@@ -61,7 +61,7 @@ greg.ross.visualisation.SurfacePlot = function(container){
     this.containerElement = container;
 }
 
-greg.ross.visualisation.SurfacePlot.prototype.draw = function(data, options){
+greg.ross.visualisation.SurfacePlot.prototype.draw = function(data, options) {
     var xPos = options.xPos;
     var yPos = options.yPos;
     var w = options.width;
@@ -75,7 +75,7 @@ greg.ross.visualisation.SurfacePlot.prototype.draw = function(data, options){
 	var restrictXRotation = options.restrictXRotation;
     
     if (this.surfacePlot == undefined) 
-        this.surfacePlot = new greg.ross.visualisation.JSSurfacePlot(xPos, yPos, w, h, colourGradient, this.containerElement, fillPolygons, tooltips, xTitle, yTitle, zTitle, restrictXRotation);
+        this.surfacePlot = new greg.ross.visualisation.JSSurfacePlot(xPos, yPos, w, h, colourGradient, this.containerElement, tooltips, fillPolygons, xTitle, yTitle, zTitle, restrictXRotation);
     
     this.surfacePlot.redraw(data);
 }
@@ -84,7 +84,7 @@ greg.ross.visualisation.SurfacePlot.prototype.draw = function(data, options){
  * This class does most of the work.
  * *********************************
  */
-greg.ross.visualisation.JSSurfacePlot = function(x, y, width, height, colourGradient, targetElement, fillRegions, tooltips, xTitle, yTitle, zTitle, restrictXRotation){
+greg.ross.visualisation.JSSurfacePlot = function(x, y, width, height, colourGradient, targetElement, tooltips, fillRegions, xTitle, yTitle, zTitle, restrictXRotation){
     this.targetDiv;
     var id = allocateId();
     var canvas;

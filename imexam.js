@@ -80,7 +80,6 @@ ndops.print = function(a, width, prec) {
 
 ndops.indexof = function(a, x) {
     for ( var i = 0; i < a.shape[0]; i++ ) {
-	console.log(x, a[i]);
 
 	if ( x < a.get(i) ) { break } 
     }
