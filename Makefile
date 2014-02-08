@@ -1,18 +1,23 @@
 JS9   = ../js9
 JS9JS = $(JS9)/plugins/imexam
 
-all:	$(JS9)/js9imexam.html		\
-	$(JS9JS)/imexam.js		\
+all:	$(JS9)/js9Imexam.html	\
+	$(JS9JS)/imexam.js	\
 	$(JS9JS)/xyproj.js	\
-	$(JS9JS)/r_proj.js
+	$(JS9JS)/r_proj.js	\
+	$(JS9JS)/rgstat.js	
 
-$(JS9JS)/imexam.js : imexam.js
+$(JS9JS)/imexam.js : imexam.js template.js
 	mkdir -p $(JS9JS)
 	browserify -r ./imexam > $(JS9JS)/imexam.js
 
 $(JS9JS)/xyproj.js: xyproj.js 
 	mkdir -p $(JS9JS)
 	cp -p xyproj.js $(JS9JS)/xyproj.js
+
+$(JS9JS)/rgstat.js: rgstat.js 
+	mkdir -p $(JS9JS)
+	cp -p rgstat.js $(JS9JS)/rgstat.js
 
 $(JS9JS)/r_proj.js: r_proj.js 
 	mkdir -p $(JS9JS)
@@ -23,9 +28,9 @@ $(JS9JS)/3dplot.js: 3dplot.js
 	browserify -x ./imexam -r ./imexam_3plot > $(JS9JS)/js9imexam_3plot.js
 	cat js9imexam_3plot.js >> $(JS9JS)/js9imexam_3plot.js
 
-$(JS9)/js9imexam.html: js9imexam.html
+$(JS9)/js9Imexam.html: js9imexam.html
 	mkdir -p $(JS9JS)
-	cp -p js9imexam.html $(JS9)/js9imexam.html
+	cp -p js9imexam.html $(JS9)/js9Imexam.html
 
 $(JS9JS)/surface.js: surface.js
 	mkdir -p $(JS9JS)

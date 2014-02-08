@@ -1,9 +1,6 @@
-function template(templateid,data){
+function template(str, data){
     
-    var el = document.getElementById(templateid);
-
-    if ( el ) {
-	return el.innerHTML.replace(/{([a-zA-Z0-9_.%]*)}/g,
+	return str.replace(/{([a-zA-Z0-9_.%]*)}/g,
 	    function(m,key){
 		var type, prec, val;
 		var val = data;
@@ -44,9 +41,6 @@ function template(templateid,data){
 		return val;
 	    }
 	);
-    } else {
-	return "";
-    }
 }
 
 module.exports = template;
