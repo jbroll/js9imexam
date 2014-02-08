@@ -16,14 +16,20 @@
 
 	    $(div).empty();
 
-	    var section  = imexam.reg2section(xreg);
-	    var im_2d    = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-	    var imag     = imexam.ndops.section(im_2d, section);
-	    var data     = imexam.ndops.section(imag, section);
-	    var centroid = imexam.ndops.centroid(data, imexam.ndops.qcenter(data));
+	    var section = imexam.reg2section(xreg);
+	    var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+	    var imag    = imexam.ndops.section(im_2d, section);
+
+	    var max     = imexam.ndops.maxvalue(imag);
+	    var backgr  = imexam.imops.backgr(imag, 4).value;
+	    data 	= imexam.ndops.assign(imexam.ndops.ndarray(imag.shape), imag)
+
+	    imexam.ndops.subs(data, imag, backgr);
+
+	    qcenter  = imexam.ndops.qcenter(data);
+	    centroid = imexam.ndops.centroid(data, imexam.ndops.qcenter(data));
+
 	    var rproj    = imexam.imops.rproj(imag, [centroid.ceny, centroid.cenx]);
-	    var max      = imexam.ndops.maxvalue(imag);
-	    var backgr   = imexam.imops.backgr(imag, 4).value;
 
 	    var fit = imexam.ndops.gsfit1d(rproj.radi, rproj.data, [max, 0, centroid.fwhm/2.355, backgr]);
 	    fitv = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] }
@@ -31,7 +37,6 @@
 	    var rdata = [];
 	    var rfdat = [];
 	    var r;
-
 
 	    for ( r = 0;  r < rproj.radi.shape[0]; r++ ) {
 		    rdata[r] = [rproj.radi.get(r), rproj.data.get(r)]

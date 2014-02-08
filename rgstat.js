@@ -32,7 +32,6 @@
 	    stat.reg = xreg;
 	    stat.min = imexam.ndops.minvalue(imag);
 	    stat.max = imexam.ndops.maxvalue(imag);
-
 	    stat.backgr  = imexam.imops.backgr(imag, 4);
 
 	    data = imexam.ndops.assign(imexam.ndops.ndarray(imag.shape), imag)
@@ -40,7 +39,6 @@
 	    imexam.ndops.subs(data, imag, stat.backgr.value);
 
 	    stat.qcenter  = imexam.ndops.qcenter(data);
-
 	    stat.centroid = imexam.ndops.centroid(data, imexam.ndops.qcenter(data));
 
 	    stat.centroid.cenx += section[0][0]

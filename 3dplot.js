@@ -2,6 +2,9 @@
 (function() {
     var imexam = require("./imexam")
 
+    require("./JSSurfacePlot-V1.7/javascript/SurfacePlot")
+    require("./JSSurfacePlot-V1.7/javascript/ColourGradient")
+
 
     function surface(div, data, normalize) {
 
@@ -34,7 +37,6 @@
 	    $(div).data("surfplot", surfacePlot);
 	}
 
-	// Don't fill polygons in IE. It's too slow.
 	var fillPly = true;
 	
 	// Define a colour gradient.
@@ -76,25 +78,22 @@
 	surfacePlot.draw(surf, options);
     }
 
-    function 3dplotUpdate(im, xreg, div) {
-	    var section = imexamreg2section(xreg);
+    function pluginUpdate(im, xreg) {
+	    var section = imexam.reg2section(xreg);
 	    var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 	    var imag    = imexam.ndops.section(im_2d, section);
 
-	    surface(div, imag);
+	    surface(this.div, imag);
     }
 
-    function 3dplotInit() {
+    function pluginInit() {
 	$(this.div).css('height', "100%")
-	$(this.div).append("Create a region to see projection<br>");
-	$(this.div).append(projTemplate);
+	$(this.div).append("Create a region to see 3d plot<br>");
     }
 
-    JS9.RegisterPlugin("ImExam", "3dPlot", {
+    JS9.RegisterPlugin("ImExam", "3dPlot", pluginInit, {
 	    viewMenuItem: "3dPlot",
-	    regionchange: 3dplotUpdate,
+	    regionchange: pluginUpdate,
 	    windowDims: [250, 250],
-
-	    xyproj: 1
-    }, 3dplotInit)
+    })
 })();
