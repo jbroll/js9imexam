@@ -73,11 +73,3 @@ $(JS9JS)/pinned.png: pinned.png
 	cp -p pinned.png $(JS9JS)/pinned.png
 
 
-base:
-	mkdir -p $(JS9JS)
-	rm -rf $(JS9JS)/JSSurfacePlot
-	mkdir -p $(JS9JS)
-	rm -rf $(JS9JS)/JSSurfacePlot
-	cp -rp JSSurfacePlot-V1.7 $(JS9JS)/JSSurfacePlot
-
-install: base all
