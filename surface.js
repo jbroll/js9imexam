@@ -1,5 +1,5 @@
 
-function surface(div, data, offset) {
+function surface(div, data, normalize) {
 
     var surf = imexam.ndops.ndarray(data.shape);
 
@@ -25,7 +25,7 @@ function surface(div, data, offset) {
     if ( surfacePlot === undefined ) {
         div.innerHTML = "";
 
-	surfacePlot = new greg.ross.visualisation.SurfacePlot(div);
+        surfacePlot = new greg.ross.visualisation.SurfacePlot(div);
 
         $(div).data("surfplot", surfacePlot);
     }
@@ -42,9 +42,9 @@ function surface(div, data, offset) {
     var colours = [colour1, colour2, colour3, colour4, colour5];
     
     // Axis labels.
-    var xAxisHeader	= "X";
-    var yAxisHeader	= "Y";
-    var zAxisHeader	= "Z";
+    var xAxisHeader     = "X";
+    var yAxisHeader     = "Y";
+    var zAxisHeader     = "Z";
 
     var tooltipStrings = new Array();
 
@@ -56,18 +56,18 @@ function surface(div, data, offset) {
     var width  = div.offsetWidth;
 
     for (var i = 0; i < numRows; i++) {
-	for (var j = 0; j < numCols; j++) {
-	    var value = data.get(i, j);
+        for (var j = 0; j < numCols; j++) {
+            var value = data.get(i, j);
 
-	    surf.set(j, i, (value-minvalue)/(range*2.25))
+            surf.set(j, i, (value-minvalue)/(range*2.25))
 
-	    tooltipStrings[idx] = "x:" + (i+offset[0]) + ", y:" + (j+offset[1]) + " = " + value.toFixed(2);
-	    idx++;
-	}
+            tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value.toFixed(2);
+            idx++;
+        }
     }
     
     var options = {xPos: 0, yPos: 0, width: width, height: height, colourGradient: colours, fillPolygons: fillPly,
-	    tooltips: tooltipStrings, xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader, restrictXRotation: false};
+            tooltips: tooltipStrings, xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader, restrictXRotation: false};
 
     surfacePlot.draw(surf, options);
 }

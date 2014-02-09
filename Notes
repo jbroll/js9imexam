@@ -1,8 +1,5 @@
 
- Test region stats
-
- Projection
-	median
+ Pix Table
 
  Histogram
 	stats
@@ -11,5 +8,8 @@
 	Zoom stack
 	horizontal & vertical selection
 
+ Pin control
+
+ Plugin menu (view) control
 
 
