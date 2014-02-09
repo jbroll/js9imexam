@@ -7,7 +7,8 @@ all:	$(JS9)/js9Imexam.html 	\
 	$(JS9JS)/r_proj.js	\
 	$(JS9JS)/rgstat.js	\
 	$(JS9JS)/rghist.js	\
-	$(JS9JS)/3dplot.js
+	$(JS9JS)/3dplot.js	\
+	$(JS9JS)/enener.js
 
 lint :				\
 	imexam.js		\
@@ -15,7 +16,8 @@ lint :				\
 	r_proj.js		\
 	rgstat.js		\
 	rghist.js		\
-	3dplot.js
+	3dplot.js		\
+	enener.js
 	jslint $^
 
 
@@ -45,6 +47,10 @@ $(JS9JS)/3dplot.js: 3dplot.js ./JSSurfacePlot-V1.7/javascript/SurfacePlot.js
 	    -r ./JSSurfacePlot-V1.7/javascript/SurfacePlot 	\
 	    -r ./JSSurfacePlot-V1.7/javascript/ColourGradient > $(JS9JS)/3dplot.js
 	cat 3dplot.js >> $(JS9JS)/3dplot.js
+
+$(JS9JS)/enener.js: enener.js 
+	mkdir -p $(JS9JS)
+	cp -p enener.js $(JS9JS)/enener.js
 
 $(JS9)/js9Imexam.html: js9imexam.html
 	mkdir -p $(JS9JS)

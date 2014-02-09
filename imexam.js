@@ -392,6 +392,61 @@ imops.rproj = function(im, center) {
     return { radi: radi, data: data, radius: radius };
 };
 
+imops._encen = cwise({
+	  args: ["array", "scalar", "scalar", "scalar", "index"]
+	, pre: function(a, cx, cy, radius) {
+	        this.reply = new Float64Array(radius);
+		this.sum = 0;
+		this.r   = radius;
+		this.rsq = radius*radius;
+	  }
+	, body: function(a, cx, cy, radius, index) {
+		var x = index[1] - cx;
+		var y = index[0] - cy;
+
+		var rsq = x*x+y*y;
+
+		if ( a > 0 && rsq < this.rsq ) { 
+		    this.reply[Math.round(Math.sqrt(rsq))] += a;
+		    this.sum += a;
+		}
+	  }
+	, post: function() {
+		var tot = 0;
+		var i;
+
+		for ( i = 0; i < this.r; i++ ) {
+		    tot += this.reply[i];
+
+		    this.reply[i] = tot / this.sum;
+		}
+
+		return this.reply;
+	}
+});
+
+imops.encen = function(im, center) {
+    var radius = (im.shape[0]/2 + im.shape[1]/2) / 2;
+
+    var reply = imops._encen(im, center[1], center[0], radius);
+
+    return ndarray(reply, [reply.length]);
+};
+
+ndops.indexof = function(a, x) {
+    var i;
+
+    for ( i = 0; i < a.shape[0]; i++ ) {
+
+	if ( x < a.get(i) ) { break; }
+    }
+
+    if ( i === 0          ) { return 0; }
+    if ( i === a.shape[0] ) { return a.shape[0]; }
+
+    return i + (x - a.get(i))/(a.get(i) - a.get(i-1));
+};
+
 ndops.gauss1d = function(radi, x0) {
     var reply = ndops.ndarray(radi.shape);
 
