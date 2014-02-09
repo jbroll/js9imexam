@@ -1,13 +1,22 @@
 JS9   = ../js9
 JS9JS = $(JS9)/plugins/imexam
 
-all:	$(JS9)/js9Imexam.html	\
+all:	$(JS9)/js9Imexam.html 	\
 	$(JS9JS)/imexam.js	\
 	$(JS9JS)/xyproj.js	\
 	$(JS9JS)/r_proj.js	\
 	$(JS9JS)/rgstat.js	\
 	$(JS9JS)/rghist.js	\
 	$(JS9JS)/3dplot.js
+
+lint :				\
+	imexam.js		\
+	xyproj.js		\
+	r_proj.js		\
+	rgstat.js		\
+	rghist.js		\
+	3dplot.js
+	jslint $^
 
 
 $(JS9JS)/imexam.js : imexam.js template.js
