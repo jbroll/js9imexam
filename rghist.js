@@ -31,7 +31,7 @@
                 if ( n > skip &&  n < hist.sum - skip ) { 
 		    value = hist.data.get(h);
 
-		    hdata[h] = [i*hist.width, value];
+		    hdata[h] = [i*hist.width+hist.min, value];
 		    h++;
 		}
             }

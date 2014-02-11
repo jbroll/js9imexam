@@ -114,7 +114,7 @@ ndops.hist = function(a, width, min, max) {
         max = ndops.maxvalue(a);
     }
     if ( width === undefined ) {
-        width = (max-min) / 2500;
+        width = Math.max(1, (max-min) / 250);
     }
 
     hist.min   = min;
