@@ -90,7 +90,7 @@
     }
 
     function pluginInit() {
-        $(this.div).css('height', "100%");
+	JS9.DecoratePlugin(this);
         $(this.div).append("Create a region to see 3d plot<br>");
     }
 

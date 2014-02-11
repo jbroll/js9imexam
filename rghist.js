@@ -40,7 +40,7 @@
     }
 
     function histInit() {
-        $(this.div).css('height', "100%");
+	JS9.DecoratePlugin(this);
         $(this.div).append("Create a region to see histogram<br>");
     }
 

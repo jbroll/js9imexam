@@ -3,6 +3,17 @@
 
 "use strict";
 
+      JS9.DecoratePlugin = function (plugin) {
+	var type = plugin.type;
+	var div  = plugin.div;
+
+	if ( type === "div" ) {
+	    $(div).css("border",  "1px solid black");
+	} else {
+	    $(div).css("height", "100%");
+	}
+      };
+
 
 (function() {
     var imexam = require("./imexam");
@@ -67,7 +78,8 @@
     }
 
     function projInit() {
-        $(this.div).css('height', "100%");
+	JS9.DecoratePlugin(this);
+
         $(this.div).append("Create a region to see projection<br>");
         $(this.div).append(projTemplate);
     }
