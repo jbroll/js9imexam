@@ -7,8 +7,11 @@
 	var type = plugin.type;
 	var div  = plugin.div;
 
+//	var opts = plugin.plugin.opts;
+
 	if ( type === "div" ) {
 	    $(div).css("border",  "1px solid black");
+	    $(div).append("<div>Title of plugin</div>");
 	} else {
 	    $(div).css("height", "100%");
 	}
