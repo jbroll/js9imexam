@@ -71,7 +71,7 @@
     JS9.RegisterPlugin("ImExam", "RadialProj", rprojInit, {
             viewMenuItem: "Radial Proj",
             regionchange: rprojUpdate,
-            windowDims: [250, 250],
+            winDims: [250, 250],
     });
 
 }());

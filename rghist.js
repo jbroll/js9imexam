@@ -47,7 +47,7 @@
     JS9.RegisterPlugin("ImExam", "Histogram", histInit, {
             viewMenuItem: "Histogram",
             regionchange: histUpdate,
-            windowDims: [250, 250],
+            winDims: [250, 250],
     });
 
 }());

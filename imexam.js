@@ -144,9 +144,10 @@ ndops.proj = function(a, axis, length) {
         var sect;
 	var i;
 
-        var proj = ndarray(ndops._proj(a, axis, a.shape[axis]), [a.shape[axis]]);
+        var proj = ndarray(ndops._proj(a, axis, a.shape[axis === 0 ? 1 : 0]), [a.shape[axis === 0 ? 1 : 0]]);
         
         proj.n   = a.shape[axis === 1 ? 0 : 1];
+	proj.x   = a.shape[axis]
 
         proj.sum = ndops.ndarray([proj.n]);
         proj.avg = ndops.ndarray([proj.n]);
@@ -156,9 +157,9 @@ ndops.proj = function(a, axis, length) {
 
         for ( i = 0; i < proj.n; i++ ) {
             if ( axis === 0 ) {
-                sect = ndops.section(copy, [[i, i+1], [0, proj.n]]);
+                sect = ndops.section(copy, [[i, i+1], [0, proj.x]]);
             } else {
-                sect = ndops.section(copy, [[0, proj.n], [i, i+1]]);
+                sect = ndops.section(copy, [[0, proj.x], [i, i+1]]);
             }
 
             proj.sum.set(i, ndops.sum(sect));
@@ -536,8 +537,7 @@ imops.imstat = function (image, section, type) {
 exports.reg2section = function(xreg) {
 
     switch ( xreg.shape ) {
-           case "box":
-              break;
+
           case "circle":
               xreg.size = {};
 
@@ -546,11 +546,18 @@ exports.reg2section = function(xreg) {
 
               break;
 
+          case "ellipse":
+              xreg.size = {};
+
+              xreg.size.width  = xreg.eradius.x*2;
+              xreg.size.height = xreg.eradius.y*2;
+
+              break;
+
           default:
-                return;
       }
 
-          return imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height);
+      return imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height);
 };
 
 exports.template = template;

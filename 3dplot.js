@@ -97,6 +97,6 @@
     JS9.RegisterPlugin("ImExam", "3dPlot", pluginInit, {
             viewMenuItem: "3dPlot",
             regionchange: pluginUpdate,
-            windowDims: [250, 250],
+            winDims: [250, 250],
     });
 }());

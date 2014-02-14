@@ -4,7 +4,7 @@
 "use strict";
 
       JS9.DecoratePlugin = function (plugin) {
-	var type = plugin.type;
+	var type = plugin.winType;
 	var div  = plugin.div;
 
 //	var opts = plugin.plugin.opts;
@@ -34,10 +34,11 @@
     function projUpdate(im, xreg) {
         var div = this.div;
 
+	    var axis    = this.plugin.opts.xyproj;
             var section = imexam.reg2section(xreg);
             var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
             var imag    = imexam.ndops.section(im_2d, section);
-            var proj    = imexam.ndops.proj(imag, this.plugin.opts.xyproj);
+            var proj    = imexam.ndops.proj(imag, axis);
 
             var xdata = [];
 	    var  data;
@@ -69,10 +70,10 @@
             }
 
             for ( x = 0;  x < proj.shape[0]; x++ ) {
-                    xdata[x] = [x+section[0][0], data.get(x)];
+                    xdata[x] = [x+section[axis][0], data.get(x)];
             }
 
-            $.plot(div, [xdata], { xaxis: { min: section[0][0], max: section[0][1] }});
+            $.plot(div, [xdata], { xaxis: { min: section[axis][0], max: section[axis][1] }});
 
 
             $(div).append(projTemplate);
@@ -90,7 +91,7 @@
     JS9.RegisterPlugin("ImExam", "XProj", projInit, {
             viewMenuItem: "XProj",
             regionchange: projUpdate,
-            windowDims: [250, 250],
+            winDims: [250, 250],
 
             xyproj: 0
     });
@@ -98,7 +99,7 @@
     JS9.RegisterPlugin("ImExam", "YProj", projInit, {
             viewMenuItem: "YProj",
             regionchange: projUpdate,
-            windowDims: [250, 250],
+            winDims: [250, 250],
 
             xyproj: 1
     });

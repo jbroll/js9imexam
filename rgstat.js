@@ -60,6 +60,6 @@
     JS9.RegisterPlugin("ImExam", "RegionStats", statInit, {
             viewMenuItem: "Region Stats",
             regionchange: statUpdate,
-            windowDims: [250, 250]
+            winDims: [250, 250]
     });
 }());
