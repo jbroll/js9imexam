@@ -12,6 +12,7 @@ ndops.unpack  = require("ndarray-unpack");
 ndops.fill    = require("ndarray-fill");
 ndops.sort    = require("ndarray-sort");
 ndops.moments = require("ndarray-moments");
+ndops.rotate  = require("image-rotate");
 
 var numeric   = require("numeric");
 

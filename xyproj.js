@@ -7,13 +7,27 @@
 	var type = plugin.winType;
 	var div  = plugin.div;
 
-//	var opts = plugin.plugin.opts;
+	var opts = plugin.plugin.opts;
 
 	if ( type === "div" ) {
-	    $(div).css("border",  "1px solid black");
-	    $(div).append("<div>Title of plugin</div>");
+	    $(div).css("border", "1px solid black");
+
+	    if ( opts.winTitle === undefined ) {
+		opts.winTitle = plugin.plugin.name;
+	    }
+
+	    $(div).append('<div style="height=25px; background: lightgrey;">' + opts.winTitle + '</div>');
+	    $(div).append('<div class="' + plugin.plugin.name + '" </div>');
+
+	    plugin.divjq = $(div).find("." + plugin.plugin.name);
+	    plugin.div = plugin.divjq[0];
+
+	    $(plugin.div).height($(div).outerHeight()-25);
+	    $(plugin.div).css("background", "white");
+
+
 	} else {
-	    $(div).css("height", "100%");
+	    $(plugin.div).css("height", "100%");
 	}
       };
 
@@ -35,6 +49,7 @@
         var div = this.div;
 
 	    var axis    = this.plugin.opts.xyproj;
+
             var section = imexam.reg2section(xreg);
             var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
             var imag    = imexam.ndops.section(im_2d, section);
@@ -92,6 +107,7 @@
             viewMenuItem: "XProj",
             regionchange: projUpdate,
             winDims: [250, 250],
+	    winTitle: "X Projection",
 
             xyproj: 0
     });
@@ -100,6 +116,7 @@
             viewMenuItem: "YProj",
             regionchange: projUpdate,
             winDims: [250, 250],
+	    winTitle: "Y Projection",
 
             xyproj: 1
     });
