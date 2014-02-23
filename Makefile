@@ -13,7 +13,8 @@ JS    = 		\
 	r_proj.js	\
 	rgstat.js	\
 	rghist.js	\
-	enener.js
+	enener.js	\
+	rghxrg.js
 
 all:	$(JX:.jx=.js)
 
@@ -24,7 +25,7 @@ install: $(JX) FORCE
 
 
 lint :
-	jslint $(JX:.jx=.js) $(JS)
+	jslint $(JX) $(JS)
 
 
 imexam.js : imexam.jx template.js
