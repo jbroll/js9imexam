@@ -53,6 +53,12 @@
             var section = imexam.reg2section(xreg);
             var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
             var imag    = imexam.ndops.section(im_2d, section);
+
+	    if ( xreg.angle && xreg.angle != 0 ) {
+		imag = imexam.ndops.ndarray(imag.shape)
+
+		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.x, xreg.pos.y);
+	    }
             var proj    = imexam.ndops.proj(imag, axis);
 
             var xdata = [];

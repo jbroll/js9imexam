@@ -36,6 +36,7 @@
 
     function pixtUpdate(im, xreg) {
 	var hxrg = [], i;
+	var div  = this.div;
 
 	hxrgReadPixelStack(im.raw.hdu.fits, 0, [xreg.pos.y, xreg.pos.x], function(data) {
 
@@ -43,7 +44,8 @@
 		hxrg[i] = [i, data[i]];
 	    }
 
-	    $.plot(this.div, [hxrg]);
+            $(div).empty();
+	    $.plot(div, [hxrg]);
 	});
     }
 
