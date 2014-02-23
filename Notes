@@ -1,4 +1,17 @@
 
+ ImExpr 
+     https://github.com/silentmatt/js-expression-eval/blob/master/parser.js
+
+     Take parser , replace ops functions with multi dispatch versions.
+
+
+     a: ...
+     b: ....
+     c: .....
+
+     x = a + b
+
+
  Pix Table 
  
  HxRG Pix Stack - Test
