@@ -1,5 +1,11 @@
 
- Pix Table
+ Pix Table 
+ 
+ HxRG Pix Stack - Test
+
+ Pin/UnPin control
+
+ Move DecoratePlugin to html file?
 
  Histogram
 	stats
@@ -8,5 +14,4 @@
 	Zoom stack
 	horizontal & vertical selection
 
- Pin control
 
