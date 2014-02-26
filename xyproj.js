@@ -55,7 +55,7 @@
             var imag    = imexam.ndops.section(im_2d, section);
 
 	    if ( xreg.angle && xreg.angle != 0 ) {
-		imag = imexam.ndops.ndarray(imag.shape)
+		imag = imexam.ndops.ndarray([xreg.width, xreg.height])
 
 		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.x, xreg.pos.y);
 	    }
