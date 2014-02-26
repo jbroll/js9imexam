@@ -3,34 +3,6 @@
 
 "use strict";
 
-      JS9.DecoratePlugin = function (plugin) {
-	var type = plugin.winType;
-	var div  = plugin.div;
-
-	var opts = plugin.plugin.opts;
-
-	if ( type === "div" ) {
-	    $(div).css("border", "1px solid black");
-
-	    if ( opts.winTitle === undefined ) {
-		opts.winTitle = plugin.plugin.name;
-	    }
-
-	    $(div).append('<div style="height=25px; background: lightgrey;">' + opts.winTitle + '</div>');
-	    $(div).append('<div class="' + plugin.plugin.name + '" </div>');
-
-	    plugin.divjq = $(div).find("." + plugin.plugin.name);
-	    plugin.div = plugin.divjq[0];
-
-	    $(plugin.div).height($(div).outerHeight()-25);
-	    $(plugin.div).css("background", "white");
-
-
-	} else {
-	    $(plugin.div).css("height", "100%");
-	}
-      };
-
 
 (function() {
     var imexam = require("./imexam");

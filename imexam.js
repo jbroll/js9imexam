@@ -1,8 +1,42 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"uKhyze":[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
-/*globals Float64Array, Float32Array, Int32Array */ 
+/*globals Float64Array, Float32Array, Int32Array, JS9 */ 
 
 "use strict";
+
+      JS9.DecoratePlugin = function (plugin) {
+	var type = plugin.winType;
+	var div  = plugin.div;
+
+	var opts = plugin.plugin.opts;
+
+	if ( type === "div" ) {
+	    $(div).css("border", "1px solid black");
+
+	    if ( $(div).height() <= 0 ) {
+		$(plugin.div).css("height", opts.winDims[1]);
+		$(plugin.div).css("width", opts.winDims[0]);
+	    }
+
+	    if ( opts.winTitle === undefined ) {
+		opts.winTitle = plugin.plugin.name;
+	    }
+
+	    $(div).append('<div style="height=25px; background: lightgrey;">' + opts.winTitle + '</div>');
+	    $(div).append('<div class="' + plugin.plugin.name + '" </div>');
+
+	    plugin.divjq = $(div).find("." + plugin.plugin.name);
+	    plugin.div = plugin.divjq[0];
+
+	    $(plugin.div).height($(div).height()-25);
+	    $(plugin.div).css("background", "white");
+
+
+	} else {
+	    $(plugin.div).css("height", "100%");
+	}
+      };
+
 
 var cwise     = require("cwise");
 var ndarray   = require("ndarray");
