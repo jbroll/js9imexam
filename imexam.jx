@@ -34,6 +34,8 @@
 	} else {
 	    $(plugin.div).css("height", "100%");
 	}
+
+	$(plugin.div).css("position", "relative");
       };
 
 
