@@ -14,7 +14,8 @@ JS    = 		\
 	rgstat.js	\
 	rghist.js	\
 	enener.js	\
-	rghxrg.js
+	rghxrg.js	\
+	pxtabl.js
 
 all:	$(JX:.jx=.js)
 

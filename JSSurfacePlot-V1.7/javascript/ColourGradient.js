@@ -60,7 +60,7 @@ greg.ross.visualisation.ColourGradient = function(minValue, maxValue, rgbColourA
 	 */
 	this.getColour = function(value)
 	{
-		if (value < minValue || value > maxValue || rgbColourArray.length == 1)
+		if ( isNaN(value) || value < minValue || value > maxValue || rgbColourArray.length == 1)
 		{
 			var colr = {
 				red: rgbColourArray[0].red,

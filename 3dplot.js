@@ -61,7 +61,7 @@ greg.ross.visualisation.ColourGradient = function(minValue, maxValue, rgbColourA
 	 */
 	this.getColour = function(value)
 	{
-		if (value < minValue || value > maxValue || rgbColourArray.length == 1)
+		if ( isNaN(value) || value < minValue || value > maxValue || rgbColourArray.length == 1)
 		{
 			var colr = {
 				red: rgbColourArray[0].red,
@@ -1477,7 +1477,11 @@ module.exports=require('OC7+bw');
     }
 
     JS9.RegisterPlugin("ImExam", "3dPlot", pluginInit, {
-            viewMenuItem: "3dPlot",
+	    menu: "analysis",
+
+            menuItem: "3dPlot",
+            winTitle: "3dPlot",
+
             regionchange: pluginUpdate,
             winDims: [250, 250],
     });

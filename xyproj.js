@@ -82,20 +82,28 @@
     }
 
     JS9.RegisterPlugin("ImExam", "XProj", projInit, {
-            viewMenuItem: "XProj",
-            regionchange: projUpdate,
-            winDims: [250, 250],
+	    menu: "analysis",
+
+            menuItem: "X Projection",
 	    winTitle: "X Projection",
 
+            regionchange: projUpdate,
+            winDims: [250, 250],
+
+	    html: "imexam/xyproj.html"
             xyproj: 0
     });
 
     JS9.RegisterPlugin("ImExam", "YProj", projInit, {
-            viewMenuItem: "YProj",
-            regionchange: projUpdate,
-            winDims: [250, 250],
+	    menu: "analysis",
+
+            menuItem: "Y Projection",
 	    winTitle: "Y Projection",
 
+            regionchange: projUpdate,
+            winDims: [250, 250],
+
+	    html: "imexam/xyproj.html"
             xyproj: 1
     });
 }());

@@ -45,7 +45,11 @@
     }
 
     JS9.RegisterPlugin("ImExam", "Histogram", histInit, {
-            viewMenuItem: "Histogram",
+	    menu: "analysis",
+
+            menuItem: "Histogram",
+            winTitle: "Histogram",
+
             regionchange: histUpdate,
             winDims: [250, 250],
     });
