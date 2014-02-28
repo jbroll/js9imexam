@@ -55,7 +55,11 @@
     }
 
     JS9.RegisterPlugin("HxRG", "PixelStack", pixtInit, {
-            viewMenuItem: "Pixel Stack",
+	    menu: "analysis",
+
+            menuItem: "Pixel Stack",
+            winTitle: "Pixel Stack",
+
             regionchange: pixtUpdate,
             winDims: [250, 250],
     });

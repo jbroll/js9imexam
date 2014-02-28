@@ -18,19 +18,21 @@
         </div>";
 
     function projUpdate(im, xreg) {
-        var div = this.div;
-
+	    var div     = this.div;
 	    var axis    = this.plugin.opts.xyproj;
 
             var section = imexam.reg2section(xreg);
             var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-            var imag    = imexam.ndops.section(im_2d, section);
+	    var imag;
 
-	    if ( xreg.angle && xreg.angle != 0 ) {
-		imag = imexam.ndops.ndarray([xreg.width, xreg.height])
+	    if ( xreg.angle && xreg.angle !== 0 ) {
+		imag = imexam.ndops.ndarray([xreg.size.width, xreg.size.height]);
 
-		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.x, xreg.pos.y);
+		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
+	    } else {
+		imag    = imexam.ndops.section(im_2d, section);
 	    }
+
             var proj    = imexam.ndops.proj(imag, axis);
 
             var xdata = [];
@@ -82,20 +84,28 @@
     }
 
     JS9.RegisterPlugin("ImExam", "XProj", projInit, {
-            viewMenuItem: "XProj",
-            regionchange: projUpdate,
-            winDims: [250, 250],
+	    menu: "analysis",
+
+            menuItem: "X Projection",
 	    winTitle: "X Projection",
 
+            regionchange: projUpdate,
+            winDims: [250, 250],
+
+	    html: "imexam/xyproj.html",
             xyproj: 0
     });
 
     JS9.RegisterPlugin("ImExam", "YProj", projInit, {
-            viewMenuItem: "YProj",
-            regionchange: projUpdate,
-            winDims: [250, 250],
+	    menu: "analysis",
+
+            menuItem: "Y Projection",
 	    winTitle: "Y Projection",
 
+            regionchange: projUpdate,
+            winDims: [250, 250],
+
+	    html: "imexam/xyproj.html",
             xyproj: 1
     });
 }());

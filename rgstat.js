@@ -58,8 +58,14 @@
     }
 
     JS9.RegisterPlugin("ImExam", "RegionStats", statInit, {
-            viewMenuItem: "Region Stats",
+	    menu: "analysis",
+
+            winTitle: "Region Stats",
+            menuItem: "Region Stats",
+
             regionchange: statUpdate,
-            winDims: [250, 250]
+            winDims: [250, 250],
+
+	    help: "Foo"
     });
 }());

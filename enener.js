@@ -56,7 +56,11 @@
     }
 
     JS9.RegisterPlugin("ImExam", "EncEnergy", energInit, {
-            viewMenuItem: "Encircled Energy",
+	    menu: "analysis",
+
+            menuItem: "Encircled Energy",
+            winTitle: "Encircled Energy",
+
             regionchange: energUpdate,
             winDims: [250, 250],
     });

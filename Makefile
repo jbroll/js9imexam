@@ -2,7 +2,9 @@
 JS9   = ../js9
 JS9JS = $(JS9)/plugins/imexam
 
-HTML  = js9Imexam.html
+HTML  = js9Imexam.html 
+
+HX    = imexam.html xyproj.html
 
 JX    = 		\
 	imexam.jx	\
@@ -14,7 +16,8 @@ JS    = 		\
 	rgstat.js	\
 	rghist.js	\
 	enener.js	\
-	rghxrg.js
+	rghxrg.js	\
+	pxtabl.js
 
 all:	$(JX:.jx=.js)
 
@@ -22,6 +25,7 @@ install: $(JX) FORCE
 	mkdir -p $(JS9JS)
 	cp -p $(HTML) $(JS9)
 	cp -p $(JX:.jx=.js) $(JS) $(JS9JS)/.
+	cp -p $(HX) $(JS9JS)/.
 
 
 lint :

@@ -95,7 +95,11 @@
     }
 
     JS9.RegisterPlugin("ImExam", "3dPlot", pluginInit, {
-            viewMenuItem: "3dPlot",
+	    menu: "analysis",
+
+            menuItem: "3dPlot",
+            winTitle: "3dPlot",
+
             regionchange: pluginUpdate,
             winDims: [250, 250],
     });
