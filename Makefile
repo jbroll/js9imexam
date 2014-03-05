@@ -1,46 +1,54 @@
 
-
 JS9   = ../js9
-JS9JS = $(JS9)/js/imexam
+JS9JS = $(JS9)/plugins/imexam
 
-all: 	$(JS9)/js9imexam.html	\
-	$(JS9JS)/imexam.js	\
-	$(JS9JS)/surface.js	\
-	$(JS9JS)/template.js	\
-	$(JS9JS)/pinned.png	\
-	$(JS9JS)/unpinned.png
+HTML  = js9Imexam.html 
 
-$(JS9)/js9imexam.html: js9imexam.html
+HX    = imexam.html xyproj.html
+
+JX    = 		\
+	imexam.jx	\
+	3dplot.jx
+	
+JS    = 		\
+	xyproj.js	\
+	r_proj.js	\
+	rgstat.js	\
+	rghist.js	\
+	enener.js	\
+	rghxrg.js	\
+	pxtabl.js
+
+all:	$(JX:.jx=.js)
+
+install: $(JX) FORCE
 	mkdir -p $(JS9JS)
-	cp -p js9imexam.html $(JS9)/js9imexam.html
-
-$(JS9JS)/imexam.js: imexam.js
-	#browserify -r ./imexam | uglifyjs > $(JS9JS)/imexam.js
-	mkdir -p $(JS9JS)
-	browserify -r ./imexam 		  > $(JS9JS)/imexam.js
-
-$(JS9JS)/surface.js: surface.js
-	mkdir -p $(JS9JS)
-	cp -p surface.js $(JS9JS)/surface.js
-
-$(JS9JS)/template.js: template.js
-	mkdir -p $(JS9JS)
-	cp -p template.js $(JS9JS)/template.js
-
-$(JS9JS)/unpinned.png: unpinned.png
-	mkdir -p $(JS9JS)
-	cp -p unpinned.png $(JS9JS)/unpinned.png
-
-$(JS9JS)/pinned.png: pinned.png
-	mkdir -p $(JS9JS)
-	cp -p pinned.png $(JS9JS)/pinned.png
+	cp -p $(HTML) $(JS9)
+	cp -p $(JX:.jx=.js) $(JS) $(JS9JS)/.
+	cp -p $(HX) $(JS9JS)/.
 
 
-base:
-	mkdir -p $(JS9JS)
-	rm -rf $(JS9JS)/JSSurfacePlot
-	mkdir -p $(JS9JS)
-	rm -rf $(JS9JS)/JSSurfacePlot
-	cp -rp JSSurfacePlot-V1.7 $(JS9JS)/JSSurfacePlot
+lint :
+	jslint $(JX) $(JS)
 
-install: base all
+
+imexam.js : imexam.jx template.js
+	browserify -r ./imexam.jx | sed -e s/imexam.jx/imexam/ > imexam.js
+
+3dplot.js: 3dplot.jx ./JSSurfacePlot-V1.7/javascript/SurfacePlot.js ./JSSurfacePlot-V1.7/javascript/ColourGradient.js
+	browserify 						\
+	    -r ./JSSurfacePlot-V1.7/javascript/SurfacePlot 	\
+	    -r ./JSSurfacePlot-V1.7/javascript/ColourGradient > 3dplot.js
+	cat 3dplot.jx >> 3dplot.js
+
+FORCE:
+
+#$(JS9JS)/unpinned.png: unpinned.png
+#	mkdir -p $(JS9JS)
+#	cp -p unpinned.png $(JS9JS)/unpinned.png
+#
+#$(JS9JS)/pinned.png: pinned.png
+#	mkdir -p $(JS9JS)
+#	cp -p pinned.png $(JS9JS)/pinned.png
+#
+

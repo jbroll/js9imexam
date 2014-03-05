@@ -1,8 +1,40 @@
 
- Test region stats
+ 1. Standard plugin help button + help text for each plugin
+    Important : Gets help standard in place before release.
 
- Projection
-	median
+ 2. Standard plugin "pin/unpin" button
+    Important : Allows comparison of data analyses from two parts of the image. 
+
+ 3. Fix counts in region for each shape.
+   Important : Least surprise to user. 
+
+ 4. Pixel table plugin attached to mouse move
+    Important : Shows use of mouse move callback
+ 
+ 5. Contour plugin.
+   Important : Shows use of plugin controlling regions on image.
+
+
+
+
+ ImExpr 
+     https://github.com/silentmatt/js-expression-eval/blob/master/parser.js
+
+     Take parser , replace ops functions with multi dispatch versions.
+
+
+     a: ...
+     b: ....
+     c: .....
+
+     x = a + b
+
+
+ Pix Table 
+ 
+ HxRG Pix Stack - Test
+
+ Pin/UnPin control
 
  Histogram
 	stats
@@ -10,6 +42,5 @@
  Graphs
 	Zoom stack
 	horizontal & vertical selection
-
 
 

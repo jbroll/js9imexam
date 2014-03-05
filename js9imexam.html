@@ -7,6 +7,7 @@
   <link type="text/css" rel="stylesheet" href="css/jquery.contextMenu.css">
   <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
   <link type="text/css" rel="stylesheet" href="js9.css">
+  <link type="text/css" rel="stylesheet" href="plugins/plugintest.css">
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/kinetic.min.js"></script>
   <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
@@ -20,438 +21,88 @@
   * Visit http://www.dynamicdrive.com/ for full source code
   ***********************************************/
   </script>
-  <script type="text/javascript" src="js/astrolib.js"></script>
   <script type="text/javascript" src="js/fitsy.js"></script>
+  <script type="text/javascript" src="js/astrolib.js"></script>
   <script type="text/javascript" src="js9.js"></script>
-
-  <script>
-  $(document).ready(function() {
-
-      $(".JS9").attr('tabindex', 1);
-
-      $(".JS9").keydown(function(evt) {
-
-	  var im = JS9.GetImage(this);
-
-	  switch(evt.which) {
-	  case 37: // left
-
-	  break;
-
-	  case 38: // up
-	  break;
-
-	  case 39: // right
-	  break;
-
-	  case 40: // down
-	  break;
-
-	  default: return; // exit this handler for other keys
-	  }
-	  evt.preventDefault(); // prevent the default action (scroll / move caret)
-      });
-  })
-</script>
-  <script type="text/javascript" src="js/imexam/template.js"></script>
-  <script type="text/javascript" src="js/imexam/surface.js"></script>
-  <script type="text/javascript" src="js/imexam/imexam.js"></script>
-
-  <!--[if IE]><script type="text/javascript" src="javascript/excanvas.js"></script><![endif]-->
-  <script type="text/javascript" src="js/imexam/JSSurfacePlot/javascript/SurfacePlot.js"></script>
-  <script type="text/javascript" src="js/imexam/JSSurfacePlot/javascript/ColourGradient.js"></script>
-
-
-    <script type="text/template" id="imstat-stats-template">
-    <table width=100%>
-	 <tr><td align=right>Position X</td><td align=right>{reg.pos.x%.2f}</td>
-	     <td align=right>Y</td>	    <td align=right>{reg.pos.y%.2f}</td></tr>
-	 <tr><td align=right>width</td>     <td align=right>{reg.size.width%.2f}</td>
-	     <td align=right>height</td>    <td align=right>{reg.size.height%.2f}</td></tr>
-	 <tr><td align=right>min</td>       <td align=right>{min%.2f}		 </td>	
-	     <td align=right>max</td>       <td align=right>{max%.2f}		 </td></tr>
-	 <tr><td align=right>Counts</td>    <td align=right colspan=3>{counts%.2f}</tr>
-	 <tr><td align=right>backgr</td>    <td align=right>{backgr%.2f}	</td>
-	     <td align=right>noise</td>     <td align=right>{noise%.2f}		</td></tr>
-	 <tr><td align=right>Centroid X</td><td align=right>{centroid.cenx%.2f} </td>
-	     <td align=right>Y</td>	    <td align=right>{centroid.ceny%.2f}</td></tr>
-	 <tr><td align=right>FWHM</td>      <td align=right>{centroid.fwhm%.2f}</td>
-	     <td align=right>RMS</td>      <td align=right>{centroid.rmom%.2f}</td></tr>
-    </table>
-    </script>
-
-    <script type="text/template" id="imstat-rproj-template">
-    	<div style='position:absolute;right: 10px;top:10px'>
-        <table>
-	<tr><td>peak	</td><td align=right>{rproj.fit.a%.2f}</td><tr>
-	<tr><td>decenter</td><td align=right>{rproj.fit.b%.2f}</td><tr>
-	<tr><td>sigma	</td><td align=right>{rproj.fit.c%.2f}</td><tr>
-	<tr><td>bias	</td><td align=right>{rproj.fit.d%.2f}</td><tr>
-        </table>
-	</div>
-    </script>
-
-    <script type="text/template" id="imstat-xproj-template">
-    	<div style='position:absolute;right: 10px;top:10px'>
-	 <select class="xproj-menu" onchange='imexamUpdate(undefined, $(this).parents(".js9imexam-box")[0]);'>
-	 	<option>sum</option>
-	 	<option>avg</option>
-	 	<option>med</option>
-	</select>
-    </script>
-
-    <script type="text/template" id="js9imexam-box-template">
-    <form>
-	<input type=image class="js9imexam-pin" src="js/imexam/unpinned.png"
-		onclick='imexamPin($(this).parents(".js9imexam-box")[0]); return false;'>
-	<select class="js9imexam-menu" onchange='imexamUpdate(undefined, $(this).parents(".js9imexam-box")[0], undefined, this.options[this.selectedIndex].value);'>
-		<option value="stats"> Regions Stats</option>
-		<option value="rproj"> Radial Profile</option>
-		<option value="encen"> Encircled Energy</option>
-		<option value="3plot"> 3d Plot</option>
-		<option value="xproj"> X Projection</option>
-		<option value="yproj"> Y Projection</option>
-		<option value="histo"> Histogram</option>
-		<option value="hxrg-stack"> HxRG Pixel Stack</option>
-	</select>
-    </form>
-    <div id="js9imexam-box-display" style="height:250px; width:280px"> </div>
-    </script>
-
+  <script type="text/javascript" src="plugins/imexam/imexam.js"></script>
+  <script type="text/javascript" src="plugins/imexam/rgstat.js"></script>
+  <script type="text/javascript" src="plugins/imexam/xyproj.js"></script>
+  <script type="text/javascript" src="plugins/imexam/r_proj.js"></script>
+  <script type="text/javascript" src="plugins/imexam/enener.js"></script>
+  <script type="text/javascript" src="plugins/imexam/rghist.js"></script>
+  <script type="text/javascript" src="plugins/imexam/3dplot.js"></script>
 </head>
 <body>
-
-    <script type="text/javascript">
-
-
-	imexam = require("./imexam");
-
-	    function HxRGReadPixelStack(fits, n, index, deliver, data) {
-		if ( n === 0 ) {
-		    data = []
-		} else {
-		    data[n-1] = fits.pixel
-		}
-
-		n += 1;
-
-		if ( n >= fits.nhdu ) {
-		    var last = data[0]
-		    for ( i = 1; i < n; i++ ) {
-			data[i-1] = data[i]
-		    }
-
-		    data[n-1] = last
-
-		    deliver(data);
-
-		    return
-		}
-
-		Fitsy.readPixel(fits, fits.hdu[n], index, function() { HxRGReadPixelStack(fits, n, index, deliver, data) });
-	    }
-
-
-    // this is the callback for all region changes
-    //
-    JS9.regionOpts.xeqonchange = "runImExam";
-
-    function runImExam(im, xreg) {
-
-        switch ( xreg.shape ) {
-	    case "box":
-	        w = xreg.size.width;
-	        h = xreg.size.height;
-
-	        break;
-	    case "circle":
-	        xreg.size = new Object();
-
-	        xreg.size.width  = xreg.radius*2;
-	        xreg.size.height = xreg.radius*2;
-
-	        break;
-
-	    default:
-		return;
-        }
-	
-	var im_2d  = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-	var imstat = imexam.imops.imstat(im_2d
-		, imexam.imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height)
-		, xreg.shape);
-
-	imstat.im  = im
-	imstat.reg = xreg;
-	imstat.jspix = im.raw.data[xreg.pos.y*im.raw.width+xreg.pos.x]
-	imstat.impix = im_2d.get(xreg.pos.y, xreg.pos.x)
-	imstat.rgpix = imstat.imag.get(xreg.size.width/2, xreg.size.height/2)
-
-	dispImExam(im, xreg, imstat);
-    }
-
-    NextType = 0;
-
-    function imexamPin(el) {
-	var pinned = $(el).data("pinned");
-	var img;
-
-	if ( pinned === undefined || pinned === 0 ) {
-	    pinned = 1;
-	    img = "js/imexam/pinned.png"
-	} else {
-	    pinned = 0;
-	    img = "js/imexam/unpinned.png"
-	}
-	
-	$(el).find(".js9imexam-pin")[0].setAttribute("src", img);
-	$(el).data("pinned", pinned);
-	
-    }
-
-    function imexamUpdate(im, el, imstat, type) {
-	var change = 0;
-
-	if ( type === undefined ) {
-	    type = $(el).data("type")
-
-	    if ( type === undefined ) {
-		el.innerHTML = template("js9imexam-box-template", null);
-
-		var menu = $(el).find(".js9imexam-menu")[0];
-
-		menu.selectedIndex = NextType;
-		type = menu.options[NextType].value;
-		
-		NextType++
-
-		$(el).data("type", type)
-	    }
-	} else {
-	    $(el).data("type", type)
-
-	    change = 1;
-	}
-
-	if ( imstat === undefined ) {
-	    imstat = $(el).data("imstat")
-	    im     = $(el).data("im")
-	} else {
-	    if ( $(el).data("pinned") ) {
-		return;
-	    }
-
-	    $(el).data("imstat", imstat)
-	    $(el).data("im"    , im)
-	}
-
-	var box = $(el).find("#js9imexam-box-display");
-
-	if ( change ) {
-	    $(box[0]).removeData();
-	}
-
-	switch ( type ) {
-	 case "stats" : {
-	    box[0].innerHTML = template("imstat-stats-template", imstat);
-	    break;
-	 }
-	 case "rproj" : {
-	    imstat.rdata = [];
-	    imstat.rfdat = [];
-	    var r;
-
-	    for ( r = 0;  r < imstat.rproj.radi.shape[0]; r++ ) {
-		imstat.rdata[r] = [imstat.rproj.radi.get(r), imstat.rproj.data.get(r)]
-	    }
-
-	    imstat.rproj.samp = imexam.ndops.ndarray([box[0].offsetWidth/2])
-
-	    imexam.ndops.fill(imstat.rproj.samp, function(r) { return imstat.rproj.radius*r/(box[0].offsetWidth/2); })
-
-
-	    imstat.rproj.modl = imexam.ndops.gauss1d(imstat.rproj.samp, imstat.rproj.fitv)
-
-	    for ( r = 0;  r < imstat.rproj.modl.shape[0]; r++ ) {
-		imstat.rfdat[r] = [imstat.rproj.samp.get(r), imstat.rproj.modl.get(r)]
-	    }
-
-	    $.plot(box, [{ data: imstat.rdata, points: { radius: 1, show: true } }, { data: imstat.rfdat }])
-
-	    box.append(template("imstat-rproj-template", imstat));
-
-	    break;
-	 }
-	 case "xproj" : {
-	    imstat.xdata = [];
-	    var n = 1
-	    var data = imstat.xproj;
-		
-	    var xmenu = $(el).find(".xproj-menu")[0];
-
-	    if ( xmenu === undefined ) {
-		proj_type = "sum"
-	    } else {
-		var proj_indx = xmenu.selectedIndex;
-		var proj_type = xmenu.options[xmenu.selectedIndex].value;
-
-	    }
-	    if ( proj_type === "sum" ) {
-		data = imstat.xproj.sum
-	    }
-	    if ( proj_type === "avg" ) {
-		data = imstat.xproj.avg
-	    }
-	    if ( proj_type === "med" ) {
-		data = imstat.xproj.med
-	    }
-
-	    for ( var x = 0;  x < imstat.xproj.shape[0]; x++ ) {
-		imstat.xdata[x] = [x+imstat.sect[0][0], data.get(x)]
-	    }
-
-	    $.plot(box, [imstat.xdata], { xaxis: { min: imstat.sect[0][0], max: imstat.sect[0][1] }});
-
-	    box.append(template("imstat-xproj-template", imstat));
-	    xmenu = $(el).find(".xproj-menu")[0];
-	    xmenu.selectedIndex = proj_indx;
-	    break;
-	 }
-	 case "yproj" : {
-	    imstat.ydata = [];
-	    var n = 1
-		
-	    var xmenu = $(el).find(".xproj-menu")[0];
-
-	    if ( xmenu === undefined ) {
-		proj_type = "sum"
-	    } else {
-		var proj_indx = xmenu.selectedIndex;
-		var proj_type = xmenu.options[xmenu.selectedIndex].value;
-	    }
-
-	    if ( proj_type === "sum" ) {
-		data = imstat.yproj.sum
-	    }
-	    if ( proj_type === "avg" ) {
-		data = imstat.yproj.avg
-	    }
-	    if ( proj_type === "med" ) {
-		data = imstat.yproj.med
-	    }
-
-	    for ( var y = 0;  y < imstat.yproj.shape[0]; y++ ) {
-		imstat.ydata[y] = [y+imstat.sect[1][0], data.get(y)]
-	    }
-
-	    $.plot(box, [imstat.ydata], { xaxis: { min: imstat.sect[1][0], max: imstat.sect[1][1] }});
-
-	    box.append(template("imstat-xproj-template", imstat));
-	    xmenu = $(el).find(".xproj-menu")[0];
-	    xmenu.selectedIndex = proj_indx;
-	    break;
-	 }
-	 case "encen" : {
-	    imstat.edata = [];
-
-	    for ( var i = 0;  i < imstat.encen.shape[0]; i++ ) {
-		imstat.edata[i] = [i, imstat.encen.get(i)]
-	    }
-
-	    $.plot(box, [imstat.edata]);
-
-	    break;
-	 }
-	 case "histo" : {
-	    imstat.hdata = [];
-
-	    var n = 0
-	    var skip = imstat.hist.sum * .001
-	    var h = 0
-
-	    for ( var i = 0; i < imstat.hist.data.shape[0]; i++ ) {
-		n += imstat.hist.data.get(i);
-
-		if ( n < skip ) { continue }
-		if ( n > imstat.hist.sum - skip ) { break }
-
-		var value = imstat.hist.data.get(h);
-
-		imstat.hdata[h] = [i*imstat.hist.width, value]
-		h++
-	    }
-	
-	    $.plot(box, [imstat.hdata]);
-
-	    break;
-	 }
-	 case "hxrg-stack" : {
-	    HxRGReadPixelStack(im.raw.hdu.fits, 0, [imstat.reg.pos.y, imstat.reg.pos.x], function(data) {
-
-		var hxrg = []
-		for ( var i = 0; i < data.length; i++ ) {
-		    hxrg[i] = [i, data[i]]
-	 	}
-
-		$.plot(box, [hxrg]);
-	    })
-
-	    break;
-	 }
-	 case "3plot" : {
-	    surface(box[0], imstat.imag);
-	    break;
-	 }
-
-	 default:
-	    console.log("Unknown ImExam Display Type")
-	}
-    }
-
-    function dispImExam(im, xreg, imstat) {
-	$(".js9imexam-box").each(function(i, obj) { imexamUpdate(im, obj, imstat); });
-    }
-
-    </script>
-
-    Here are a couple of FITS images to try:
-
+    <font size="+1"><center>
+    <b>JS9 Imexam: browser-based imexam using JS9 plugins</b>
+    </center></font>
+    <p>
+    You can add browser-based imexam analysis to a JS9 Web page!
+    <table cellspacing="30">
+
+    <tr valign="top">
+    <td>
+    <div class="JS9Menubar" id="JS9Menubar"></div>
+    <div class="JS9" id="JS9"></div>
+    </td>
+    <td>
+      In this example, ImExam div elements are defined in the Web-page
     <ul>
-    <li><A href="javascript:Fitsy.fetchURL('1212.fits', 'fits/1212.fits', undefined, window.JS9.Load)">DSS 12:0:0 12:0:0</A></li>
-    <li><A href="javascript:Fitsy.fetchURL('STAR1_3.fits', 'fits/STAR1_3.fits', undefined, window.JS9.Load)">FLWO 48 Inch Shack Hartman WFS Image</A></li>
-    <li><A href="javascript:Fitsy.fetchURL('dot.fits', 'fits/dot.fits', undefined, window.JS9.Load)">A Dot</A></li>
+    <li> <a href='javascript:JS9.Load("png/casa.png");'>CAS-A (Chandra)</a>
+    <li> <a href='javascript:JS9.Load("png/snr.png", {colormap:"heat"});'>CTB 109 (Einstein)</a>
+    <li> <a href='javascript:JS9.Load("png/m13.png", {scale:"linear", colormap:"sls"});'>m13 (via SkyView)</a>
+    <li> <a href='javascript:JS9.Load("png/i1000.png", {scale:"linear", colormap:"grey"});'>i1000 (v=x*1000+y)</a>
     </ul>
+    Load an image, create a region, and move it around to see the imexam windows
+    update. You also can select one or more light imexam windows from the View
+    menu to see other cuts of the data.
+    <p>
 
-<table>
-<tr>
-<td valign=top>
-    <div class="JS9Menubar"></div>
-    <div class="JS9"></div>
-</td>
-<td>
-  <div id="region-info">
-      <div>JS9 ImExam <div style="float:right">
-                             <input type="button" value="+" onClick="addGrid();">
-                             <input type="button" value="-" onClick="delGrid();">
-                             <select>
-                                     <option value="grid">single</option>
-                                     <option value="grid">grid</option>
-                                     <option value="row"> row</option>
-                                     <option value="col"> col</option>
-                             </select>
-      		      </div>
-      </div>
-      <div style="clear:right"></div>
-      <div>
-	    <div class="js9imexam-box" style="float:left; height:270px; width:300px"> Create a circle region to activate region analysis</div>
-	    <div class="js9imexam-box" style="float:left;height:270px; width:300px"></div>
-	    <div class="js9imexam-box" style="float:left;height:270px; width:300px"></div>
-	    <div class="js9imexam-box" style="float:left;height:270px; width:300px"></div>
-      </div>
-  </div>
-</td>
-</tr>
-</table>
+    <table>
+    <tr><td><div class="ImExamRegionStats" data-js9id="JS9"></div></td>
+        <td><div class="ImExam3dPlot"      data-js9id="JS9"></div></td></tr>
+    <tr><td><div class="ImExamXProj"       data-js9id="JS9"></div></td>
+        <td><div class="ImExamYProj"       data-js9id="JS9"></div></td></tr>
+    </table>
 
+    </td>
+    </tr>
+
+    <tr valign="top">
+    <td>
+    <div class="JS9Menubar" id="nopMenubar"></div>
+    <div class="JS9" id="nop"></div>
+    </td>
+    <td>
+      In this example, no Plugin div element has been defined on the page.
+      It therefore will be offered in the View menu as a light window.
+    <ul>
+    <li> <a href='javascript:JS9.Load("png/casa.png", "nop");'>CAS-A (Chandra)</a>
+    <li> <a href='javascript:JS9.Load("png/snr.png", {colormap:"heat", display:"nop"});'>CTB 109 (Einstein)</a>
+    <li> <a href='javascript:JS9.Load("png/m13.png", {scale:"linear", colormap:"sls", display:"nop"});'>m13 (via SkyView)</a>
+    <li> <a href='javascript:JS9.Load("png/i1000.png", {scale:"linear", colormap:"grey", display:"nop"});'>i1000 (v=x*1000+y)</a>
+    </ul>
+    Load an image, create a region, select one or more imexam windows
+    from the View menu. Then move the regions around to see the imexam
+    windows update.
+    </td>
+    </tr>
+
+    </table>
+<p>
+JS9 Demos:
+<ul>
+<li><a href='js9basics.html'>JS9 Demo: the basics</a>
+<li><a href='js9panzoom.html'>JS9 Demo: pan and zoom</a> 
+<li><a href='js9rgb.html'>JS9 Demo: RGB composite images</a> 
+<li><a href='js9analysis.html'>JS9 Demo: two ways of doing data analysis</a> 
+<li><a href='js9onchange.html'>JS9 Demo: running tasks when a region changes</a>
+<li><a href='js9cat.html'>JS9 Demo: overlaying catalogs</a>
+<li><a href='js9multi.html'>JS9 Demo: independent instances of JS9</a> 
+<li><a href='js9create.html'>JS9 Demo: creating a JS9 instance dynamically</a> 
+<li><a href='js9preload.html'>JS9 Demo: preloading images into JS9</a>
+<li><a href='js9bitpix.html'>JS9 Demo: displaying different FITS datatypes</a> 
+<li><a href='js9plugins.html'>JS9 Demo: adding plugins to JS9</a> 
+</ul>
 </body>
 </html>
