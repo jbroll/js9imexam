@@ -524,26 +524,57 @@ exports.reg2section = function(xreg) {
 
     switch ( xreg.shape ) {
 
-          case "circle":
-              xreg.size = {};
+	case "annulus":
+            xreg.size = {};
 
-              xreg.size.width  = xreg.radius*2 + 1;
-              xreg.size.height = xreg.radius*2 + 1;
+            xreg.size.width  = xreg.radii[xreg.radii.length-1]*2;
+            xreg.size.height = xreg.radii[xreg.radii.length-1]*2;
 
-              break;
+            break;
 
-          case "ellipse":
-              xreg.size = {};
+       	case "circle":
 
-              xreg.size.width  = xreg.eradius.x*2;
-              xreg.size.height = xreg.eradius.y*2;
+            xreg.size.width  = xreg.radius*2;
+            xreg.size.height = xreg.radius*2;
 
-              break;
+            break;
 
-          default:
-      }
+       	case "ellipse":
+            xreg.size = {};
 
-      return imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height);
+            xreg.size.width  = xreg.eradius.x*2;
+            xreg.size.height = xreg.eradius.y*2;
+
+            break;
+
+       	case "polygon":
+            xreg.size = {};
+            xreg.pos  = {};
+
+	    var i, xx = 0, yy = 0, minx = 1000000, maxx = 0, miny = 1000000, maxy = 0;
+
+	    for ( i = 0; i < xreg.points.length; i++ ) {
+		xx += xreg.points[i].x;
+		yy += xreg.points[i].y;
+
+		if ( xreg.points[i].x > maxx ) { maxx = xreg.points[i].x; }
+		if ( xreg.points[i].x < minx ) { minx = xreg.points[i].x; }
+		if ( xreg.points[i].y > maxy ) { maxy = xreg.points[i].y; }
+		if ( xreg.points[i].y < miny ) { miny = xreg.points[i].y; }
+	    }
+
+	    xreg.pos.x = xx/xreg.points.length;
+	    xreg.pos.y = yy/xreg.points.length;
+
+	    xreg.size.width  = maxx - minx;
+	    xreg.size.height = maxy - miny;
+
+	    break;
+
+       	default:
+    }
+
+    return imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height);
 };
 
 exports.template = template;

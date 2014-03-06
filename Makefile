@@ -21,7 +21,7 @@ JS    = 		\
 
 all:	$(JX:.jx=.js)
 
-install: $(JX) FORCE
+install: $(JX:.jx=.js) FORCE
 	mkdir -p $(JS9JS)
 	cp -p $(HTML) $(JS9)
 	cp -p $(JX:.jx=.js) $(JS) $(JS9JS)/.
