@@ -22,7 +22,7 @@
             <tr><td align=right>Centroid X</td> <td align=right>{centroid.cenx%.2f}     </td>           \
             <td align=right>Y</td>              <td align=right>{centroid.ceny%.2f}     </td></tr>      \
             <tr><td align=right>FWHM</td>       <td align=right>{centroid.fwhm%.2f}     </td>           \
-            <td align=right>RMS</td>            <td align=right>{centroid.rms%.2f}      </td></tr>      \
+            <td align=right></td>            <td align=right>{centroid.rms%.2f}      </td></tr>      \
         </table>";
 
     function statUpdate(im, xreg) {
@@ -30,9 +30,17 @@
 
             var section = imexam.reg2section(xreg);
             var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-            var imag    = imexam.ndops.section(im_2d, section);
-            var data    = imexam.ndops.assign(imexam.ndops.ndarray(imag.shape), imag);
+	    var imag;
 
+	    if ( xreg.angle && xreg.angle !== 0 ) {
+		imag = imexam.ndops.ndarray([xreg.size.width, xreg.size.height]);
+
+		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
+	    } else {
+		imag    = imexam.ndops.section(im_2d, section);
+	    }
+
+            var data    = imexam.ndops.assign(imexam.ndops.ndarray(imag.shape), imag);
 
             var stat    = {};
 

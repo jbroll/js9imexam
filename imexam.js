@@ -534,6 +534,7 @@ exports.reg2section = function(xreg) {
             break;
 
        	case "circle":
+            xreg.size = {};
 
             xreg.size.width  = xreg.radius*2;
             xreg.size.height = xreg.radius*2;

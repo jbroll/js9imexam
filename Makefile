@@ -4,7 +4,14 @@ JS9JS = $(JS9)/plugins/imexam
 
 HTML  = js9Imexam.html 
 
-HX    = imexam.html xyproj.html
+HX    = imexam.html	\
+	rgstat.html	\
+	xyproj.html	\
+	r_proj.html	\
+	rghist.html	\
+	enener.html	\
+	3dplot.html
+	
 
 JX    = 		\
 	imexam.jx	\
