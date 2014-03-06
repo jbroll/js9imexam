@@ -1,0 +1,32 @@
+<html>
+<body>
+<h3>Region Statistics </h3>
+
+A rectangualr box of image pixels is sectected and some statical values 
+are computed from the data.  The selected box may be rotated for box and 
+ellipse regions.
+
+<h3>Notes</h3>
+
+<ul>
+ <li><b>Background and Noise</b>
+ <p>
+	The background and noise are obtained by from the outer 4 pixel wide
+	perimeter the selected region.  The background value is the median of 
+	the area and the noise value is the RMS.
+ </li>
+ <li><b>Centroid</b>
+ <p>
+	The centroid is obtained by locating the brightest 9 pixel box and 
+	computing the centroid of the background subtracted data about this point.
+ </li>
+ <li><b>FWHM</b>
+ <p>
+	The FWHM is estimated from the image moments about the centroid assuming 
+	a gausian distribution.
+ </li>
+
+
+</body>
+</html>
+
