@@ -51,7 +51,7 @@
     }
 
     function pluginInit() {
-	JS9.DecoratePlugin(this);
+	imexam.fixupDiv(this);
     }
 
     JS9.RegisterPlugin("ImExam", "PxTabl", pluginInit, {
@@ -59,6 +59,10 @@
 
             menuItem: "Pixel Table",
             winTitle: "Pixel Table",
+	    help:     "imexam/imexam.html#pxtabl",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
 
             regionchange: pluginUpdate,
             winDims: [250, 250],

@@ -98,7 +98,7 @@
     }
 
     function pluginInit() {
-	JS9.DecoratePlugin(this);
+	imexam.fixupDiv(this);
         $(this.div).append("Create a region to see 3d plot<br>");
     }
 
@@ -107,6 +107,10 @@
 
             menuItem: "3dPlot",
             winTitle: "3dPlot",
+	    help:     "imexam/3dplot.html",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
 
             regionchange: pluginUpdate,
             winDims: [250, 250],

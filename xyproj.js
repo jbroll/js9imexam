@@ -8,21 +8,20 @@
     var imexam = require("./imexam");
 
 
-    var projTemplate = "                                        \
-        <div style='position:absolute;right: 10px;top:10px'>    \
+    var projToolbar = "                                      	\
                  <select  class='proj_menu'> 			\
                         <option>sum</option>                    \
                         <option>avg</option>                    \
                         <option>med</option>                    \
-                </select> \
-        </div>";
+                </select>";
 
     function projUpdate(im, xreg) {
-	var div;
+	var div, proj, menx;
 
         if ( im === undefined ) {
 	    div  = xreg.div;
 	    proj = xreg.proj;
+	    menx = xreg.menu;
 	} else {
 	    div  = this.div; 
 
@@ -40,7 +39,13 @@
 		imag    = imexam.ndops.section(im_2d, section);
 	    }
 
-            var proj    = imexam.ndops.proj(imag, axis);
+            proj = imexam.ndops.proj(imag, axis);
+
+	    menx = $(this.toolbar).find(".proj_menu")[0];
+
+	    $(menx).change(function (event) {
+		    projUpdate(undefined, { div: div, proj: proj, menu: menx });
+		});
 	}
 
 
@@ -48,19 +53,7 @@
 	var  data;
 	var x;
 
-	var xmenu = $(div).find(".proj_menu")[0];
-
-	var proj_indx;
-	var proj_type;
-
-	if ( xmenu === undefined ) {
-		proj_type = "sum";
-		proj_indx = 0;
-	} else {
-		proj_indx = xmenu.selectedIndex;
-		proj_type = xmenu.options[xmenu.selectedIndex].value;
-	}
-
+	var proj_type = menx.options[menx.selectedIndex].value;
 
 	$(div).empty();
 
@@ -80,21 +73,11 @@
 	}
 
 	$.plot(div, [xdata]);
-
-
-	$(div).append(projTemplate);
-	xmenu = $(div).find(".proj_menu")[0];
-	xmenu.selectedIndex = proj_indx;
-	$(xmenu).change(function (xmenu) {
-		projUpdate(undefined, { div: div, proj: proj });
-	    });
     }
 
     function projInit() {
-	JS9.DecoratePlugin(this);
-
+	imexam.fixupDiv(this);
         $(this.div).append("Create a region to see projection<br>");
-        $(this.div).append(projTemplate);
     }
 
     JS9.RegisterPlugin("ImExam", "XProj", projInit, {
@@ -102,11 +85,15 @@
 
             menuItem: "X Projection",
 	    winTitle: "X Projection",
+	    help:     "imexam/imexam.html#xyproj",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: projToolbar,
 
             regionchange: projUpdate,
+
             winDims: [250, 250],
 
-	    html: "imexam/xyproj.html",
             xyproj: 0
     });
 
@@ -115,11 +102,15 @@
 
             menuItem: "Y Projection",
 	    winTitle: "Y Projection",
+	    help:     "imexam/imexam.html#xyproj",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: projToolbar,
 
             regionchange: projUpdate,
+
             winDims: [250, 250],
 
-	    html: "imexam/xyproj.html",
             xyproj: 1
     });
 }());

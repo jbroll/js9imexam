@@ -1,5 +1,5 @@
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
-/*globals $, JS9, Fitsy */ 
+/*globals $, JS9, Fitsy, imexam */ 
 
 "use strict";
 
@@ -50,7 +50,7 @@
     }
 
     function pixtInit() {
-	JS9.DecoratePlugin(this);
+	imexam.fixupDiv(this);
         $(this.div).append("Create a region to see the pixel stack<br>");
     }
 
@@ -59,6 +59,10 @@
 
             menuItem: "Pixel Stack",
             winTitle: "Pixel Stack",
+	    help:     "imexam/imexam.html#rghxrg",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
 
             regionchange: pixtUpdate,
             winDims: [250, 250],

@@ -59,7 +59,7 @@
     }
 
     function energInit() {
-	JS9.DecoratePlugin(this);
+	imexam.fixupDiv(this);
         $(this.div).append("Create a region to see encircled energy<br>");
     }
 
@@ -68,6 +68,10 @@
 
             menuItem: "Encircled Energy",
             winTitle: "Encircled Energy",
+	    help:     "imexam/imexam.html#enener",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
 
             regionchange: energUpdate,
             winDims: [250, 250],

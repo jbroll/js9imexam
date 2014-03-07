@@ -1480,7 +1480,7 @@ module.exports=require('OC7+bw');
     }
 
     function pluginInit() {
-	JS9.DecoratePlugin(this);
+	imexam.fixupDiv(this);
         $(this.div).append("Create a region to see 3d plot<br>");
     }
 
@@ -1489,6 +1489,10 @@ module.exports=require('OC7+bw');
 
             menuItem: "3dPlot",
             winTitle: "3dPlot",
+	    help:     "imexam/imexam.html#3dplot",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
 
             regionchange: pluginUpdate,
             winDims: [250, 250],

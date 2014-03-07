@@ -61,7 +61,7 @@
     }
 
     function statInit() {
-	JS9.DecoratePlugin(this);
+	imexam.fixupDiv(this);
         $(this.div).append("Create a region to see stats<br>");
     }
 
@@ -70,10 +70,12 @@
 
             winTitle: "Region Stats",
             menuItem: "Region Stats",
+	    help:     "imexam/imexam.html#rgstat",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
 
             regionchange: statUpdate,
             winDims: [250, 250],
-
-	    help: "Foo"
     });
 }());

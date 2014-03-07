@@ -4,7 +4,7 @@ JS9JS = $(JS9)/plugins/imexam
 
 HTML  = js9Imexam.html 
 
-HX    = imexam.html	\
+HX    = 		\
 	rgstat.html	\
 	xyproj.html	\
 	r_proj.html	\
@@ -26,13 +26,13 @@ JS    = 		\
 	rghxrg.js	\
 	pxtabl.js
 
-all:	$(JX:.jx=.js)
+all:	$(JX:.jx=.js) imexam.html
 
-install: $(JX:.jx=.js) FORCE
+install: $(JX:.jx=.js) imexam.html FORCE
 	mkdir -p $(JS9JS)
 	cp -p $(HTML) $(JS9)
 	cp -p $(JX:.jx=.js) $(JS) $(JS9JS)/.
-	cp -p $(HX) $(JS9JS)/.
+	cp -p imexam.html $(JS9JS)/.
 
 
 lint :
@@ -41,6 +41,9 @@ lint :
 
 imexam.js : imexam.jx template.js
 	browserify -r ./imexam.jx | sed -e s/imexam.jx/imexam/ > imexam.js
+
+imexam.html : $(HX)
+	cat $(HX) > imexam.html
 
 3dplot.js: 3dplot.jx ./JSSurfacePlot-V1.7/javascript/SurfacePlot.js ./JSSurfacePlot-V1.7/javascript/ColourGradient.js
 	browserify 						\

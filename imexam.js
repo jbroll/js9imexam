@@ -4,42 +4,6 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
 "use strict";
 
-      JS9.DecoratePlugin = function (plugin) {
-	var type = plugin.winType;
-	var div  = plugin.div;
-
-	var opts = plugin.plugin.opts;
-
-	if ( type === "div" ) {
-	    $(div).css("border", "1px solid black");
-
-	    if ( $(div).height() <= 0 ) {
-		$(plugin.div).css("height", opts.winDims[1]);
-		$(plugin.div).css("width", opts.winDims[0]);
-	    }
-
-	    if ( opts.winTitle === undefined ) {
-		opts.winTitle = plugin.plugin.name;
-	    }
-
-	    $(div).append('<div style="height=25px; background: lightgrey;">' + opts.winTitle + '</div>');
-	    $(div).append('<div class="' + plugin.plugin.name + '" </div>');
-
-	    plugin.divjq = $(div).find("." + plugin.plugin.name);
-	    plugin.div = plugin.divjq[0];
-
-	    $(plugin.div).height($(div).height()-25);
-	    $(plugin.div).css("background", "white");
-
-
-	} else {
-	    $(plugin.div).css("height", "100%");
-	}
-
-	$(plugin.div).css("position", "relative");
-      };
-
-
 var cwise     = require("cwise");
 var ndarray   = require("ndarray");
 var ndops     = require("ndarray-ops");
@@ -54,6 +18,39 @@ ndops.rotate  = require("image-rotate");
 var numeric   = require("numeric");
 
 var template  = require("./template");
+
+      exports.fixupDiv = function (plugin) {
+	var type   = plugin.winType;
+	var div    = plugin.div;
+	var parent = $(div).parent();
+
+	var opts = plugin.plugin.opts;
+
+	if ( type === "div" ) {
+	    $(parent).css("border", "1px solid black");
+
+	    plugin.toolbar = $(parent).find(".JS9PluginToolbar-div");
+	    plugin.toolbar.css("width", "95%");
+	    plugin.toolbar.css("cursor", "default");
+	    plugin.toolbar.css("text-align", "left");
+
+	    if ( opts.toolbarHTML !== " " ) {
+		plugin.toolbar.html("<div style='float: right;'>" + opts.toolbarHTML + "</div>" + opts.winTitle);
+	    } else {
+		plugin.toolbar.html(opts.winTitle);
+	    }
+	    
+	    if ( $(div).height() <= 0 ) {
+		$(plugin.div).css("height", opts.winDims[1]);
+		$(plugin.div).css("width",  opts.winDims[0]);
+	    }
+
+	    $(plugin.div).height($(parent).height()-25);
+	} else {
+	    plugin.toolbar = $(parent).parent().find(".JS9PluginToolbar-light");
+	    $(plugin.div).css("height", "100%");
+	}
+      };
 
 var imops = {};
 

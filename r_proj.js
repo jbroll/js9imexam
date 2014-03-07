@@ -72,7 +72,7 @@
     }
 
     function rprojInit() {
-	JS9.DecoratePlugin(this);
+	imexam.fixupDiv(this);
         $(this.div).append("Create a region to see radial projection<br>");
     }
 
@@ -81,6 +81,10 @@
 
             menuItem: "Radial Proj",
             winTitle: "Radial Proj",
+	    help:     "imexam/imexam.html#r_proj",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
 
             regionchange: rprojUpdate,
             winDims: [250, 250],

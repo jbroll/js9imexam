@@ -48,7 +48,7 @@
     }
 
     function histInit() {
-	JS9.DecoratePlugin(this);
+	imexam.fixupDiv(this);
         $(this.div).append("Create a region to see histogram<br>");
     }
 
@@ -57,6 +57,10 @@
 
             menuItem: "Histogram",
             winTitle: "Histogram",
+	    help:     "imexam/imexam.html#rghist",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
 
             regionchange: histUpdate,
             winDims: [250, 250],
