@@ -1,108 +1,56 @@
-<!DOCTYPE HTML>
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
-  <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
-  <link type="text/css" rel="stylesheet" href="css/jquery.contextMenu.css">
-  <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
-  <link type="text/css" rel="stylesheet" href="js9.css">
-  <link type="text/css" rel="stylesheet" href="plugins/plugintest.css">
-  <script type="text/javascript" src="js/jquery.min.js"></script>
-  <script type="text/javascript" src="js/kinetic.min.js"></script>
-  <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
-  <script type="text/javascript" src="js/jquery.flot.min.js"></script>
-  <script type="text/javascript" src="js/jquery.flot.errorbars.min.js"></script>
-  <script type="text/javascript" src="js/sprintf.min.js"></script>
-  <script type="text/javascript" src="js/dhtmlwindow.min.js">
-  /***********************************************
-  * DHTML Window Widget- © Dynamic Drive (www.dynamicdrive.com)
-  * This notice must stay intact for legal use.
-  * Visit http://www.dynamicdrive.com/ for full source code
-  ***********************************************/
-  </script>
-  <script type="text/javascript" src="js/fitsy.js"></script>
-  <script type="text/javascript" src="js/astrolib.js"></script>
-  <script type="text/javascript" src="js9.js"></script>
-  <script type="text/javascript" src="plugins/imexam/imexam.js"></script>
-  <script type="text/javascript" src="plugins/imexam/rgstat.js"></script>
-  <script type="text/javascript" src="plugins/imexam/xyproj.js"></script>
-  <script type="text/javascript" src="plugins/imexam/r_proj.js"></script>
-  <script type="text/javascript" src="plugins/imexam/enener.js"></script>
-  <script type="text/javascript" src="plugins/imexam/rghist.js"></script>
-  <script type="text/javascript" src="plugins/imexam/3dplot.js"></script>
-</head>
-<body>
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
+      <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+      <link type="text/css" rel="stylesheet" href="css/jquery.contextMenu.css">
+      <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
+      <link type="text/css" rel="stylesheet" href="js9.css">
+      <script type="text/javascript" src="js/jquery.min.js"></script>
+      <script type="text/javascript" src="js/kinetic.min.js"></script>
+      <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.errorbars.min.js"></script>
+      <script type="text/javascript" src="js/sprintf.min.js"></script>
+      <script type="text/javascript" src="js/dhtmlwindow.min.js">	
+      /***********************************************
+      * DHTML Window Widget- © Dynamic Drive (www.dynamicdrive.com)
+      * This notice must stay intact for legal use.
+      * Visit http://www.dynamicdrive.com/ for full source code
+      ***********************************************/
+      </script>
+
+      <script type="text/javascript" src="js/fitsy.js"></script>
+      <script type="text/javascript" src="js/astrolib.js"></script>
+      <script type="text/javascript" src="js9.js"></script>
+
+
+      <script type="text/javascript" src="plugins/imexam/imexam.js"></script>
+      <script type="text/javascript" src="plugins/imexam/rgstat.js"></script>
+      <script type="text/javascript" src="plugins/imexam/xyproj.js"></script>
+      <script type="text/javascript" src="plugins/imexam/r_proj.js"></script>
+      <script type="text/javascript" src="plugins/imexam/enener.js"></script>
+      <script type="text/javascript" src="plugins/imexam/rghist.js"></script>
+      <script type="text/javascript" src="plugins/imexam/3dplot.js"></script>
+      <script type="text/javascript" src="plugins/imexam/pxtabl.js"></script>
+      <script type="text/javascript" src="plugins/imexam/rghxrg.js"></script>
+
+    </head>
+    <body>
+    <ul>
+    <div style="float: right;"><a href="plugins/imexam/imexam.html">Help</a></div>
+
     <font size="+1"><center>
     <b>JS9 Imexam: browser-based imexam using JS9 plugins</b>
     </center></font>
     <p>
-    You can add browser-based imexam analysis to a JS9 Web page!
-    <table cellspacing="30">
-    <tr valign="top">
-    <td>
-    <div class="JS9Menubar" id="JS9Menubar"></div>
-    <div class="JS9" id="JS9"></div>
-    </td>
-    <td>
-      In this example, ImExam div elements are defined in the Web-page
-    <ul>
-    <li> <a href='javascript:JS9.Load("png/casa.png");'>CAS-A (Chandra)</a>
-    <li> <a href='javascript:JS9.Load("png/snr.png", {colormap:"heat"});'>CTB 109 (Einstein)</a>
-    <li> <a href='javascript:JS9.Load("png/m13.png", {scale:"linear", colormap:"sls"});'>m13 (via SkyView)</a>
-    <li> <a href='javascript:JS9.Load("png/i1000.png", {scale:"linear", colormap:"grey"});'>i1000 (v=x*1000+y)</a>
+    <li><A href="javascript:Fitsy.fetchURL('1212.fits', 'fits/1212.fits', undefined, window.JS9.Load)">DSS 12:0:0 12:0:0</A></li>
+    <li><A href="javascript:Fitsy.fetchURL('STAR1_3.fits', 'fits/STAR1_3.fits', undefined, window.JS9.Load)">FLWO 48 Inch Shack Hartman WFS Image</A></li>
+    <li><A href="javascript:Fitsy.fetchURL('gauss.fits', 'fits/gauss.fits', undefined, window.JS9.Load)">A Gaussian</A></li>
+    <li><A href="javascript:Fitsy.fetchURL('dot.fits', 'fits/dot.fits', undefined, window.JS9.Load)">A Dot</A></li>
     </ul>
-    Load an image, create a region, and move it around to see the
-    imexam windows update. You also can select one or more light
-    imexam windows from the Analysis menu to see other cuts of the
-    data.
-    <p>
 
-    <table>
-    <tr><td><div class="ImExamRegionStats" data-js9id="JS9"></div></td>
-        <td><div class="ImExam3dPlot"      data-js9id="JS9"></div></td></tr>
-    <tr><td><div class="ImExamXProj"       data-js9id="JS9"></div></td>
-        <td><div class="ImExamYProj"       data-js9id="JS9"></div></td></tr>
-    </table>
-
-    </td>
-    </tr>
-
-    <tr valign="top">
-    <td>
-    <div class="JS9Menubar" id="nopMenubar"></div>
-    <div class="JS9" id="nop"></div>
-    </td>
-    <td>
-      In this example, no ImExam div element has been defined on the page.
-      They therefore will be offered in the Analysis menu as light windows.
-    <ul>
-    <li> <a href='javascript:JS9.Load("png/casa.png", "nop");'>CAS-A (Chandra)</a>
-    <li> <a href='javascript:JS9.Load("png/snr.png", {colormap:"heat", display:"nop"});'>CTB 109 (Einstein)</a>
-    <li> <a href='javascript:JS9.Load("png/m13.png", {scale:"linear", colormap:"sls", display:"nop"});'>m13 (via SkyView)</a>
-    <li> <a href='javascript:JS9.Load("png/i1000.png", {scale:"linear", colormap:"grey", display:"nop"});'>i1000 (v=x*1000+y)</a>
-    </ul>
-    Load an image, create a region, select one or more imexam windows
-    from the Analysis menu. Then move the regions around to see the
-    imexam windows update.
-    </td>
-    </tr>
-
-    </table>
-<p>
-JS9 Demos:
-<ul>
-<li><a href='js9basics.html'>JS9 Demo: the basics</a>
-<li><a href='js9panzoom.html'>JS9 Demo: pan and zoom</a> 
-<li><a href='js9rgb.html'>JS9 Demo: RGB composite images</a> 
-<li><a href='js9analysis.html'>JS9 Demo: two ways of doing data analysis</a> 
-<li><a href='js9onchange.html'>JS9 Demo: running tasks when a region changes</a>
-<li><a href='js9cat.html'>JS9 Demo: overlaying catalogs</a>
-<li><a href='js9multi.html'>JS9 Demo: independent instances of JS9</a> 
-<li><a href='js9create.html'>JS9 Demo: creating a JS9 instance dynamically</a> 
-<li><a href='js9preload.html'>JS9 Demo: preloading images into JS9</a>
-<li><a href='js9bitpix.html'>JS9 Demo: displaying different FITS datatypes</a> 
-<li><a href='js9plugins.html'>JS9 Demo: adding plugins to JS9</a> 
-</ul>
-</body>
+    <div class="JS9Menubar"></div>
+    <div class="JS9"></div>
+    </body>
 </html>
