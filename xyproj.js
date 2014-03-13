@@ -24,24 +24,9 @@
 	    menx = xreg.menu;
 	} else {
 	    div  = this.div; 
-
-	    var axis    = this.plugin.opts.xyproj;
-
-            var section = imexam.reg2section(xreg);
-            var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-	    var imag;
-
-	    if ( xreg.angle && xreg.angle !== 0 ) {
-		imag = imexam.ndops.ndarray([xreg.size.width, xreg.size.height]);
-
-		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
-	    } else {
-		imag    = imexam.ndops.section(im_2d, section);
-	    }
-
-            proj = imexam.ndops.proj(imag, axis);
-
 	    menx = $(this.toolbar).find(".proj_menu")[0];
+
+            proj = imexam.ndops.proj(imexam.getRegionData(im, xreg), this.plugin.opts.xyproj);
 
 	    $(menx).change(function (event) {
 		    projUpdate(undefined, { div: div, proj: proj, menu: menx });

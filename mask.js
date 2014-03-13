@@ -1,48 +1,46 @@
 
-// Recursive function to compute the area of a pixel at x,y that falls with in
-// radius r.
-//
-function pixwt(r, x, y, D) {
-	var d;
 
-    if ( x < 0 || y < 0 ) {
-	return pixwt(r, Math.abs(x), Math.abs(y), D);
-    }
+// source
+// background
+// exclude
 
-    if ( D === undefined ) {
-	D = 1;
-    }
+function Mask(im) {
+    this.im = im;
+    this.ctx = canvas thingy;
 
-    if ( D < .001 ) {					// Just stop after a while.
-	return 0;
-    }
+    if ( !this.ctx.ellipse ) { this.ctx.ellipse = fakeEllipse; }
+    if ( !this.ctx.polygon ) { this.ctx.ellipse = fakePolygon; }
 
-    d = D / 2.0;
+    this.draw = function (reg) {
+	var regno = 1;
 
+	var x, y, j;
 
-    if ( (x+d)*(x+d) + (y+d)*(y+d)        <= r*r ) {	// Outside corner is inside circle
-	return D*D;
-    } else if ( (x-d)*(x-d) + (y-d)*(y-d) >= r*r ) {	// Inside corner is outside circle
-	return 0;
-    } else {
-	d = D/4.0;
-	D = D/2.0;
+	for ( i = 0 i <= reg.length; i++ ) {
+	    x = reg.pos.x;
+	    y = reg.pos.y;
 
-	var reply =
-		pixwt(r, x+d, y+0, D) +
-	       	pixwt(r, x+0, y+d, D) +
-	       	pixwt(r, x-d, y-0, D) +
-	      	pixwt(r, x-0, y-d, D);
+	    switch reg[i].shape {
+	     case "annulus":
+		for ( j = 0; j < reg.annuli.length; j++ ) {
+		    cxt.circle(x, y, reg.radii[j]);
+		    regno++;
+		}
+	     case "circle":
+		cxt.circle(x, y, reg.radius);
 
-	return reply;
+	     case "box":
+		cxt.box(x, y, reg.size.width, reg.size.height
+
+	     case "ellipse":
+		cxt.ellipse(x, y, r);
+	     case "polygon":
+
+		cxt.polygon(...);
+	    }
+	    regno++;
+	}
     }
 }
 
-
-imops.circle_mask = function(nx, ny, x, y, r) {
-
-    return ndops.fill(ndops.ndarray([nx, ny]), function(i, j) {
-
-	    return pixwt(r, i-nx+x, j-ny+y);
-    });
-}
+exports.Mask = Mask;
