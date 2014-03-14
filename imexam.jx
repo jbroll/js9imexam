@@ -44,7 +44,7 @@ var template  = require("./template");
 		$(plugin.div).css("width",  opts.winDims[0]);
 	    }
 
-	    $(plugin.div).height($(parent).height()-25);
+	    $(plugin.div).height($(parent).parent().height()-25);
 	} else {
 	    plugin.toolbar = $(parent).parent().find(".JS9PluginToolbar-light");
 	    $(plugin.div).css("height", "100%");

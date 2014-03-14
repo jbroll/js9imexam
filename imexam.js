@@ -1,4 +1,6 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"uKhyze":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./imexam":[function(require,module,exports){
+module.exports=require('uKhyze');
+},{}],"uKhyze":[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
 /*globals Float64Array, Float32Array, Int32Array, JS9, $ */ 
 
@@ -45,7 +47,7 @@ var template  = require("./template");
 		$(plugin.div).css("width",  opts.winDims[0]);
 	    }
 
-	    $(plugin.div).height($(parent).height()-25);
+	    $(plugin.div).height($(parent).parent().height()-25);
 	} else {
 	    plugin.toolbar = $(parent).parent().find(".JS9PluginToolbar-light");
 	    $(plugin.div).css("height", "100%");
@@ -584,9 +586,7 @@ exports.ndops    = ndops;
 exports.imops    = imops;
 
 
-},{"./template":72,"cwise":3,"image-rotate":11,"ndarray":69,"ndarray-fill":12,"ndarray-moments":21,"ndarray-ops":30,"ndarray-pack":35,"ndarray-sort":48,"ndarray-unpack":58,"numeric":71}],"./imexam":[function(require,module,exports){
-module.exports=require('uKhyze');
-},{}],3:[function(require,module,exports){
+},{"./template":72,"cwise":3,"image-rotate":11,"ndarray":69,"ndarray-fill":12,"ndarray-moments":21,"ndarray-ops":30,"ndarray-pack":35,"ndarray-sort":48,"ndarray-unpack":58,"numeric":71}],3:[function(require,module,exports){
 "use strict"
 
 var parse   = require("cwise-parser")
