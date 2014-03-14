@@ -4,14 +4,23 @@
 // background
 // exclude
 
-function Mask(im) {
+exports.Mask = function (im) {
     this.im = im;
-    this.ctx = canvas thingy;
+
+    this.canvas = document.createElement("canvas");
+    canvas.width = im.width;
+    canvas.height = im.height;
+
+    this.ctx = canvas.getContext("2d");
 
     if ( !this.ctx.ellipse ) { this.ctx.ellipse = fakeEllipse; }
-    if ( !this.ctx.polygon ) { this.ctx.ellipse = fakePolygon; }
 
-    this.draw = function (reg) {
+    this.getMask = function () {
+	return ndarray(new Ushort16Array(ctx.getImageData(0, 0, img.width, img.height).data)
+	    , [img.height, img.width], [2*img.width, 2], 0);
+    }
+
+    this.drawRegions = function (reg) {
 	var regno = 1;
 
 	var x, y, j;
@@ -43,4 +52,3 @@ function Mask(im) {
     }
 }
 
-exports.Mask = Mask;

@@ -1,3 +1,6 @@
+
+
+
 context.beginPath() ;
 
     var x             = 150;         // The X coordinate
