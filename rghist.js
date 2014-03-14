@@ -10,17 +10,7 @@
     function histUpdate(im, xreg) {
         var div = this.div;
 
-            var section = imexam.reg2section(xreg);
-            var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-	    var imag;
-
-	    if ( xreg.angle && xreg.angle !== 0 ) {
-		imag = imexam.ndops.ndarray([xreg.size.width, xreg.size.height]);
-
-		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
-	    } else {
-		imag    = imexam.ndops.section(im_2d, section);
-	    }
+	    var imag = imexam.getRegionData(im, xreg);
 
             var hist    = imexam.ndops.hist(imag);
             hist.sum    = imexam.ndops.sum(hist.data);

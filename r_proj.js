@@ -19,19 +19,7 @@
     function rprojUpdate(im, xreg) {
         var div = this.div;
 
-            $(div).empty();
-
-            var section = imexam.reg2section(xreg);
-            var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-	    var imag;
-
-	    if ( xreg.angle && xreg.angle !== 0 ) {
-		imag = imexam.ndops.ndarray([xreg.size.width, xreg.size.height]);
-
-		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
-	    } else {
-		imag    = imexam.ndops.section(im_2d, section);
-	    }
+	    var imag = imexam.getRegionData(im, xreg);
 
             var max     = imexam.ndops.maxvalue(imag);
             var backgr  = imexam.imops.backgr(imag, 4).value;
@@ -66,8 +54,8 @@
 		rfdat[r] = [rproj.samp.get(r), rproj.modl.get(r)];
             }
 
+            $(div).empty();
             $.plot(div, [{ data: rdata, points: { radius: 1, show: true } }, { data: rfdat }]);
-
             $(div).append(imexam.template(rproj_template, fitv));
     }
 

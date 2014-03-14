@@ -1464,19 +1464,7 @@ module.exports=require('OC7+bw');
     }
 
     function pluginUpdate(im, xreg) {
-            var section = imexam.reg2section(xreg);
-            var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-	    var imag;
-
-	    if ( xreg.angle && xreg.angle !== 0 ) {
-		imag = imexam.ndops.ndarray([xreg.size.width, xreg.size.height]);
-
-		imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
-	    } else {
-		imag    = imexam.ndops.section(im_2d, section);
-	    }
-
-            surface(this.div, imag);
+            surface(this.div, imexam.getRegionData(im, xreg));
     }
 
     function pluginInit() {
@@ -1489,7 +1477,7 @@ module.exports=require('OC7+bw');
 
             menuItem: "3dPlot",
             winTitle: "3dPlot",
-	    help:     "imexam/imexam.html#3dplot",
+	    help:     "imexam/3dplot.html",
 
 	    toolbarSeparate: true,
 	    toolbarHTML: " ",

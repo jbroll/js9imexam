@@ -517,7 +517,7 @@ ndops.gsfit1d = function(radi, data, x0) {
     }
 };
 
-exports.reg2section = function(xreg) {
+function reg2section(xreg) {
 
     switch ( xreg.shape ) {
 
@@ -573,25 +573,26 @@ exports.reg2section = function(xreg) {
     }
 
     return imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height);
-};
+}
 
-exports.getRegionData = funciton (im, xreg) {
-    var section = imexam.reg2section(xreg);
-    var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+exports.getRegionData = function (im, xreg) {
+    var section = reg2section(xreg);
+    var im_2d   = ndarray(im.raw.data, [im.raw.height, im.raw.width]);
     var imag;
 
     if ( xreg.angle && xreg.angle !== 0 ) {
-	imag = imexam.ndops.ndarray([xreg.size.width, xreg.size.height]);
+	imag = ndarray([xreg.size.width, xreg.size.height]);
 
-	imexam.ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
+	ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
     } else {
-	imag    = imexam.ndops.section(im_2d, section);
+	imag = ndops.section(im_2d, section);
     }
 
     return imag;
-}
+};
 
 
+exports.reg2section = reg2section;
 exports.template = template;
 
 exports.numeric  = numeric;

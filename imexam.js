@@ -1,6 +1,4 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./imexam":[function(require,module,exports){
-module.exports=require('uKhyze');
-},{}],"uKhyze":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"uKhyze":[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
 /*globals Float64Array, Float32Array, Int32Array, JS9, $ */ 
 
@@ -520,7 +518,7 @@ ndops.gsfit1d = function(radi, data, x0) {
     }
 };
 
-exports.reg2section = function(xreg) {
+function reg2section(xreg) {
 
     switch ( xreg.shape ) {
 
@@ -576,8 +574,26 @@ exports.reg2section = function(xreg) {
     }
 
     return imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height);
+}
+
+exports.getRegionData = function (im, xreg) {
+    var section = reg2section(xreg);
+    var im_2d   = ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+    var imag;
+
+    if ( xreg.angle && xreg.angle !== 0 ) {
+	imag = ndarray([xreg.size.width, xreg.size.height]);
+
+	ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
+    } else {
+	imag = ndops.section(im_2d, section);
+    }
+
+    return imag;
 };
 
+
+exports.reg2section = reg2section;
 exports.template = template;
 
 exports.numeric  = numeric;
@@ -586,7 +602,9 @@ exports.ndops    = ndops;
 exports.imops    = imops;
 
 
-},{"./template":72,"cwise":3,"image-rotate":11,"ndarray":69,"ndarray-fill":12,"ndarray-moments":21,"ndarray-ops":30,"ndarray-pack":35,"ndarray-sort":48,"ndarray-unpack":58,"numeric":71}],3:[function(require,module,exports){
+},{"./template":72,"cwise":3,"image-rotate":11,"ndarray":69,"ndarray-fill":12,"ndarray-moments":21,"ndarray-ops":30,"ndarray-pack":35,"ndarray-sort":48,"ndarray-unpack":58,"numeric":71}],"./imexam":[function(require,module,exports){
+module.exports=require('uKhyze');
+},{}],3:[function(require,module,exports){
 "use strict"
 
 var parse   = require("cwise-parser")
