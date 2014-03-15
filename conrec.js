@@ -369,14 +369,17 @@ var Conrec = (function() {
       ]
     ];
 
+
     for (var j=(jub-1);j>=jlb;j--) {
       for (var i=ilb;i<=iub-1;i++) {
         var temp1, temp2;
-        temp1 = Math.min(d[i][j],d[i][j+1]);
-        temp2 = Math.min(d[i+1][j],d[i+1][j+1]);
+        temp1 = Math.min(d.get(i, j), d.get(i, j+1));
+        temp2   = Math.min(d.get(i+1, j), d.get(i+1, j+1));
+
         dmin  = Math.min(temp1,temp2);
-        temp1 = Math.max(d[i][j],d[i][j+1]);
-        temp2 = Math.max(d[i+1][j],d[i+1][j+1]);
+        temp1 = Math.max(d.get(i, j), d.get(i, j+1));
+
+        temp2 = Math.max(d.get(i+1, j),d.get(i+1, j+1));
         dmax  = Math.max(temp1,temp2);
 
         if (dmax>=z[0]&&dmin<=z[nc-1]) {
@@ -386,7 +389,7 @@ var Conrec = (function() {
                 if (m>0) {
                   // The indexing of im and jm should be noted as it has to
                   // start from zero
-                  h[m] = d[i+im[m-1]][j+jm[m-1]]-z[k];
+                  h[m] = d.get(i+im[m-1], j+jm[m-1])-z[k];
                   xh[m] = x[i+im[m-1]];
                   yh[m] = y[j+jm[m-1]];
                 } else {
@@ -501,6 +504,8 @@ var Conrec = (function() {
                   }
                   // Put your processing code here and comment out the printf
                   //printf("%f %f %f %f %f\n",x1,y1,x2,y2,z[k]);
+
+                  //console.log(x1,y1,x2,y2,z[k],k);
                   drawContour(x1,y1,x2,y2,z[k],k);
                 }
               }

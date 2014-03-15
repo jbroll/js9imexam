@@ -13,6 +13,7 @@ ndops.fill    = require("ndarray-fill");
 ndops.sort    = require("ndarray-sort");
 ndops.moments = require("ndarray-moments");
 ndops.rotate  = require("image-rotate");
+ndops.iota    = require("iota-array");
 
 var numeric   = require("numeric");
 
