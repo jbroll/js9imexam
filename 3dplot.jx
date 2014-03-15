@@ -1,15 +1,14 @@
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, continue: true */
-/*globals $, JS9, greg */ 
+/*globals $, JS9, imexam, greg */ 
 
 "use strict";
 
 
 (function () {
-    var imexam = require("./imexam");
+    //DELETE-ME var imexam = require("./imexam");
 
     require("./JSSurfacePlot-V1.7/javascript/SurfacePlot");
     require("./JSSurfacePlot-V1.7/javascript/ColourGradient");
-
 
     function surface(div, data) {
 

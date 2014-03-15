@@ -1,4 +1,6 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"uKhyze":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./imexam":[function(require,module,exports){
+module.exports=require('Ll8vMw');
+},{}],"Ll8vMw":[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
 /*globals Float64Array, Float32Array, Int32Array, JS9, $ */ 
 
@@ -14,6 +16,7 @@ ndops.fill    = require("ndarray-fill");
 ndops.sort    = require("ndarray-sort");
 ndops.moments = require("ndarray-moments");
 ndops.rotate  = require("image-rotate");
+ndops.iota    = require("iota-array");
 
 var numeric   = require("numeric");
 
@@ -68,7 +71,11 @@ ndops.size = function(shape) {
 };
 
 ndops.ndarray = function(shape) {
-        return ndarray(new Float64Array(ndops.size(shape)), shape);
+    if ( shape.data ) {
+	return ndarray(shape, shape.shape);
+    }
+
+    return ndarray(new Float64Array(ndops.size(shape)), shape);
 };
 
 ndops.reshape = function(a, shape) {
@@ -602,9 +609,7 @@ exports.ndops    = ndops;
 exports.imops    = imops;
 
 
-},{"./template":72,"cwise":3,"image-rotate":11,"ndarray":69,"ndarray-fill":12,"ndarray-moments":21,"ndarray-ops":30,"ndarray-pack":35,"ndarray-sort":48,"ndarray-unpack":58,"numeric":71}],"./imexam":[function(require,module,exports){
-module.exports=require('uKhyze');
-},{}],3:[function(require,module,exports){
+},{"./template":73,"cwise":3,"image-rotate":11,"iota-array":12,"ndarray":70,"ndarray-fill":13,"ndarray-moments":22,"ndarray-ops":31,"ndarray-pack":36,"ndarray-sort":49,"ndarray-unpack":59,"numeric":72}],3:[function(require,module,exports){
 "use strict"
 
 var parse   = require("cwise-parser")
@@ -5270,7 +5275,19 @@ function rotateImage(out, inp, theta, iX, iY, oX, oY) {
   })
   return out
 }
-},{"ndarray-warp":68}],12:[function(require,module,exports){
+},{"ndarray-warp":69}],12:[function(require,module,exports){
+"use strict"
+
+function iota(n) {
+  var result = new Array(n)
+  for(var i=0; i<n; ++i) {
+    result[i] = i
+  }
+  return result
+}
+
+module.exports = iota
+},{}],13:[function(require,module,exports){
 "use strict"
 
 var fill = require("cwise")({
@@ -5285,9 +5302,9 @@ module.exports = function(array, f) {
   return array
 }
 
-},{"cwise":13}],13:[function(require,module,exports){
+},{"cwise":14}],14:[function(require,module,exports){
 arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":14,"cwise-parser":18}],14:[function(require,module,exports){
+},{"cwise-compiler":15,"cwise-parser":19}],15:[function(require,module,exports){
 "use strict"
 
 var createThunk = require("./lib/thunk.js")
@@ -5393,7 +5410,7 @@ function compileCwise(user_args) {
 
 module.exports = compileCwise
 
-},{"./lib/thunk.js":16}],15:[function(require,module,exports){
+},{"./lib/thunk.js":17}],16:[function(require,module,exports){
 "use strict"
 
 var uniq = require("uniq")
@@ -5650,17 +5667,17 @@ function generateCWiseOp(proc, typesig) {
   return f()
 }
 module.exports = generateCWiseOp
-},{"uniq":17}],16:[function(require,module,exports){
+},{"uniq":18}],17:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":15}],17:[function(require,module,exports){
+},{"./compile.js":16}],18:[function(require,module,exports){
 module.exports=require(7)
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports=require(8)
-},{"esprima":19,"uniq":20}],19:[function(require,module,exports){
+},{"esprima":20,"uniq":21}],20:[function(require,module,exports){
 module.exports=require(9)
-},{}],20:[function(require,module,exports){
-module.exports=require(7)
 },{}],21:[function(require,module,exports){
+module.exports=require(7)
+},{}],22:[function(require,module,exports){
 "use strict"
 
 var cwise = require("cwise")
@@ -5707,23 +5724,23 @@ module.exports = function computeMoments(n, array) {
 
 
 
-},{"cwise":22}],22:[function(require,module,exports){
+},{"cwise":23}],23:[function(require,module,exports){
 arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":23,"cwise-parser":27}],23:[function(require,module,exports){
-module.exports=require(14)
-},{"./lib/thunk.js":25}],24:[function(require,module,exports){
-module.exports=require(15)
-},{"uniq":26}],25:[function(require,module,exports){
+},{"cwise-compiler":24,"cwise-parser":28}],24:[function(require,module,exports){
+arguments[4][15][0].apply(exports,arguments)
+},{"./lib/thunk.js":26}],25:[function(require,module,exports){
+module.exports=require(16)
+},{"uniq":27}],26:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":24}],26:[function(require,module,exports){
+},{"./compile.js":25}],27:[function(require,module,exports){
 module.exports=require(7)
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports=require(8)
-},{"esprima":28,"uniq":29}],28:[function(require,module,exports){
+},{"esprima":29,"uniq":30}],29:[function(require,module,exports){
 module.exports=require(9)
-},{}],29:[function(require,module,exports){
-module.exports=require(7)
 },{}],30:[function(require,module,exports){
+module.exports=require(7)
+},{}],31:[function(require,module,exports){
 "use strict"
 
 var compile = require("cwise-compiler")
@@ -6172,15 +6189,15 @@ exports.assigns = makeOp({
   funcName: "assigns" })
 
 
-},{"cwise-compiler":31}],31:[function(require,module,exports){
-module.exports=require(14)
-},{"./lib/thunk.js":33}],32:[function(require,module,exports){
-module.exports=require(15)
-},{"uniq":34}],33:[function(require,module,exports){
+},{"cwise-compiler":32}],32:[function(require,module,exports){
+arguments[4][15][0].apply(exports,arguments)
+},{"./lib/thunk.js":34}],33:[function(require,module,exports){
+module.exports=require(16)
+},{"uniq":35}],34:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":32}],34:[function(require,module,exports){
+},{"./compile.js":33}],35:[function(require,module,exports){
 module.exports=require(7)
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict"
 
 var ndarray = require("ndarray")
@@ -6212,23 +6229,23 @@ module.exports = function convert(arr) {
   return result
 }
 
-},{"cwise":36,"ndarray":69}],36:[function(require,module,exports){
+},{"cwise":37,"ndarray":70}],37:[function(require,module,exports){
 arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":37,"cwise-parser":41}],37:[function(require,module,exports){
-module.exports=require(14)
-},{"./lib/thunk.js":39}],38:[function(require,module,exports){
-module.exports=require(15)
-},{"uniq":40}],39:[function(require,module,exports){
+},{"cwise-compiler":38,"cwise-parser":42}],38:[function(require,module,exports){
+arguments[4][15][0].apply(exports,arguments)
+},{"./lib/thunk.js":40}],39:[function(require,module,exports){
+module.exports=require(16)
+},{"uniq":41}],40:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":38}],40:[function(require,module,exports){
+},{"./compile.js":39}],41:[function(require,module,exports){
 module.exports=require(7)
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 module.exports=require(8)
-},{"esprima":42,"uniq":43}],42:[function(require,module,exports){
+},{"esprima":43,"uniq":44}],43:[function(require,module,exports){
 module.exports=require(9)
-},{}],43:[function(require,module,exports){
-module.exports=require(7)
 },{}],44:[function(require,module,exports){
+module.exports=require(7)
+},{}],45:[function(require,module,exports){
 "use strict"
 
 var pool = require("typedarray-pool")
@@ -6957,7 +6974,7 @@ function compileSort(order, dtype) {
 }
 
 module.exports = compileSort
-},{"typedarray-pool":47}],45:[function(require,module,exports){
+},{"typedarray-pool":48}],46:[function(require,module,exports){
 /**
  * Bit twiddling hacks for JavaScript.
  *
@@ -7163,7 +7180,7 @@ exports.nextCombination = function(v) {
 }
 
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict"
 
 function dupe_array(count, value, i) {
@@ -7213,8 +7230,9 @@ function dupe(count, value) {
 }
 
 module.exports = dupe
-},{}],47:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};"use strict"
+},{}],48:[function(require,module,exports){
+(function (global){
+"use strict"
 
 var bits = require("bit-twiddle")
 var dup = require("dup")
@@ -7530,7 +7548,8 @@ exports.clearCache = function clearCache() {
   }
 }
 
-},{"bit-twiddle":45,"dup":46}],48:[function(require,module,exports){
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"bit-twiddle":46,"dup":47}],49:[function(require,module,exports){
 "use strict"
 
 var compile = require("./lib/compile_sort.js")
@@ -7549,25 +7568,25 @@ function sort(array) {
 }
 
 module.exports = sort
-},{"./lib/compile_sort.js":44}],49:[function(require,module,exports){
+},{"./lib/compile_sort.js":45}],50:[function(require,module,exports){
 arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":50,"cwise-parser":54}],50:[function(require,module,exports){
-module.exports=require(14)
-},{"./lib/thunk.js":52}],51:[function(require,module,exports){
-module.exports=require(15)
-},{"uniq":53}],52:[function(require,module,exports){
+},{"cwise-compiler":51,"cwise-parser":55}],51:[function(require,module,exports){
+arguments[4][15][0].apply(exports,arguments)
+},{"./lib/thunk.js":53}],52:[function(require,module,exports){
+module.exports=require(16)
+},{"uniq":54}],53:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":51}],53:[function(require,module,exports){
+},{"./compile.js":52}],54:[function(require,module,exports){
 module.exports=require(7)
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports=require(8)
-},{"esprima":55,"uniq":56}],55:[function(require,module,exports){
+},{"esprima":56,"uniq":57}],56:[function(require,module,exports){
 module.exports=require(9)
-},{}],56:[function(require,module,exports){
-module.exports=require(7)
 },{}],57:[function(require,module,exports){
-module.exports=require(46)
+module.exports=require(7)
 },{}],58:[function(require,module,exports){
+module.exports=require(47)
+},{}],59:[function(require,module,exports){
 "use strict"
 
 var dup = require("dup")
@@ -7590,23 +7609,23 @@ module.exports = function unpack(arr) {
   return result
 }
 
-},{"cwise":49,"dup":57}],59:[function(require,module,exports){
+},{"cwise":50,"dup":58}],60:[function(require,module,exports){
 arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":60,"cwise-parser":64}],60:[function(require,module,exports){
-module.exports=require(14)
-},{"./lib/thunk.js":62}],61:[function(require,module,exports){
-module.exports=require(15)
-},{"uniq":63}],62:[function(require,module,exports){
+},{"cwise-compiler":61,"cwise-parser":65}],61:[function(require,module,exports){
+arguments[4][15][0].apply(exports,arguments)
+},{"./lib/thunk.js":63}],62:[function(require,module,exports){
+module.exports=require(16)
+},{"uniq":64}],63:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":61}],63:[function(require,module,exports){
+},{"./compile.js":62}],64:[function(require,module,exports){
 module.exports=require(7)
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports=require(8)
-},{"esprima":65,"uniq":66}],65:[function(require,module,exports){
+},{"esprima":66,"uniq":67}],66:[function(require,module,exports){
 module.exports=require(9)
-},{}],66:[function(require,module,exports){
-module.exports=require(7)
 },{}],67:[function(require,module,exports){
+module.exports=require(7)
+},{}],68:[function(require,module,exports){
 "use strict"
 
 function interp1d(arr, x) {
@@ -7717,7 +7736,7 @@ module.exports.d1 = interp1d
 module.exports.d2 = interp2d
 module.exports.d3 = interp3d
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict"
 
 var interp = require("ndarray-linear-interpolate")
@@ -7785,7 +7804,7 @@ module.exports = function warp(dest, src, func) {
   return dest
 }
 
-},{"cwise":59,"ndarray-linear-interpolate":67}],69:[function(require,module,exports){
+},{"cwise":60,"ndarray-linear-interpolate":68}],70:[function(require,module,exports){
 "use strict"
 
 var iota = require("iota-array")
@@ -8125,20 +8144,11 @@ function wrappedNDArrayCtor(data, shape, stride, offset) {
 }
 
 module.exports = wrappedNDArrayCtor
-},{"iota-array":70}],70:[function(require,module,exports){
-"use strict"
-
-function iota(n) {
-  var result = new Array(n)
-  for(var i=0; i<n; ++i) {
-    result[i] = i
-  }
-  return result
-}
-
-module.exports = iota
-},{}],71:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};"use strict";
+},{"iota-array":71}],71:[function(require,module,exports){
+module.exports=require(12)
+},{}],72:[function(require,module,exports){
+(function (global){
+"use strict";
 
 var numeric = (typeof exports === "undefined")?(function numeric() {}):(exports);
 if(typeof global !== "undefined") { global.numeric = numeric; }
@@ -12563,7 +12573,8 @@ numeric.svd= function svd(A) {
 };
 
 
-},{}],72:[function(require,module,exports){
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],73:[function(require,module,exports){
 function template(str, data){
     
         return str.replace(/{([a-zA-Z0-9_.%]*)}/g,
@@ -12612,4 +12623,3 @@ function template(str, data){
 module.exports = template;
 
 },{}]},{},[])
-;

@@ -68,7 +68,11 @@ ndops.size = function(shape) {
 };
 
 ndops.ndarray = function(shape) {
-        return ndarray(new Float64Array(ndops.size(shape)), shape);
+    if ( shape.data ) {
+	return ndarray(shape, shape.shape);
+    }
+
+    return ndarray(new Float64Array(ndops.size(shape)), shape);
 };
 
 ndops.reshape = function(a, shape) {

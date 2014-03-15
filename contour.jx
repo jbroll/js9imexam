@@ -1,0 +1,121 @@
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
+/*globals $, JS9, imexam */ 
+
+"use strict";
+
+
+(function() {
+    //DELETE-ME var imexam = require("./imexam");
+    var conrec = require("./conrec");
+
+    function drawContours(div, display) {
+	var i;
+	var im   = JS9.GetImage(display);
+	var form = $(div).find(".contour-form")[0];
+
+	var data = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+
+	var levelString = form.level.value;
+
+	var level = JSON.parse("[" + levelString.split(/\s+/).join(",") + "]");
+
+	var c      = new conrec.Conrec();
+
+	c.contour(data
+		, 0, data.shape[0]-1, 0, data.shape[1]-1
+		, imexam.ndops.iota(data.shape[0]), imexam.ndops.iota(data.shape[1])
+		, 10, level);
+
+	var contours = c.contourList();
+	for ( i = 0; i < contours.length; i++ ) {
+	    JS9.Regions(im, { shape: "polygon", points: contours[i] });
+	}
+    }
+
+    function getMinMax(div, display) {
+	var im  = JS9.GetImage(display);
+
+	if ( im ) {
+	    var data = imexam.ndarray(im.raw.data);
+	    var form = $(div).find(".contour-form")[0];
+
+	    form.min.value = imexam.ndops.minvalue(data).toFixed(2);
+	    form.max.value = imexam.ndops.maxvalue(data).toFixed(2);
+	}
+    }
+
+    function makeLevel(div, display) {
+	var i;
+	var im  = JS9.GetImage(display);
+
+	if ( im ) {
+	    var form = $(div).find(".contour-form")[0];
+
+	    var level = imexam.ndarray(imexam.ndops.iota(Number(form.nlevel.value)));
+
+	    var min   = Number(form.min.value);
+	    var max   = Number(form.max.value);
+
+	    imexam.ndops.divs(level, level, 10);		// Try 10 levels from min to max.
+	    imexam.ndops.muls(level, level, max-min);
+	    imexam.ndops.adds(level, level, min);
+
+	    var levText = [];
+	    for ( i = 0; i < level.shape[0]; i++ ) {
+		levText.push(level.data[i].toFixed(2));
+	    }
+
+	    form.level.value = levText.join("\n");
+	}
+    }
+
+    function contInit() {
+	var im  = JS9.GetImage(this.display);
+	var div = this.div;
+
+	div.innerHTML = '<form class="contour-form">							\
+	    <table><tr>	<td>N</td>									\
+			<td><input type=text name=nlevel value=10 size=10></td>			\
+		       	<td><input type=button value="Draw Contours" class="drw-contour"></td></tr>	\
+	           <tr>	<td>Min</td>									\
+			<td><input type=text name=min size=10></td>					\
+		       	<td><input type=button value="Set Min/Max" class="get-min-max"></td></tr>	\
+	           <tr>	<td>Max</td>									\
+			<td><input type=text name=max size=10></td></tr>				\
+	           <tr>	<td valign=top>Levels:</td>							\
+	    		<td><textarea type=textarea rows=12 cols=10 name=level class="contour-levels">	\
+			    </textarea>									\
+		       	<td valign=top><input type=button value="Make Levels" class="make-levels"></td>	\
+		   </tr>										\
+	    </table>											\
+	    <p>												\
+	    </form>';
+
+	var display = this.display;
+
+	$(div).find(".drw-contour").click(function () { drawContours(div, display); });
+	$(div).find(".get-min-max").click(function () { getMinMax(div, display); });
+	$(div).find(".make-levels").click(function () { makeLevel(div, display); });
+
+
+	if ( im !== undefined ) {
+	    getMinMax(div, display);
+	    makeLevel(div, display);
+	}
+
+	imexam.fixupDiv(this);
+    }
+
+    JS9.RegisterPlugin("ImExam", "Contours", contInit, {
+	    menu: "view",
+
+            winTitle: "Contours",
+            menuItem: "Contours",
+	    help:     "imexam/coutours.html",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
+
+            winDims: [250, 250],
+    });
+}());

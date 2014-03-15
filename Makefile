@@ -15,8 +15,9 @@ HX    = 		\
 
 JX    = 		\
 	imexam.jx	\
-	3dplot.jx
-	
+	3dplot.jx	\
+	contour.jx
+
 JS    = 		\
 	xyproj.js	\
 	r_proj.js	\
@@ -40,16 +41,17 @@ lint :
 
 
 imexam.js : imexam.jx template.js
-	browserify -r ./imexam.jx | sed -e s/imexam.jx/imexam/ > imexam.js
+	browserify -r ./imexam.jx:./imexam > imexam.js
 
 imexam.html : $(HX)
 	cat $(HX) > imexam.html
 
 3dplot.js: 3dplot.jx ./JSSurfacePlot-V1.7/javascript/SurfacePlot.js ./JSSurfacePlot-V1.7/javascript/ColourGradient.js
-	browserify 						\
-	    -r ./JSSurfacePlot-V1.7/javascript/SurfacePlot 	\
-	    -r ./JSSurfacePlot-V1.7/javascript/ColourGradient > 3dplot.js
-	cat 3dplot.jx >> 3dplot.js
+	browserify  3dplot.jx | sed -e s%//DELETE-ME%% > 3dplot.js
+
+contour.js : contour.jx conrec.js
+	browserify contour.jx | sed -e s%//DELETE-ME%% > contour.js
+
 
 FORCE:
 

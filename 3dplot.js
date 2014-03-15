@@ -1,4 +1,111 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"k5rQ6b":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, continue: true */
+/*globals $, JS9, imexam, greg */ 
+
+"use strict";
+
+
+(function () {
+     var imexam = require("./imexam");
+
+    require("./JSSurfacePlot-V1.7/javascript/SurfacePlot");
+    require("./JSSurfacePlot-V1.7/javascript/ColourGradient");
+
+    function surface(div, data) {
+
+        var surf     = imexam.ndops.ndarray(data.shape),
+            minvalue = imexam.ndops.minvalue(data),
+            maxvalue = imexam.ndops.maxvalue(data),
+            range    = maxvalue - minvalue;
+
+        var  surfacePlot = $(div).data("surfplot");
+        var fillPly = true;
+        
+
+        surf.getNumberOfRows = function () {
+            return this.shape[0];
+        };
+        surf.getNumberOfColumns = function () {
+            return this.shape[1];
+        };
+        surf.getFormattedValue = function (i, j) {
+            return this.get(i, j).toString();
+        };
+
+
+        if ( surfacePlot === undefined ) {
+            div.innerHTML = "";
+
+            surfacePlot = new greg.ross.visualisation.SurfacePlot(div);
+
+            $(div).data("surfplot", surfacePlot);
+        }
+
+        // Define a colour gradient.
+        var colour1 = {red:   0, green:   0, blue: 255};
+        var colour2 = {red:   0, green: 255, blue: 255};
+        var colour3 = {red:   0, green: 255, blue:   0};
+        var colour4 = {red: 255, green: 255, blue:   0};
+        var colour5 = {red: 255, green:   0, blue:   0};
+        var colours = [colour1, colour2, colour3, colour4, colour5];
+        
+        // Axis labels.
+        var xAxisHeader = "X";
+        var yAxisHeader = "Y";
+        var zAxisHeader = "Z";
+
+        var tooltipStrings = [];
+
+        var numRows = surf.getNumberOfRows();
+        var numCols = surf.getNumberOfColumns();
+        var idx = 0;
+
+        var height = div.offsetHeight;
+        var width  = div.offsetWidth;
+        var i, j, value;
+
+        for (i = 0; i < numRows; i++) {
+            for (j = 0; j < numCols; j++) {
+                value = data.get(i, j);
+
+                surf.set(j, i, (value-minvalue)/(range*2.25));
+
+                tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value.toFixed(2);
+                idx++;
+            }
+        }
+        
+        var options = {xPos: 0, yPos: 0, width: width, height: height, colourGradient: colours, fillPolygons: fillPly,
+                tooltips: tooltipStrings, xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader, restrictXRotation: false};
+
+        surfacePlot.draw(surf, options);
+    }
+
+    function pluginUpdate(im, xreg) {
+            surface(this.div, imexam.getRegionData(im, xreg));
+    }
+
+    function pluginInit() {
+	imexam.fixupDiv(this);
+        $(this.div).append("Create a region to see 3d plot<br>");
+    }
+
+    JS9.RegisterPlugin("ImExam", "3dPlot", pluginInit, {
+	    menu: "analysis",
+
+            menuItem: "3dPlot",
+            winTitle: "3dPlot",
+	    help:     "imexam/3dplot.html",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
+
+            regionchange: pluginUpdate,
+            winDims: [250, 250],
+    });
+}());
+
+},{"./JSSurfacePlot-V1.7/javascript/ColourGradient":2,"./JSSurfacePlot-V1.7/javascript/SurfacePlot":3}],2:[function(require,module,exports){
 /*
  * ColourGradient.js
  *
@@ -146,9 +253,7 @@ greg.ross.visualisation.ColourGradient = function(minValue, maxValue, rgbColourA
 }
 
 
-},{}],"./JSSurfacePlot-V1.7/javascript/ColourGradient":[function(require,module,exports){
-module.exports=require('k5rQ6b');
-},{}],"OC7+bw":[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /*
  * SurfacePlot.js
  *
@@ -1377,112 +1482,4 @@ greg.ross.visualisation.JSSurfacePlot.MAX_SCALE = 1100;
 greg.ross.visualisation.JSSurfacePlot.SCALE_FACTOR = 1.4;
 
 
-},{}],"./JSSurfacePlot-V1.7/javascript/SurfacePlot":[function(require,module,exports){
-module.exports=require('OC7+bw');
-},{}]},{},[])
-;/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, continue: true */
-/*globals $, JS9, greg */ 
-
-"use strict";
-
-
-(function () {
-    var imexam = require("./imexam");
-
-    require("./JSSurfacePlot-V1.7/javascript/SurfacePlot");
-    require("./JSSurfacePlot-V1.7/javascript/ColourGradient");
-
-
-    function surface(div, data) {
-
-        var surf     = imexam.ndops.ndarray(data.shape),
-            minvalue = imexam.ndops.minvalue(data),
-            maxvalue = imexam.ndops.maxvalue(data),
-            range    = maxvalue - minvalue;
-
-        var  surfacePlot = $(div).data("surfplot");
-        var fillPly = true;
-        
-
-        surf.getNumberOfRows = function () {
-            return this.shape[0];
-        };
-        surf.getNumberOfColumns = function () {
-            return this.shape[1];
-        };
-        surf.getFormattedValue = function (i, j) {
-            return this.get(i, j).toString();
-        };
-
-
-        if ( surfacePlot === undefined ) {
-            div.innerHTML = "";
-
-            surfacePlot = new greg.ross.visualisation.SurfacePlot(div);
-
-            $(div).data("surfplot", surfacePlot);
-        }
-
-        // Define a colour gradient.
-        var colour1 = {red:   0, green:   0, blue: 255};
-        var colour2 = {red:   0, green: 255, blue: 255};
-        var colour3 = {red:   0, green: 255, blue:   0};
-        var colour4 = {red: 255, green: 255, blue:   0};
-        var colour5 = {red: 255, green:   0, blue:   0};
-        var colours = [colour1, colour2, colour3, colour4, colour5];
-        
-        // Axis labels.
-        var xAxisHeader = "X";
-        var yAxisHeader = "Y";
-        var zAxisHeader = "Z";
-
-        var tooltipStrings = [];
-
-        var numRows = surf.getNumberOfRows();
-        var numCols = surf.getNumberOfColumns();
-        var idx = 0;
-
-        var height = div.offsetHeight;
-        var width  = div.offsetWidth;
-        var i, j, value;
-
-        for (i = 0; i < numRows; i++) {
-            for (j = 0; j < numCols; j++) {
-                value = data.get(i, j);
-
-                surf.set(j, i, (value-minvalue)/(range*2.25));
-
-                tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value.toFixed(2);
-                idx++;
-            }
-        }
-        
-        var options = {xPos: 0, yPos: 0, width: width, height: height, colourGradient: colours, fillPolygons: fillPly,
-                tooltips: tooltipStrings, xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader, restrictXRotation: false};
-
-        surfacePlot.draw(surf, options);
-    }
-
-    function pluginUpdate(im, xreg) {
-            surface(this.div, imexam.getRegionData(im, xreg));
-    }
-
-    function pluginInit() {
-	imexam.fixupDiv(this);
-        $(this.div).append("Create a region to see 3d plot<br>");
-    }
-
-    JS9.RegisterPlugin("ImExam", "3dPlot", pluginInit, {
-	    menu: "analysis",
-
-            menuItem: "3dPlot",
-            winTitle: "3dPlot",
-	    help:     "imexam/3dplot.html",
-
-	    toolbarSeparate: true,
-	    toolbarHTML: " ",
-
-            regionchange: pluginUpdate,
-            winDims: [250, 250],
-    });
-}());
+},{}]},{},[1])
