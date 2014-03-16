@@ -466,11 +466,4 @@ exports.equals = compile({
   funcName: "equals"
 })
 
-// Rename the exports to this point
-//
-for( var key in exports ) {
-    exports[key + "_mask"] = exports[key];
-
-    delete exports[key];
-}
 

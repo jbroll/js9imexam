@@ -6,6 +6,7 @@
 var cwise     = require("cwise");
 var ndarray   = require("ndarray");
 var ndops     = require("ndarray-ops");
+var ndops.mask= require("ndarray-ops-mask");
 
 ndops.pack    = require("ndarray-pack");
 ndops.unpack  = require("ndarray-unpack");
@@ -237,18 +238,23 @@ ndops.qcenter = cwise({
 });
 
 
-ndops.sum_wt = cwise({
-          args: ["array", "array", "index"]
-        , pre: function() {
-                this.sum = 0;
+ndops._imcnts = cwise({
+          args: ["array", "array", "scalar"]
+        , pre: function(a, b, c) {
+                this.proj = new Int32Array(c);
           }
-        , body: function(a, b, index) {
-                this.sum += a * b;
+        , body: function(a, b) {
+                this.counts[b] += a;
           }
         , post: function() {
-                return this.sum;
+                return this.counts;
           }
         });
+
+ndops.imcnts = function (a, b, n) {
+	return ndops.ndarray(ndops._imcnts(a, b, n));
+}
+
 
 ndops._rms = cwise({
           args: ["array", "scalar", "scalar", "scalar", "scalar", "index"]
