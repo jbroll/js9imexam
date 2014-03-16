@@ -20,8 +20,15 @@ exports.Mask = function (im) {
 	    , [img.height, img.width], [2*img.width, 2], 0);
     }
 
+    this.regNumber = function (n) {
+	var regno = this.regno;
+	this.regno = n;
+	return regno;
+    }
+
+    this.regno = 1;
+
     this.drawRegions = function (reg) {
-	var regno = 1;
 
 	var x, y, j;
 
@@ -29,17 +36,21 @@ exports.Mask = function (im) {
 	    x = reg.pos.x;
 	    y = reg.pos.y;
 
+	    if ( reg[i].regno ) {
+		regno = this.regno++;
+	    }
+
 	    switch reg[i].shape {
 	     case "annulus":
 		for ( j = 0; j < reg.annuli.length; j++ ) {
 		    cxt.circle(x, y, reg.radii[j]);
-		    regno++;
+		    regno;
 		}
 	     case "circle":
 		cxt.circle(x, y, reg.radius);
 
 	     case "box":
-		cxt.box(x, y, reg.size.width, reg.size.height
+		cxt.box(x, y, reg.size.width, reg.size.height)
 
 	     case "ellipse":
 		cxt.ellipse(x, y, r);
@@ -47,7 +58,7 @@ exports.Mask = function (im) {
 
 		cxt.polygon(...);
 	    }
-	    regno++;
+	    this.regno++;
 	}
     }
 }

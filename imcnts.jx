@@ -1,0 +1,88 @@
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
+/*globals $, JS9, imexam */ 
+
+"use strict";
+
+
+(function() {
+    //DELETE-ME var imexam = require("./imexam");
+
+    function runImCounts(div, display) {
+	var i;
+	var im   = JS9.GetImage(display);
+	var form = $(div).find(".imcounts-form")[0];
+
+	var data = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+	var mask = new Mask(im);
+
+	var regs = JS9.Regions(im);
+
+	mask.drawRegions(regs);
+
+	counts = mask.imcnts(data);
+
+
+	
+    }
+
+    function getRegions(div, display) {
+	var im  = JS9.GetImage(display);
+
+	if ( im ) {
+	    var data = imexam.ndarray(im.raw.data);
+	    var form = $(div).find(".imcounts-form")[0];
+
+	    form.min.value = imexam.ndops.minvalue(data).toFixed(2);
+	    form.max.value = imexam.ndops.maxvalue(data).toFixed(2);
+	}
+    }
+
+    function imcntsInit() {
+	var im  = JS9.GetImage(this.display);
+	var div = this.div;
+
+	div.innerHTML = '<form class="imcounts-form">							\
+	    <table><tr>	<td>Source</td>									\
+			<td>Background</td>								\
+		       	<td><input type=button value="Run ImCnts" class="run-imcnts"></td></tr>		\
+	           <tr>	<td><textarea type=textarea rows=12 cols=10 name=level class="imcnts-src">	\
+			    </textarea>									\
+	    		<td><textarea type=textarea rows=12 cols=10 name=level class="imcnts-bkg">	\
+			    </textarea>									\
+		       	<td><input type=button value="Get Regions" class="get-min-max"></td></tr>	\
+	           <tr>	<td>Results</td>								\
+	           <tr>	<td colspan=3 valign=top>Levels:</td>						\
+	    		<td><textarea type=textarea rows=12 cols=80 name=level class="imcounts-levels">	\
+			    </textarea>									\
+		   </tr>										\
+	    </table>											\
+	    <p>												\
+	    </form>';
+
+	var display = this.display;
+
+	$(div).find(".run-imcnts").click(function ()  { runImCnts (div, display); });
+	$(div).find(".get-regions").click(function () { getRegions(div, display); });
+
+
+	if ( im !== undefined ) {
+	    getMinMax(div, display);
+	    makeLevel(div, display);
+	}
+
+	imexam.fixupDiv(this);
+    }
+
+    JS9.RegisterPlugin("ImExam", "ImCounts", imcntsInit, {
+	    menu: "view",
+
+            winTitle: "ImCounts",
+            menuItem: "ImCounts",
+	    help:     "imexam/imcounts.html",
+
+	    toolbarSeparate: true,
+	    toolbarHTML: " ",
+
+            winDims: [500, 500],
+    });
+}());
