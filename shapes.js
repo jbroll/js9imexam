@@ -122,8 +122,6 @@ function ellipse(cx, cy, w, h){
     ctx.bezierCurveTo(cx-xmagic,by,lx,cy+ymagic,lx,cy);
     ctx.bezierCurveTo(lx,cy-ymagic,cx-xmagic,ty,cx,ty);
     ctx.stroke();
-
-
 }
 
 
