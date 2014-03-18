@@ -12,7 +12,7 @@
 
     function surface(div, data) {
 
-        var surf     = imexam.ndops.ndarray(data.shape),
+        var surf     = imexam.ndops.zeros(data.shape),
             minvalue = imexam.ndops.minvalue(data),
             maxvalue = imexam.ndops.maxvalue(data),
             range    = maxvalue - minvalue;

@@ -6,73 +6,121 @@
 
 (function() {
     //DELETE-ME var imexam = require("./imexam");
+    var Mask = require("./mask");
 
-    function runImCnts(div, display) {
+    function hasTag(reg, tag) {
 	var i;
-	var im   = JS9.GetImage(display);
-	var form = $(div).find(".imcnts-form")[0];
 
-	var data = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+	for ( i = 0; i < reg.tags.length; i++ ) {
+	    if ( reg.tags[i] === tag ) { return true; }
+	}
+
+	return false;
+    }
+
+    function runImCnts(im, xreg) {
+	var i;
+	var div  = this.div;
+	var text = $(div).find(".imcnts-result")[0];
+
+	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 	var mask = new Mask(im);
 
 	var regs = JS9.Regions(im);
-	var nreg = mask.drawRegions(regs);
-	var cnts = imexam.ndops.imcnts(data, mask.getMask(), nreg.total+1);
+	var list = mask.listRegions(regs);
+	           mask.drawRegions(list);
 
+	var cnts = imexam.ndops.imcnts(data, mask.getMask(), list.length+1);
 
-	
+	var backgr_cnts = 0, backgr_area = 0;
+
+	var back = [];
+	var srce = [];
+	var net, regno;
+
+	for ( i = 0; i < list.length; i++ ) {
+	    if ( hasTag(list[i], "background") ) {
+		regno = list[i].regno;
+
+		backgr_cnts += cnts.cnts.get(regno);
+		backgr_area += cnts.area.get(regno);
+
+		back.push({ regno: regno, cnts: cnts.cnts[regno], area: cnts.area[regno] });
+	    }
+	}
+
+	for ( i = 0; i < list.length; i++ ) {
+	    if ( hasTag(list[i], "source") ) {
+		regno = list[i].regno;
+
+		if ( backgr_area > 0 ) {
+		    net = cnts.cnts.get(regno) - (backgr_cnts * (cnts.area.get(regno)/backgr_area));
+		} else {
+		    net = cnts.cnts.get(regno);
+		}
+
+		srce.push({ regno: regno, net: net, cnts: cnts.cnts.get(regno), area: cnts.area.get(regno) });
+	    }
+	}
+
+	$(text).html($.map(srce, JSON.stringify).join("\n"));
     }
 
+/*
     function getRegions(div, display) {
 	var im  = JS9.GetImage(display);
 
 	if ( im ) {
-	    var data = imexam.ndarray(im.raw.data);
+	    var data = imexam.ndops.ndarray(im.raw.data);
 	    var form = $(div).find(".imcnts-form")[0];
 
 	    form.min.value = imexam.ndops.minvalue(data).toFixed(2);
 	    form.max.value = imexam.ndops.maxvalue(data).toFixed(2);
 	}
     }
+ */
 
     function imcntsInit() {
-	var im  = JS9.GetImage(this.display);
 	var div = this.div;
 
+/*
 	div.innerHTML = '<form class="imcnts-form">							\
 	    <table><tr>	<td>Source</td>									\
 			<td>Background</td>								\
 		       	<td><input type=button value="Run ImCnts" class="run-imcnts"></td></tr>		\
-	           <tr>	<td><textarea type=textarea rows=12 cols=10 name=level class="imcnts-src">	\
+	           <tr>	<td><textarea type=textarea rows=12 cols=20 name=level class="imcnts-src">	\
 			    </textarea>									\
-	    		<td><textarea type=textarea rows=12 cols=10 name=level class="imcnts-bkg">	\
+	    		<td><textarea type=textarea rows=12 cols=20 name=level class="imcnts-bkg">	\
 			    </textarea>									\
 		       	<td><input type=button value="Get Regions" class="get-min-max"></td></tr>	\
-	           <tr>	<td>Results</td>								\
-	           <tr>	<td colspan=3 valign=top>Levels:</td>						\
-	    		<td><textarea type=textarea rows=12 cols=80 name=level class="imcnts-levels">	\
-			    </textarea>									\
+	           <tr>	<td>Results</td></tr>								\
+	           <tr> <td colspan=3><textarea type=textarea rows=12 cols=60 name=level class="imcnts-levels">	\
+			              </textarea>							\
+		   </tr>										\
+	    </table>											\
+	    <p>												\
+	    </form>';
+ */
+
+	div.innerHTML = '<form class="imcnts-form">							\
+	    <table>											\
+	           <tr>	<td>Counts in Regions</td></tr>							\
+	           <tr> <td colspan=3><textarea type=textarea rows=12 cols=60 name=level class="imcnts-result">	\
+			              </textarea>							\
 		   </tr>										\
 	    </table>											\
 	    <p>												\
 	    </form>';
 
-	var display = this.display;
-
-	$(div).find(".run-imcnts").click(function ()  { runImCnts (div, display); });
-	$(div).find(".get-regions").click(function () { getRegions(div, display); });
-
-
-	if ( im !== undefined ) {
-	    getMinMax(div, display);
-	    makeLevel(div, display);
-	}
+	//var display = this.display;
+	//$(div).find(".run-imcnts").click(function ()  { runImCnts (div, display); });
+	//$(div).find(".get-regions").click(function () { getRegions(div, display); });
 
 	imexam.fixupDiv(this);
     }
 
     JS9.RegisterPlugin("ImExam", "ImCnts", imcntsInit, {
-	    menu: "view",
+	    menu: "analysis",
 
             winTitle: "ImCounts",
             menuItem: "ImCounts",
@@ -81,6 +129,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: " ",
 
-            winDims: [500, 500],
+            regionchange: runImCnts,
+            winDims: [500, 250],
     });
 }());

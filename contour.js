@@ -538,7 +538,7 @@ if (typeof exports !== "undefined") {
 	var im   = JS9.GetImage(display);
 	var form = $(div).find(".contour-form")[0];
 
-	var data = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 
 	var levelString = form.level.value;
 
@@ -561,7 +561,7 @@ if (typeof exports !== "undefined") {
 	var im  = JS9.GetImage(display);
 
 	if ( im ) {
-	    var data = imexam.ndarray(im.raw.data);
+	    var data = imexam.ndops.ndarray(im.raw.data);
 	    var form = $(div).find(".contour-form")[0];
 
 	    form.min.value = imexam.ndops.minvalue(data).toFixed(2);
@@ -576,7 +576,7 @@ if (typeof exports !== "undefined") {
 	if ( im ) {
 	    var form = $(div).find(".contour-form")[0];
 
-	    var level = imexam.ndarray(imexam.ndops.iota(Number(form.nlevel.value)));
+	    var level = imexam.ndops.ndarray(imexam.ndops.iota(Number(form.nlevel.value)));
 
 	    var min   = Number(form.min.value);
 	    var max   = Number(form.max.value);

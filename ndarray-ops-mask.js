@@ -36,8 +36,6 @@ function pcompile(user_args) {
   user_args.body.body = "if(m) { " + user_args.body.body + "; };";
   user_args.funcName = user_args.funcName + "_mask";
 
-  console.log(user_args);
-
   return compile({
     args:     user_args.args,
     pre:      fixup(user_args.pre),

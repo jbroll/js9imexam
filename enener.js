@@ -21,7 +21,7 @@
 	    var imag = imexam.getRegionData(im, xreg);
 
             var backgr  = imexam.imops.backgr(imag, 4).value;
-            var data    = imexam.ndops.assign(imexam.ndops.ndarray(imag.shape), imag);
+            var data    = imexam.ndops.assign(imexam.ndops.zeros(imag.shape), imag);
 
             imexam.ndops.subs(data, imag, backgr);
 

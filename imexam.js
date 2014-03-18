@@ -1,15 +1,14 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./imexam":[function(require,module,exports){
-module.exports=require('Ll8vMw');
-},{}],"Ll8vMw":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"Ll8vMw":[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
-/*globals Float64Array, Float32Array, Int32Array, JS9, $ */ 
+/*globals Float32Array, Int32Array, JS9, $ */ 
 
 "use strict";
 
 var cwise     = require("cwise");
-var ndarray   = require("ndarray");
 var ndops     = require("ndarray-ops");
 
+
+ndops.ndarray = require("ndarray");
 ndops.pack    = require("ndarray-pack");
 ndops.unpack  = require("ndarray-unpack");
 ndops.fill    = require("ndarray-fill");
@@ -20,7 +19,22 @@ ndops.iota    = require("iota-array");
 
 var numeric   = require("numeric");
 
+ndops.mask    = require("./ndarray-ops-mask");
 var template  = require("./template");
+
+ndops.zeros   = function zeros(shape, Type) {
+  var i, sz = 1;
+  if ( Type === undefined ) {
+	Type = Float32Array;
+  }
+
+  for(i=0; i<shape.length; ++i) {
+    sz *= shape[i];
+  }
+
+  return ndops.ndarray(new Type(sz), shape);
+};
+
 
       exports.fixupDiv = function (plugin) {
 	var type   = plugin.winType;
@@ -70,13 +84,6 @@ ndops.size = function(shape) {
         return size;
 };
 
-ndops.ndarray = function(shape) {
-    if ( shape.data ) {
-	return ndarray(shape, shape.shape);
-    }
-
-    return ndarray(new Float64Array(ndops.size(shape)), shape);
-};
 
 ndops.reshape = function(a, shape) {
 
@@ -84,7 +91,7 @@ ndops.reshape = function(a, shape) {
         throw new Error("sizes not equil " + a.size + " != ", + ndops.size(shape));
     }
 
-    return ndarray(a.data, shape);
+    return ndops.ndarray(a.data, shape);
 };
 
 ndops.section = function(a, sect) {
@@ -126,17 +133,20 @@ ndops.print = function(a, width, prec) {
 ndops._hist = cwise({
       args: ["array", "scalar", "scalar", "scalar"]
     , pre: function(a, width, min, max) {
-        var size = (max-min) / width + 1;
+        var size = (max-min) / width;
 
         this.width = width;
         this.size = size;
         this.min = min;
         this.max = max;
 
-        this.h = new Int32Array(size);
+
+        this.h = new Int32Array(size+1);
     }
     , body: function(a) {
-        var bin = Math.round(Math.max(0, Math.min(this.size, (a-this.min)/this.width)));
+        var bin = Math.max(0, Math.min(this.size, Math.round((a-this.min)/this.width)));
+
+//if ( a !== 0 ) { console.log(a, bin); }
 
         this.h[bin]++;
     }
@@ -164,7 +174,7 @@ ndops.hist = function(a, width, min, max) {
     hist.width = width;
 
     reply = ndops._hist(a, width, min, max);
-    hist.data = ndarray(reply, [reply.length]);
+    hist.data = ndops.ndarray(reply, [reply.length]);
 
     return hist;
 };
@@ -186,16 +196,16 @@ ndops.proj = function(a, axis, length) {
         var sect;
 	var i;
 
-        var proj = ndarray(ndops._proj(a, axis, a.shape[axis === 0 ? 1 : 0]), [a.shape[axis === 0 ? 1 : 0]]);
+        var proj = ndops.ndarray(ndops._proj(a, axis, a.shape[axis === 0 ? 1 : 0]), [a.shape[axis === 0 ? 1 : 0]]);
         
         proj.n   = a.shape[axis === 1 ? 0 : 1];
 	proj.x   = a.shape[axis];
 
-        proj.sum = ndops.ndarray([proj.n]);
-        proj.avg = ndops.ndarray([proj.n]);
-        proj.med = ndops.ndarray([proj.n]);
+        proj.sum = ndops.zeros([proj.n]);
+        proj.avg = ndops.zeros([proj.n]);
+        proj.med = ndops.zeros([proj.n]);
 
-        var copy = ndops.assign(ndops.ndarray(a.shape), a);
+        var copy = ndops.assign(ndops.zeros(a.shape), a);
 
         for ( i = 0; i < proj.n; i++ ) {
             if ( axis === 0 ) {
@@ -240,18 +250,27 @@ ndops.qcenter = cwise({
 });
 
 
-ndops.sum_wt = cwise({
-          args: ["array", "array", "index"]
-        , pre: function() {
-                this.sum = 0;
+ndops._imcnts = cwise({
+          args: ["array", "array", "scalar"]
+        , pre: function(a, b, c) {
+                this.counts = new Float32Array(c);
           }
-        , body: function(a, b, index) {
-                this.sum += a * b;
+        , body: function(a, b) {
+                this.counts[b] += a;
           }
         , post: function() {
-                return this.sum;
+                return this.counts;
           }
         });
+
+ndops.imcnts = function (a, b, n) {
+    var reply = {};
+    reply.cnts = ndops.ndarray(ndops._imcnts(a, b, n));
+    reply.area = ndops.hist(b, 1, 0, n-1).data;
+
+    return reply;
+};
+
 
 ndops._rms = cwise({
           args: ["array", "scalar", "scalar", "scalar", "scalar", "index"]
@@ -341,13 +360,13 @@ ndops.flatten = function() {
             size += arguments[i].size;
         }
 
-        var reply = ndops.ndarray([size]);
+        var reply = ndops.zeros([size]);
         var off   = 0;
 
         for ( n = 0; n < arguments.length; n++ ) {
             a = arguments[n];
 
-            ndops.assign(ndarray(reply.data, a.shape, undefined, off), a);
+            ndops.assign(ndops.ndarray(reply.data, a.shape, undefined, off), a);
 
             off += a.size;
         }
@@ -356,7 +375,7 @@ ndops.flatten = function() {
 };
 
 ndops.median = function(a) {
-        var data = ndops.assign(ndops.ndarray(a.shape), a);
+        var data = ndops.assign(ndops.zeros(a.shape), a);
 
         data = ndops.reshape(data, [a.size]);
 
@@ -393,7 +412,7 @@ imops.mksection = function(x, y, w, h) {
 imops._rproj = cwise({
           args: ["array", "scalar", "scalar", "scalar", "scalar", "index"]
         , pre: function(a, cx, cy, radius, length) {
-                this.reply = new Float64Array(length*2);
+                this.reply = new Float32Array(length*2);
                 this.r = Math.sqrt(radius*radius);
                 this.i = 0;
           }
@@ -420,12 +439,12 @@ imops.rproj = function(im, center) {
     var n    = raw[1];
     var i;
 
-    var raw2d = ndarray(vect, [n, 2]);
+    var raw2d = ndops.ndarray(vect, [n, 2]);
 
     ndops.sort(raw2d);
 
-    var radi = ndops.ndarray([n]);
-    var data = ndops.ndarray([n]);
+    var radi = ndops.zeros([n]);
+    var data = ndops.zeros([n]);
 
     for ( i = 0; i < im.size; i++ ) {
         radi.set(i, raw2d.get(i, 0));
@@ -438,7 +457,7 @@ imops.rproj = function(im, center) {
 imops._encen = cwise({
 	  args: ["array", "scalar", "scalar", "scalar", "index"]
 	, pre: function(a, cx, cy, radius) {
-	        this.reply = new Float64Array(radius);
+	        this.reply = new Float32Array(radius);
 		this.sum = 0;
 		this.r   = radius;
 		this.rsq = radius*radius;
@@ -473,7 +492,7 @@ imops.encen = function(im, center) {
 
     var reply = imops._encen(im, center[1], center[0], radius);
 
-    return ndarray(reply, [reply.length]);
+    return ndops.ndarray(reply, [reply.length]);
 };
 
 ndops.indexof = function(a, x) {
@@ -491,7 +510,7 @@ ndops.indexof = function(a, x) {
 };
 
 ndops.gauss1d = function(radi, x0) {
-    var reply = ndops.ndarray(radi.shape);
+    var reply = ndops.zeros(radi.shape);
 
     var a = x0[0];
     var b = x0[1];
@@ -585,11 +604,11 @@ function reg2section(xreg) {
 
 exports.getRegionData = function (im, xreg) {
     var section = reg2section(xreg);
-    var im_2d   = ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+    var im_2d   = ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
     var imag;
 
     if ( xreg.angle && xreg.angle !== 0 ) {
-	imag = ndarray([xreg.size.width, xreg.size.height]);
+	imag = ndops.ndarray([xreg.size.width, xreg.size.height]);
 
 	ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
     } else {
@@ -604,49 +623,482 @@ exports.reg2section = reg2section;
 exports.template = template;
 
 exports.numeric  = numeric;
-exports.ndarray  = ndarray;
 exports.ndops    = ndops;
 exports.imops    = imops;
 
 
-},{"./template":73,"cwise":3,"image-rotate":11,"iota-array":12,"ndarray":70,"ndarray-fill":13,"ndarray-moments":22,"ndarray-ops":31,"ndarray-pack":36,"ndarray-sort":49,"ndarray-unpack":59,"numeric":72}],3:[function(require,module,exports){
+},{"./ndarray-ops-mask":3,"./template":78,"cwise":8,"image-rotate":16,"iota-array":17,"ndarray":75,"ndarray-fill":18,"ndarray-moments":27,"ndarray-ops":36,"ndarray-pack":41,"ndarray-sort":54,"ndarray-unpack":64,"numeric":77}],"./imexam":[function(require,module,exports){
+module.exports=require('Ll8vMw');
+},{}],3:[function(require,module,exports){
 "use strict"
 
-var parse   = require("cwise-parser")
 var compile = require("cwise-compiler")
 
-var REQUIRED_FIELDS = [ "args", "body" ]
-var OPTIONAL_FIELDS = [ "pre", "post", "printCode", "funcName", "blockSize" ]
+var EmptyProc = {
+  body: "",
+  args: [],
+  thisVars: [],
+  localVars: []
+}
 
-function createCWise(user_args) {
-  //Check parameters
-  for(var id in user_args) {
-    if(REQUIRED_FIELDS.indexOf(id) < 0 &&
-       OPTIONAL_FIELDS.indexOf(id) < 0) {
-      console.warn("cwise: Unknown argument '"+id+"' passed to expression compiler")
+function fixup(x) {
+  if(!x) {
+    return EmptyProc
+  }
+  for(var i=0; i<x.args.length; ++i) {
+    var a = x.args[i]
+    if(i === 0) {
+      x.args[i] = {name: a, lvalue:true, rvalue: !!x.rvalue, count:x.count||1 }
+    } else {
+      x.args[i] = {name: a, lvalue:false, rvalue:true, count: 1}
     }
   }
-  for(var i=0; i<REQUIRED_FIELDS.length; ++i) {
-    if(!user_args[REQUIRED_FIELDS[i]]) {
-      throw new Error("cwise: Missing argument: " + REQUIRED_FIELDS[i])
-    }
+  if(!x.thisVars) {
+    x.thisVars = []
   }
-  
-  //Parse blocks
+  if(!x.localVars) {
+    x.localVars = []
+  }
+  return x
+}
+
+function pcompile(user_args) {
+  user_args.args.push("array");
+  user_args.body.args.push("m");
+  user_args.body.body = "if(m) { " + user_args.body.body + "; };";
+  user_args.funcName = user_args.funcName + "_mask";
+
   return compile({
-    args:       user_args.args,
-    pre:        parse(user_args.pre || function(){}),
-    body:       parse(user_args.body),
-    post:       parse(user_args.post || function(){}),
-    debug:      !!user_args.printCode,
-    funcName:   user_args.funcName || user_args.body.name || "cwise",
-    blockSize:  user_args.blockSize || 64
+    args:     user_args.args,
+    pre:      fixup(user_args.pre),
+    body:     fixup(user_args.body),
+    post:     fixup(user_args.proc),
+    funcName: user_args.funcName
   })
 }
 
-module.exports = createCWise
+function makeOp(user_args) {
+  var args = []
+  for(var i=0; i<user_args.args.length; ++i) {
+    args.push("a"+i)
+  }
 
-},{"cwise-compiler":4,"cwise-parser":8}],4:[function(require,module,exports){
+  var wrapper = new Function("P", [
+    "return function ", user_args.funcName, "_ndarrayops(", args.join(","), ") {P(", args.join(","), ");return a0}"
+  ].join(""))
+  return wrapper(pcompile(user_args))
+}
+
+var assign_ops = {
+  add:  "+",
+  sub:  "-",
+  mul:  "*",
+  div:  "/",
+  mod:  "%",
+  band: "&",
+  bor:  "|",
+  bxor: "^",
+  lshift: "<<",
+  rshift: ">>",
+  rrshift: ">>>"
+}
+;(function(){
+  for(var id in assign_ops) {
+    var op = assign_ops[id]
+    exports[id] = makeOp({
+      args: ["array","array","array"],
+      body: {args:["a","b","c"],
+             body: "a=b"+op+"c"},
+      funcName: id
+    })
+    exports[id+"eq"] = makeOp({
+      args: ["array","array"],
+      body: {args:["a","b"],
+             body:"a"+op+"=b"},
+      rvalue: true,
+      funcName: id+"eq"
+    })
+    exports[id+"s"] = makeOp({
+      args: ["array", "array", "scalar"],
+      body: {args:["a","b","s"],
+             body:"a=b"+op+"s"},
+      funcName: id+"s"
+    })
+    exports[id+"seq"] = makeOp({
+      args: ["array","scalar"],
+      body: {args:["a","s"],
+             body:"a"+op+"=s"},
+      rvalue: true,
+      funcName: id+"seq"
+    })
+  }
+})();
+
+var unary_ops = {
+  not: "!",
+  bnot: "~",
+  neg: "-",
+  recip: "1.0/"
+}
+;(function(){
+  for(var id in unary_ops) {
+    var op = unary_ops[id]
+    exports[id] = makeOp({
+      args: ["array", "array"],
+      body: {args:["a","b"],
+             body:"a="+op+"b"},
+      funcName: id
+    })
+    exports[id+"eq"] = makeOp({
+      args: ["array"],
+      body: {args:["a"],
+             body:"a="+op+"a"},
+      rvalue: true,
+      count: 2,
+      funcName: id+"eq"
+    })
+  }
+})();
+
+var binary_ops = {
+  and: "&&",
+  or: "||",
+  eq: "===",
+  neq: "!==",
+  lt: "<",
+  gt: ">",
+  leq: "<=",
+  geq: ">="
+}
+;(function() {
+  for(var id in binary_ops) {
+    var op = binary_ops[id]
+    exports[id] = makeOp({
+      args: ["array","array","array"],
+      body: {args:["a", "b", "c"],
+             body:"a=b"+op+"c"},
+      funcName: id
+    })
+    exports[id+"s"] = makeOp({
+      args: ["array","array","scalar"],
+      body: {args:["a", "b", "s"],
+             body:"a=b"+op+"s"},
+      funcName: id+"s"
+    })
+    exports[id+"eq"] = makeOp({
+      args: ["array", "array"],
+      body: {args:["a", "b"],
+             body:"a=a"+op+"b"},
+      rvalue:true,
+      count:2,
+      funcName: id+"eq"
+    })
+    exports[id+"seq"] = makeOp({
+      args: ["array", "scalar"],
+      body: {args:["a","s"],
+             body:"a=a"+op+"s"},
+      rvalue:true,
+      count:2,
+      funcName: id+"seq"
+    })
+  }
+})();
+
+var math_unary = [
+  "abs",
+  "acos",
+  "asin",
+  "atan",
+  "ceil",
+  "cos",
+  "exp",
+  "floor",
+  "log",
+  "round",
+  "sin",
+  "sqrt",
+  "tan"
+]
+;(function() {
+  for(var i=0; i<math_unary.length; ++i) {
+    var f = math_unary[i]
+    exports[f] = makeOp({
+                    args: ["array", "array"],
+                    pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                    body: {args:["a","b"], body:"a=this_f(b)", thisVars:["this_f"]},
+                    funcName: f
+                  })
+    exports[f+"eq"] = makeOp({
+                      args: ["array"],
+                      pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                      body: {args: ["a"], body:"a=this_f(a)", thisVars:["this_f"]},
+                      rvalue: true,
+                      count: 2,
+                      funcName: f+"eq"
+                    })
+  }
+})();
+
+var math_comm = [
+  "max",
+  "min",
+  "atan2",
+  "pow"
+]
+;(function(){
+  for(var i=0; i<math_comm.length; ++i) {
+    var f= math_comm[i]
+    exports[f] = makeOp({
+                  args:["array", "array", "array"],
+                  pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                  body: {args:["a","b","c"], body:"a=this_f(b,c)", thisVars:["this_f"]},
+                  funcName: f
+                })
+    exports[f+"s"] = makeOp({
+                  args:["array", "array", "scalar"],
+                  pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                  body: {args:["a","b","c"], body:"a=this_f(b,c)", thisVars:["this_f"]},
+                  funcName: f+"s"
+                  })
+    exports[f+"eq"] = makeOp({ args:["array", "array"],
+                  pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                  body: {args:["a","b"], body:"a=this_f(a,b)", thisVars:["this_f"]},
+                  rvalue: true,
+                  count: 2,
+                  funcName: f+"eq"
+                  })
+    exports[f+"seq"] = makeOp({ args:["array", "scalar"],
+                  pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                  body: {args:["a","b"], body:"a=this_f(a,b)", thisVars:["this_f"]},
+                  rvalue:true,
+                  count:2,
+                  funcName: f+"seq"
+                  })
+  }
+})();
+
+var math_noncomm = [
+  "atan2",
+  "pow"
+]
+;(function(){
+  for(var i=0; i<math_noncomm.length; ++i) {
+    var f= math_noncomm[i]
+    exports[f+"op"] = makeOp({
+                  args:["array", "array", "array"],
+                  pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                  body: {args:["a","b","c"], body:"a=this_f(c,b)", thisVars:["this_f"]},
+                  funcName: f+"op"
+                })
+    exports[f+"ops"] = makeOp({
+                  args:["array", "array", "scalar"],
+                  pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                  body: {args:["a","b","c"], body:"a=this_f(c,b)", thisVars:["this_f"]},
+                  funcName: f+"ops"
+                  })
+    exports[f+"opeq"] = makeOp({ args:["array", "array"],
+                  pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                  body: {args:["a","b"], body:"a=this_f(b,a)", thisVars:["this_f"]},
+                  rvalue: true,
+                  count: 2,
+                  funcName: f+"opeq"
+                  })
+    exports[f+"opseq"] = makeOp({ args:["array", "scalar"],
+                  pre: {args:[], body:"this_f=Math."+f, thisVars:["this_f"]},
+                  body: {args:["a","b"], body:"a=this_f(b,a)", thisVars:["this_f"]},
+                  rvalue:true,
+                  count:2,
+                  funcName: f+"opseq"
+                  })
+  }
+})();
+
+exports.any = compile({
+  args:["array"],
+  pre: EmptyProc,
+  body: {args:[{name:"a", lvalue:false, rvalue:true, count:1}], body: "if(a){return true}", localVars: [], thisVars: []},
+  post: {args:[], localVars:[], thisVars:[], body:"return false"},
+  funcName: "any"
+})
+
+exports.all = compile({
+  args:["array"],
+  pre: EmptyProc,
+  body: {args:[{name:"x", lvalue:false, rvalue:true, count:1}], body: "if(!x){return false}", localVars: [], thisVars: []},
+  post: {args:[], localVars:[], thisVars:[], body:"return true"},
+  funcName: "all"
+})
+
+exports.sum = compile({
+  args:["array"],
+  pre: {args:[], localVars:[], thisVars:["this_s"], body:"this_s=0"},
+  body: {args:[{name:"a", lvalue:false, rvalue:true, count:1}], body: "this_s+=a", localVars: [], thisVars: ["this_s"]},
+  post: {args:[], localVars:[], thisVars:["this_s"], body:"return this_s"},
+  funcName: "sum"
+})
+
+exports.prod = compile({
+  args:["array"],
+  pre: {args:[], localVars:[], thisVars:["this_s"], body:"this_s=1"},
+  body: {args:[{name:"a", lvalue:false, rvalue:true, count:1}], body: "this_s*=a", localVars: [], thisVars: ["this_s"]},
+  post: {args:[], localVars:[], thisVars:["this_s"], body:"return this_s"},
+  funcName: "prod"
+})
+
+exports.norm2squared = compile({
+  args:["array"],
+  pre: {args:[], localVars:[], thisVars:["this_s"], body:"this_s=0"},
+  body: {args:[{name:"a", lvalue:false, rvalue:true, count:2}], body: "this_s+=a*a", localVars: [], thisVars: ["this_s"]},
+  post: {args:[], localVars:[], thisVars:["this_s"], body:"return this_s"},
+  funcName: "norm2squared"
+})
+  
+exports.norm2 = compile({
+  args:["array"],
+  pre: {args:[], localVars:[], thisVars:["this_s"], body:"this_s=0"},
+  body: {args:[{name:"a", lvalue:false, rvalue:true, count:2}], body: "this_s+=a*a", localVars: [], thisVars: ["this_s"]},
+  post: {args:[], localVars:[], thisVars:["this_s"], body:"return Math.sqrt(this_s)"},
+  funcName: "norm2"
+})
+  
+
+exports.norminf = compile({
+  args:["array"],
+  pre: {args:[], localVars:[], thisVars:["this_s"], body:"this_s=0"},
+  body: {args:[{name:"a", lvalue:false, rvalue:true, count:4}], body:"if(-a>this_s){this_s=-a}else if(a>this_s){this_s=a}", localVars: [], thisVars: ["this_s"]},
+  post: {args:[], localVars:[], thisVars:["this_s"], body:"return this_s"},
+  funcName: "norminf"
+})
+
+exports.norm1 = compile({
+  args:["array"],
+  pre: {args:[], localVars:[], thisVars:["this_s"], body:"this_s=0"},
+  body: {args:[{name:"a", lvalue:false, rvalue:true, count:3}], body: "this_s+=a<0?-a:a", localVars: [], thisVars: ["this_s"]},
+  post: {args:[], localVars:[], thisVars:["this_s"], body:"return this_s"},
+  funcName: "norm1"
+})
+
+exports.sup = compile({
+  args: [ "array" ],
+  pre:
+   { body: "this_h=-Infinity",
+     args: [],
+     thisVars: [ "this_h" ],
+     localVars: [] },
+  body:
+   { body: "if(_inline_1_arg0_>this_h)this_h=_inline_1_arg0_",
+     args: [{"name":"_inline_1_arg0_","lvalue":false,"rvalue":true,"count":2} ],
+     thisVars: [ "this_h" ],
+     localVars: [] },
+  post:
+   { body: "return this_h",
+     args: [],
+     thisVars: [ "this_h" ],
+     localVars: [] }
+ })
+
+exports.inf = compile({
+  args: [ "array" ],
+  pre:
+   { body: "this_h=Infinity",
+     args: [],
+     thisVars: [ "this_h" ],
+     localVars: [] },
+  body:
+   { body: "if(_inline_1_arg0_<this_h)this_h=_inline_1_arg0_",
+     args: [{"name":"_inline_1_arg0_","lvalue":false,"rvalue":true,"count":2} ],
+     thisVars: [ "this_h" ],
+     localVars: [] },
+  post:
+   { body: "return this_h",
+     args: [],
+     thisVars: [ "this_h" ],
+     localVars: [] }
+ })
+
+exports.argmin = compile({
+  args:["index","array","shape"],
+  pre:{
+    body:"{this_v=Infinity;this_i=_inline_0_arg2_.slice(0)}",
+    args:[
+      {name:"_inline_0_arg0_",lvalue:false,rvalue:false,count:0},
+      {name:"_inline_0_arg1_",lvalue:false,rvalue:false,count:0},
+      {name:"_inline_0_arg2_",lvalue:false,rvalue:true,count:1}
+      ],
+    thisVars:["this_i","this_v"],
+    localVars:[]},
+  body:{
+    body:"{if(_inline_1_arg1_<this_v){this_v=_inline_1_arg1_;for(var _inline_1_k=0;_inline_1_k<_inline_1_arg0_.length;++_inline_1_k){this_i[_inline_1_k]=_inline_1_arg0_[_inline_1_k]}}}",
+    args:[
+      {name:"_inline_1_arg0_",lvalue:false,rvalue:true,count:2},
+      {name:"_inline_1_arg1_",lvalue:false,rvalue:true,count:2}],
+    thisVars:["this_i","this_v"],
+    localVars:["_inline_1_k"]},
+  post:{
+    body:"{return this_i}",
+    args:[],
+    thisVars:["this_i"],
+    localVars:[]}
+})
+
+exports.argmax = compile({
+  args:["index","array","shape"],
+  pre:{
+    body:"{this_v=-Infinity;this_i=_inline_0_arg2_.slice(0)}",
+    args:[
+      {name:"_inline_0_arg0_",lvalue:false,rvalue:false,count:0},
+      {name:"_inline_0_arg1_",lvalue:false,rvalue:false,count:0},
+      {name:"_inline_0_arg2_",lvalue:false,rvalue:true,count:1}
+      ],
+    thisVars:["this_i","this_v"],
+    localVars:[]},
+  body:{
+    body:"{if(_inline_1_arg1_>this_v){this_v=_inline_1_arg1_;for(var _inline_1_k=0;_inline_1_k<_inline_1_arg0_.length;++_inline_1_k){this_i[_inline_1_k]=_inline_1_arg0_[_inline_1_k]}}}",
+    args:[
+      {name:"_inline_1_arg0_",lvalue:false,rvalue:true,count:2},
+      {name:"_inline_1_arg1_",lvalue:false,rvalue:true,count:2}],
+    thisVars:["this_i","this_v"],
+    localVars:["_inline_1_k"]},
+  post:{
+    body:"{return this_i}",
+    args:[],
+    thisVars:["this_i"],
+    localVars:[]}
+})  
+
+exports.random = makeOp({
+  args: ["array"],
+  pre: {args:[], body:"this_f=Math.random", thisVars:["this_f"]},
+  body: {args: ["a"], body:"a=this_f()", thisVars:["this_f"]},
+  funcName: "random"
+})
+
+exports.assign = makeOp({
+  args:["array", "array"],
+  body: {args:["a", "b"], body:"a=b"},
+  funcName: "assign" })
+
+exports.assigns = makeOp({
+  args:["array", "scalar"],
+  body: {args:["a", "b"], body:"a=b"},
+  funcName: "assigns" })
+
+
+exports.equals = compile({
+  args:["array", "array"],
+  pre: EmptyProc,
+  body: {args:[{name:"x", lvalue:false, rvalue:true, count:1},
+               {name:"y", lvalue:false, rvalue:true, count:1}], 
+        body: "if(x!==y){return false}", 
+        localVars: [], 
+        thisVars: []},
+  post: {args:[], localVars:[], thisVars:[], body:"return true"},
+  funcName: "equals"
+})
+
+
+
+},{"cwise-compiler":4}],4:[function(require,module,exports){
 "use strict"
 
 var createThunk = require("./lib/thunk.js")
@@ -1148,6 +1600,51 @@ module.exports = unique
 },{}],8:[function(require,module,exports){
 "use strict"
 
+var parse   = require("cwise-parser")
+var compile = require("cwise-compiler")
+
+var REQUIRED_FIELDS = [ "args", "body" ]
+var OPTIONAL_FIELDS = [ "pre", "post", "printCode", "funcName", "blockSize" ]
+
+function createCWise(user_args) {
+  //Check parameters
+  for(var id in user_args) {
+    if(REQUIRED_FIELDS.indexOf(id) < 0 &&
+       OPTIONAL_FIELDS.indexOf(id) < 0) {
+      console.warn("cwise: Unknown argument '"+id+"' passed to expression compiler")
+    }
+  }
+  for(var i=0; i<REQUIRED_FIELDS.length; ++i) {
+    if(!user_args[REQUIRED_FIELDS[i]]) {
+      throw new Error("cwise: Missing argument: " + REQUIRED_FIELDS[i])
+    }
+  }
+  
+  //Parse blocks
+  return compile({
+    args:       user_args.args,
+    pre:        parse(user_args.pre || function(){}),
+    body:       parse(user_args.body),
+    post:       parse(user_args.post || function(){}),
+    debug:      !!user_args.printCode,
+    funcName:   user_args.funcName || user_args.body.name || "cwise",
+    blockSize:  user_args.blockSize || 64
+  })
+}
+
+module.exports = createCWise
+
+},{"cwise-compiler":9,"cwise-parser":13}],9:[function(require,module,exports){
+arguments[4][4][0].apply(exports,arguments)
+},{"./lib/thunk.js":11}],10:[function(require,module,exports){
+module.exports=require(5)
+},{"uniq":12}],11:[function(require,module,exports){
+arguments[4][6][0].apply(exports,arguments)
+},{"./compile.js":10}],12:[function(require,module,exports){
+module.exports=require(7)
+},{}],13:[function(require,module,exports){
+"use strict"
+
 var esprima = require("esprima")
 var uniq = require("uniq")
 
@@ -1341,7 +1838,7 @@ function preprocess(func) {
 }
 
 module.exports = preprocess
-},{"esprima":9,"uniq":10}],9:[function(require,module,exports){
+},{"esprima":14,"uniq":15}],14:[function(require,module,exports){
 /*
   Copyright (C) 2012 Ariya Hidayat <ariya.hidayat@gmail.com>
   Copyright (C) 2012 Mathias Bynens <mathias@qiwi.be>
@@ -5251,9 +5748,9 @@ parseStatement: true, parseSourceElement: true */
 }));
 /* vim: set sw=4 ts=4 et tw=80 : */
 
-},{}],10:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports=require(7)
-},{}],11:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict"
 
 var warp = require("ndarray-warp")
@@ -5275,7 +5772,7 @@ function rotateImage(out, inp, theta, iX, iY, oX, oY) {
   })
   return out
 }
-},{"ndarray-warp":69}],12:[function(require,module,exports){
+},{"ndarray-warp":74}],17:[function(require,module,exports){
 "use strict"
 
 function iota(n) {
@@ -5287,7 +5784,7 @@ function iota(n) {
 }
 
 module.exports = iota
-},{}],13:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict"
 
 var fill = require("cwise")({
@@ -5302,9 +5799,9 @@ module.exports = function(array, f) {
   return array
 }
 
-},{"cwise":14}],14:[function(require,module,exports){
-arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":15,"cwise-parser":19}],15:[function(require,module,exports){
+},{"cwise":19}],19:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"cwise-compiler":20,"cwise-parser":24}],20:[function(require,module,exports){
 "use strict"
 
 var createThunk = require("./lib/thunk.js")
@@ -5410,7 +5907,7 @@ function compileCwise(user_args) {
 
 module.exports = compileCwise
 
-},{"./lib/thunk.js":17}],16:[function(require,module,exports){
+},{"./lib/thunk.js":22}],21:[function(require,module,exports){
 "use strict"
 
 var uniq = require("uniq")
@@ -5667,17 +6164,17 @@ function generateCWiseOp(proc, typesig) {
   return f()
 }
 module.exports = generateCWiseOp
-},{"uniq":18}],17:[function(require,module,exports){
+},{"uniq":23}],22:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":16}],18:[function(require,module,exports){
+},{"./compile.js":21}],23:[function(require,module,exports){
 module.exports=require(7)
-},{}],19:[function(require,module,exports){
-module.exports=require(8)
-},{"esprima":20,"uniq":21}],20:[function(require,module,exports){
-module.exports=require(9)
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
+module.exports=require(13)
+},{"esprima":25,"uniq":26}],25:[function(require,module,exports){
+module.exports=require(14)
+},{}],26:[function(require,module,exports){
 module.exports=require(7)
-},{}],22:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict"
 
 var cwise = require("cwise")
@@ -5724,23 +6221,23 @@ module.exports = function computeMoments(n, array) {
 
 
 
-},{"cwise":23}],23:[function(require,module,exports){
-arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":24,"cwise-parser":28}],24:[function(require,module,exports){
-arguments[4][15][0].apply(exports,arguments)
-},{"./lib/thunk.js":26}],25:[function(require,module,exports){
-module.exports=require(16)
-},{"uniq":27}],26:[function(require,module,exports){
+},{"cwise":28}],28:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"cwise-compiler":29,"cwise-parser":33}],29:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./lib/thunk.js":31}],30:[function(require,module,exports){
+module.exports=require(21)
+},{"uniq":32}],31:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":25}],27:[function(require,module,exports){
+},{"./compile.js":30}],32:[function(require,module,exports){
 module.exports=require(7)
-},{}],28:[function(require,module,exports){
-module.exports=require(8)
-},{"esprima":29,"uniq":30}],29:[function(require,module,exports){
-module.exports=require(9)
-},{}],30:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
+module.exports=require(13)
+},{"esprima":34,"uniq":35}],34:[function(require,module,exports){
+module.exports=require(14)
+},{}],35:[function(require,module,exports){
 module.exports=require(7)
-},{}],31:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict"
 
 var compile = require("cwise-compiler")
@@ -6189,15 +6686,15 @@ exports.assigns = makeOp({
   funcName: "assigns" })
 
 
-},{"cwise-compiler":32}],32:[function(require,module,exports){
-arguments[4][15][0].apply(exports,arguments)
-},{"./lib/thunk.js":34}],33:[function(require,module,exports){
-module.exports=require(16)
-},{"uniq":35}],34:[function(require,module,exports){
+},{"cwise-compiler":37}],37:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./lib/thunk.js":39}],38:[function(require,module,exports){
+module.exports=require(21)
+},{"uniq":40}],39:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":33}],35:[function(require,module,exports){
+},{"./compile.js":38}],40:[function(require,module,exports){
 module.exports=require(7)
-},{}],36:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict"
 
 var ndarray = require("ndarray")
@@ -6229,23 +6726,23 @@ module.exports = function convert(arr) {
   return result
 }
 
-},{"cwise":37,"ndarray":70}],37:[function(require,module,exports){
-arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":38,"cwise-parser":42}],38:[function(require,module,exports){
-arguments[4][15][0].apply(exports,arguments)
-},{"./lib/thunk.js":40}],39:[function(require,module,exports){
-module.exports=require(16)
-},{"uniq":41}],40:[function(require,module,exports){
+},{"cwise":42,"ndarray":75}],42:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"cwise-compiler":43,"cwise-parser":47}],43:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./lib/thunk.js":45}],44:[function(require,module,exports){
+module.exports=require(21)
+},{"uniq":46}],45:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":39}],41:[function(require,module,exports){
+},{"./compile.js":44}],46:[function(require,module,exports){
 module.exports=require(7)
-},{}],42:[function(require,module,exports){
-module.exports=require(8)
-},{"esprima":43,"uniq":44}],43:[function(require,module,exports){
-module.exports=require(9)
-},{}],44:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
+module.exports=require(13)
+},{"esprima":48,"uniq":49}],48:[function(require,module,exports){
+module.exports=require(14)
+},{}],49:[function(require,module,exports){
 module.exports=require(7)
-},{}],45:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict"
 
 var pool = require("typedarray-pool")
@@ -6974,7 +7471,7 @@ function compileSort(order, dtype) {
 }
 
 module.exports = compileSort
-},{"typedarray-pool":48}],46:[function(require,module,exports){
+},{"typedarray-pool":53}],51:[function(require,module,exports){
 /**
  * Bit twiddling hacks for JavaScript.
  *
@@ -7180,7 +7677,7 @@ exports.nextCombination = function(v) {
 }
 
 
-},{}],47:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict"
 
 function dupe_array(count, value, i) {
@@ -7230,7 +7727,7 @@ function dupe(count, value) {
 }
 
 module.exports = dupe
-},{}],48:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 (function (global){
 "use strict"
 
@@ -7549,7 +8046,7 @@ exports.clearCache = function clearCache() {
 }
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"bit-twiddle":46,"dup":47}],49:[function(require,module,exports){
+},{"bit-twiddle":51,"dup":52}],54:[function(require,module,exports){
 "use strict"
 
 var compile = require("./lib/compile_sort.js")
@@ -7568,25 +8065,25 @@ function sort(array) {
 }
 
 module.exports = sort
-},{"./lib/compile_sort.js":45}],50:[function(require,module,exports){
-arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":51,"cwise-parser":55}],51:[function(require,module,exports){
-arguments[4][15][0].apply(exports,arguments)
-},{"./lib/thunk.js":53}],52:[function(require,module,exports){
-module.exports=require(16)
-},{"uniq":54}],53:[function(require,module,exports){
+},{"./lib/compile_sort.js":50}],55:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"cwise-compiler":56,"cwise-parser":60}],56:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./lib/thunk.js":58}],57:[function(require,module,exports){
+module.exports=require(21)
+},{"uniq":59}],58:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":52}],54:[function(require,module,exports){
+},{"./compile.js":57}],59:[function(require,module,exports){
 module.exports=require(7)
-},{}],55:[function(require,module,exports){
-module.exports=require(8)
-},{"esprima":56,"uniq":57}],56:[function(require,module,exports){
-module.exports=require(9)
-},{}],57:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
+module.exports=require(13)
+},{"esprima":61,"uniq":62}],61:[function(require,module,exports){
+module.exports=require(14)
+},{}],62:[function(require,module,exports){
 module.exports=require(7)
-},{}],58:[function(require,module,exports){
-module.exports=require(47)
-},{}],59:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
+module.exports=require(52)
+},{}],64:[function(require,module,exports){
 "use strict"
 
 var dup = require("dup")
@@ -7609,23 +8106,23 @@ module.exports = function unpack(arr) {
   return result
 }
 
-},{"cwise":50,"dup":58}],60:[function(require,module,exports){
-arguments[4][3][0].apply(exports,arguments)
-},{"cwise-compiler":61,"cwise-parser":65}],61:[function(require,module,exports){
-arguments[4][15][0].apply(exports,arguments)
-},{"./lib/thunk.js":63}],62:[function(require,module,exports){
-module.exports=require(16)
-},{"uniq":64}],63:[function(require,module,exports){
+},{"cwise":55,"dup":63}],65:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"cwise-compiler":66,"cwise-parser":70}],66:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./lib/thunk.js":68}],67:[function(require,module,exports){
+module.exports=require(21)
+},{"uniq":69}],68:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"./compile.js":62}],64:[function(require,module,exports){
+},{"./compile.js":67}],69:[function(require,module,exports){
 module.exports=require(7)
-},{}],65:[function(require,module,exports){
-module.exports=require(8)
-},{"esprima":66,"uniq":67}],66:[function(require,module,exports){
-module.exports=require(9)
-},{}],67:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
+module.exports=require(13)
+},{"esprima":71,"uniq":72}],71:[function(require,module,exports){
+module.exports=require(14)
+},{}],72:[function(require,module,exports){
 module.exports=require(7)
-},{}],68:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict"
 
 function interp1d(arr, x) {
@@ -7736,7 +8233,7 @@ module.exports.d1 = interp1d
 module.exports.d2 = interp2d
 module.exports.d3 = interp3d
 
-},{}],69:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 "use strict"
 
 var interp = require("ndarray-linear-interpolate")
@@ -7804,7 +8301,7 @@ module.exports = function warp(dest, src, func) {
   return dest
 }
 
-},{"cwise":60,"ndarray-linear-interpolate":68}],70:[function(require,module,exports){
+},{"cwise":65,"ndarray-linear-interpolate":73}],75:[function(require,module,exports){
 "use strict"
 
 var iota = require("iota-array")
@@ -8144,9 +8641,9 @@ function wrappedNDArrayCtor(data, shape, stride, offset) {
 }
 
 module.exports = wrappedNDArrayCtor
-},{"iota-array":71}],71:[function(require,module,exports){
-module.exports=require(12)
-},{}],72:[function(require,module,exports){
+},{"iota-array":76}],76:[function(require,module,exports){
+module.exports=require(17)
+},{}],77:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -12574,7 +13071,7 @@ numeric.svd= function svd(A) {
 
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],73:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 function template(str, data){
     
         return str.replace(/{([a-zA-Z0-9_.%]*)}/g,

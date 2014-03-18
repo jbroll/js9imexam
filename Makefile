@@ -16,6 +16,7 @@ HX    = 		\
 JX    = 		\
 	imexam.jx	\
 	3dplot.jx	\
+	imcnts.jx	\
 	contour.jx
 
 JS    = 		\
@@ -25,6 +26,7 @@ JS    = 		\
 	rghist.js	\
 	enener.js	\
 	rghxrg.js	\
+	 mask.js	\
 	pxtabl.js
 
 all:	$(JX:.jx=.js) imexam.html
@@ -40,7 +42,7 @@ lint :
 	jslint $(JX) $(JS)
 
 
-imexam.js : imexam.jx template.js
+imexam.js : imexam.jx ndarray-ops-mask.js template.js
 	browserify -r ./imexam.jx:./imexam > imexam.js
 
 imexam.html : $(HX)
@@ -52,6 +54,8 @@ imexam.html : $(HX)
 contour.js : contour.jx conrec.js
 	browserify contour.jx | sed -e s%//DELETE-ME%% > contour.js
 
+imcnts.js : imcnts.jx mask.js
+	browserify imcnts.jx | sed -e s%//DELETE-ME%% > imcnts.js
 
 FORCE:
 

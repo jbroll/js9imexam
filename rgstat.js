@@ -31,7 +31,7 @@
             var section = imexam.reg2section(xreg);
 	    var imag    = imexam.getRegionData(im, xreg);
 
-            var data    = imexam.ndops.assign(imexam.ndops.ndarray(imag.shape), imag);
+            var data    = imexam.ndops.assign(imexam.ndops.zeros(imag.shape), imag);
 
             var stat    = {};
 

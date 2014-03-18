@@ -23,7 +23,7 @@
 
             var max     = imexam.ndops.maxvalue(imag);
             var backgr  = imexam.imops.backgr(imag, 4).value;
-            var data    = imexam.ndops.assign(imexam.ndops.ndarray(imag.shape), imag);
+            var data    = imexam.ndops.assign(imexam.ndops.zeros(imag.shape), imag);
 
             imexam.ndops.subs(data, imag, backgr);
 
@@ -43,7 +43,7 @@
                     rdata[r] = [rproj.radi.get(r), rproj.data.get(r)];
             }
 
-            rproj.samp = imexam.ndops.ndarray([div.offsetWidth/2]);
+            rproj.samp = imexam.ndops.zeros([div.offsetWidth/2]);
 
             imexam.ndops.fill(rproj.samp, function(r) { return rproj.radius*r/(div.offsetWidth/2); });
 

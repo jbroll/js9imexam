@@ -1,13 +1,13 @@
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
-/*globals Float64Array, Float32Array, Int32Array, JS9, $ */ 
+/*globals Float32Array, Int32Array, JS9, $ */ 
 
 "use strict";
 
 var cwise     = require("cwise");
-var ndarray   = require("ndarray");
 var ndops     = require("ndarray-ops");
-var ndops.mask= require("ndarray-ops-mask");
 
+
+ndops.ndarray = require("ndarray");
 ndops.pack    = require("ndarray-pack");
 ndops.unpack  = require("ndarray-unpack");
 ndops.fill    = require("ndarray-fill");
@@ -18,7 +18,22 @@ ndops.iota    = require("iota-array");
 
 var numeric   = require("numeric");
 
+ndops.mask    = require("./ndarray-ops-mask");
 var template  = require("./template");
+
+ndops.zeros   = function zeros(shape, Type) {
+  var i, sz = 1;
+  if ( Type === undefined ) {
+	Type = Float32Array;
+  }
+
+  for(i=0; i<shape.length; ++i) {
+    sz *= shape[i];
+  }
+
+  return ndops.ndarray(new Type(sz), shape);
+};
+
 
       exports.fixupDiv = function (plugin) {
 	var type   = plugin.winType;
@@ -68,13 +83,6 @@ ndops.size = function(shape) {
         return size;
 };
 
-ndops.ndarray = function(shape) {
-    if ( shape.data ) {
-	return ndarray(shape, shape.shape);
-    }
-
-    return ndarray(new Float64Array(ndops.size(shape)), shape);
-};
 
 ndops.reshape = function(a, shape) {
 
@@ -82,7 +90,7 @@ ndops.reshape = function(a, shape) {
         throw new Error("sizes not equil " + a.size + " != ", + ndops.size(shape));
     }
 
-    return ndarray(a.data, shape);
+    return ndops.ndarray(a.data, shape);
 };
 
 ndops.section = function(a, sect) {
@@ -124,17 +132,20 @@ ndops.print = function(a, width, prec) {
 ndops._hist = cwise({
       args: ["array", "scalar", "scalar", "scalar"]
     , pre: function(a, width, min, max) {
-        var size = (max-min) / width + 1;
+        var size = (max-min) / width;
 
         this.width = width;
         this.size = size;
         this.min = min;
         this.max = max;
 
-        this.h = new Int32Array(size);
+
+        this.h = new Int32Array(size+1);
     }
     , body: function(a) {
-        var bin = Math.round(Math.max(0, Math.min(this.size, (a-this.min)/this.width)));
+        var bin = Math.max(0, Math.min(this.size, Math.round((a-this.min)/this.width)));
+
+//if ( a !== 0 ) { console.log(a, bin); }
 
         this.h[bin]++;
     }
@@ -162,7 +173,7 @@ ndops.hist = function(a, width, min, max) {
     hist.width = width;
 
     reply = ndops._hist(a, width, min, max);
-    hist.data = ndarray(reply, [reply.length]);
+    hist.data = ndops.ndarray(reply, [reply.length]);
 
     return hist;
 };
@@ -184,16 +195,16 @@ ndops.proj = function(a, axis, length) {
         var sect;
 	var i;
 
-        var proj = ndarray(ndops._proj(a, axis, a.shape[axis === 0 ? 1 : 0]), [a.shape[axis === 0 ? 1 : 0]]);
+        var proj = ndops.ndarray(ndops._proj(a, axis, a.shape[axis === 0 ? 1 : 0]), [a.shape[axis === 0 ? 1 : 0]]);
         
         proj.n   = a.shape[axis === 1 ? 0 : 1];
 	proj.x   = a.shape[axis];
 
-        proj.sum = ndops.ndarray([proj.n]);
-        proj.avg = ndops.ndarray([proj.n]);
-        proj.med = ndops.ndarray([proj.n]);
+        proj.sum = ndops.zeros([proj.n]);
+        proj.avg = ndops.zeros([proj.n]);
+        proj.med = ndops.zeros([proj.n]);
 
-        var copy = ndops.assign(ndops.ndarray(a.shape), a);
+        var copy = ndops.assign(ndops.zeros(a.shape), a);
 
         for ( i = 0; i < proj.n; i++ ) {
             if ( axis === 0 ) {
@@ -241,7 +252,7 @@ ndops.qcenter = cwise({
 ndops._imcnts = cwise({
           args: ["array", "array", "scalar"]
         , pre: function(a, b, c) {
-                this.proj = new Int32Array(c);
+                this.counts = new Float32Array(c);
           }
         , body: function(a, b) {
                 this.counts[b] += a;
@@ -252,8 +263,12 @@ ndops._imcnts = cwise({
         });
 
 ndops.imcnts = function (a, b, n) {
-	return ndops.ndarray(ndops._imcnts(a, b, n));
-}
+    var reply = {};
+    reply.cnts = ndops.ndarray(ndops._imcnts(a, b, n));
+    reply.area = ndops.hist(b, 1, 0, n-1).data;
+
+    return reply;
+};
 
 
 ndops._rms = cwise({
@@ -344,13 +359,13 @@ ndops.flatten = function() {
             size += arguments[i].size;
         }
 
-        var reply = ndops.ndarray([size]);
+        var reply = ndops.zeros([size]);
         var off   = 0;
 
         for ( n = 0; n < arguments.length; n++ ) {
             a = arguments[n];
 
-            ndops.assign(ndarray(reply.data, a.shape, undefined, off), a);
+            ndops.assign(ndops.ndarray(reply.data, a.shape, undefined, off), a);
 
             off += a.size;
         }
@@ -359,7 +374,7 @@ ndops.flatten = function() {
 };
 
 ndops.median = function(a) {
-        var data = ndops.assign(ndops.ndarray(a.shape), a);
+        var data = ndops.assign(ndops.zeros(a.shape), a);
 
         data = ndops.reshape(data, [a.size]);
 
@@ -396,7 +411,7 @@ imops.mksection = function(x, y, w, h) {
 imops._rproj = cwise({
           args: ["array", "scalar", "scalar", "scalar", "scalar", "index"]
         , pre: function(a, cx, cy, radius, length) {
-                this.reply = new Float64Array(length*2);
+                this.reply = new Float32Array(length*2);
                 this.r = Math.sqrt(radius*radius);
                 this.i = 0;
           }
@@ -423,12 +438,12 @@ imops.rproj = function(im, center) {
     var n    = raw[1];
     var i;
 
-    var raw2d = ndarray(vect, [n, 2]);
+    var raw2d = ndops.ndarray(vect, [n, 2]);
 
     ndops.sort(raw2d);
 
-    var radi = ndops.ndarray([n]);
-    var data = ndops.ndarray([n]);
+    var radi = ndops.zeros([n]);
+    var data = ndops.zeros([n]);
 
     for ( i = 0; i < im.size; i++ ) {
         radi.set(i, raw2d.get(i, 0));
@@ -441,7 +456,7 @@ imops.rproj = function(im, center) {
 imops._encen = cwise({
 	  args: ["array", "scalar", "scalar", "scalar", "index"]
 	, pre: function(a, cx, cy, radius) {
-	        this.reply = new Float64Array(radius);
+	        this.reply = new Float32Array(radius);
 		this.sum = 0;
 		this.r   = radius;
 		this.rsq = radius*radius;
@@ -476,7 +491,7 @@ imops.encen = function(im, center) {
 
     var reply = imops._encen(im, center[1], center[0], radius);
 
-    return ndarray(reply, [reply.length]);
+    return ndops.ndarray(reply, [reply.length]);
 };
 
 ndops.indexof = function(a, x) {
@@ -494,7 +509,7 @@ ndops.indexof = function(a, x) {
 };
 
 ndops.gauss1d = function(radi, x0) {
-    var reply = ndops.ndarray(radi.shape);
+    var reply = ndops.zeros(radi.shape);
 
     var a = x0[0];
     var b = x0[1];
@@ -588,11 +603,11 @@ function reg2section(xreg) {
 
 exports.getRegionData = function (im, xreg) {
     var section = reg2section(xreg);
-    var im_2d   = ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+    var im_2d   = ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
     var imag;
 
     if ( xreg.angle && xreg.angle !== 0 ) {
-	imag = ndarray([xreg.size.width, xreg.size.height]);
+	imag = ndops.ndarray([xreg.size.width, xreg.size.height]);
 
 	ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
     } else {
@@ -607,7 +622,6 @@ exports.reg2section = reg2section;
 exports.template = template;
 
 exports.numeric  = numeric;
-exports.ndarray  = ndarray;
 exports.ndops    = ndops;
 exports.imops    = imops;
 

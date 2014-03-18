@@ -44,7 +44,7 @@
 
     function pluginUpdate(im, xreg) {
             var section = imexam.reg2section(xreg);
-            var im_2d   = imexam.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+            var im_2d   = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
             var imag    = imexam.ndops.section(im_2d, section);
 
 	    $(this.div).html(htmlTable(10, 10));
