@@ -1,12 +1,12 @@
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
-/*globals $, JS9, imexam */ 
+/*globals $, JS9, imexam, Uint32Array */ 
 
 "use strict";
 
 
 (function() {
     //DELETE-ME var imexam = require("./imexam");
-    var Mask = require("./mask");
+    var mask = require("./mask");
 
     function hasTag(reg, tag) {
 	var i;
@@ -24,13 +24,14 @@
 	var text = $(div).find(".imcnts-result")[0];
 
 	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
-	var mask = new Mask(im);
 
 	var regs = JS9.Regions(im);
-	var list = mask.listRegions(regs);
-	           mask.drawRegions(list);
+	var mimg = imexam.ndops.zeros(data.shape, Uint32Array);
 
-	var cnts = imexam.ndops.imcnts(data, mask.getMask(), list.length+1);
+	var list = mask.listRegions(regs);
+	           mask.drawRegions(list, mimg);
+
+	var cnts = imexam.ndops.imcnts(data, mimg, list.length+1);
 
 	var backgr_cnts = 0, backgr_area = 0;
 
@@ -62,6 +63,13 @@
 		srce.push({ regno: regno, net: net, cnts: cnts.cnts.get(regno), area: cnts.area.get(regno) });
 	    }
 	}
+
+	var image = { filename: "Mask", bitpix: 32, naxis: 2
+			, axis: { 1: data.shape[0], 2: data.shape[1] } 
+			, dmin: 0, dmax: regno
+			, head: {}, data: mimg.data
+		    };
+	JS9.Load(image);
 
 	$(text).html($.map(srce, JSON.stringify).join("\n"));
     }

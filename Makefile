@@ -26,8 +26,11 @@ JS    = 		\
 	rghist.js	\
 	enener.js	\
 	rghxrg.js	\
-	 mask.js	\
 	pxtabl.js
+
+JR	= 		\
+	mask.js		\
+	raster.js
 
 all:	$(JX:.jx=.js) imexam.html
 
@@ -39,7 +42,7 @@ install: $(JX:.jx=.js) imexam.html FORCE
 
 
 lint :
-	jslint $(JX) $(JS)
+	jslint $(JX) $(JS) $(JR)
 
 
 imexam.js : imexam.jx ndarray-ops-mask.js template.js
@@ -54,7 +57,7 @@ imexam.html : $(HX)
 contour.js : contour.jx conrec.js
 	browserify contour.jx | sed -e s%//DELETE-ME%% > contour.js
 
-imcnts.js : imcnts.jx mask.js
+imcnts.js : imcnts.jx mask.js raster.js
 	browserify imcnts.jx | sed -e s%//DELETE-ME%% > imcnts.js
 
 FORCE:
