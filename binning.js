@@ -28,7 +28,8 @@
 
     function getBinParams(div, display) {
 	if ( display === undefined ) {
-	    div = this.div;
+	    div     = this.div;
+	    display = this.display;
 	}
 	var im   = JS9.GetImage(display);
 

@@ -14,6 +14,15 @@
  5. Contour plugin.
    Important : Shows use of plugin controlling regions on image.
 
+ 6. Mask and ImCnts
+
+ 7. Binner
+
+ 8. GZip
+
+ 9. Async Fitsy.js w/GZip
+	
+
 
 
 
@@ -30,8 +39,6 @@
      x = a + b
 
 
- Pix Table 
- 
  HxRG Pix Stack - Test
 
  Pin/UnPin control
