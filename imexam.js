@@ -1,4 +1,6 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"Ll8vMw":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./imexam":[function(require,module,exports){
+module.exports=require('Ll8vMw');
+},{}],"Ll8vMw":[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
 /*globals Float32Array, Int32Array, JS9, $ */ 
 
@@ -627,9 +629,7 @@ exports.ndops    = ndops;
 exports.imops    = imops;
 
 
-},{"./ndarray-ops-mask":3,"./template":78,"cwise":8,"image-rotate":16,"iota-array":17,"ndarray":75,"ndarray-fill":18,"ndarray-moments":27,"ndarray-ops":36,"ndarray-pack":41,"ndarray-sort":54,"ndarray-unpack":64,"numeric":77}],"./imexam":[function(require,module,exports){
-module.exports=require('Ll8vMw');
-},{}],3:[function(require,module,exports){
+},{"./ndarray-ops-mask":3,"./template":78,"cwise":8,"image-rotate":16,"iota-array":17,"ndarray":75,"ndarray-fill":18,"ndarray-moments":27,"ndarray-ops":36,"ndarray-pack":41,"ndarray-sort":54,"ndarray-unpack":64,"numeric":77}],3:[function(require,module,exports){
 "use strict"
 
 var compile = require("cwise-compiler")

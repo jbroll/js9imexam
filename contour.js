@@ -561,8 +561,8 @@ if (typeof exports !== "undefined") {
 	var im  = JS9.GetImage(display);
 
 	if ( im ) {
-	    var data = imexam.ndops.ndarray(im.raw.data);
 	    var form = $(div).find(".contour-form")[0];
+	    var data = imexam.ndops.ndarray(im.raw.data, [im.raw.width, im.raw.height]);
 
 	    form.min.value = imexam.ndops.minvalue(data).toFixed(2);
 	    form.max.value = imexam.ndops.maxvalue(data).toFixed(2);
