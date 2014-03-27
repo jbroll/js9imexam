@@ -26,8 +26,7 @@ JS    = 		\
 	rghist.js	\
 	enener.js	\
 	rghxrg.js	\
-	pxtabl.js	\
-	binning.js
+	pxtabl.js
 
 JR	= 		\
 	mask.js		\

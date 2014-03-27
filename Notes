@@ -1,36 +1,43 @@
 
- 1. Standard plugin help button + help text for each plugin
+ o Move to typedArrayFunction()
+ o Test page
+
+
+ * Standard plugin help button + help text for each plugin
     Important : Gets help standard in place before release.
 
- 2. Standard plugin "pin/unpin" button
+ o Standard plugin "pin/unpin" button
     Important : Allows comparison of data analyses from two parts of the image. 
 
- 3. Fix counts in region for each shape.
+ o Fix counts in region for each shape.
    Important : Least surprise to user. 
 
- 4. Pixel table plugin attached to mouse move
+ o. Pixel table plugin attached to mouse move
     Important : Shows use of mouse move callback
  
- 5. Contour plugin.
+ o. Contour plugin.
    Important : Shows use of plugin controlling regions on image.
 
- 6. Mask and ImCnts
-
- 7. Binner
-
- 8. GZip
-
- 9. Async Fitsy.js w/GZip
+ o Mask and ImCnts
+	o Fix circle drawing aspect ratio.
 	
 
 
 
 
- ImExpr 
-     https://github.com/silentmatt/js-expression-eval/blob/master/parser.js
+ o ImCalc
+	Use typedArrayFunction 
+	
+	Have a table of registers
+	    new register button
+	    editable table
+	    JS9 image previewer of register
 
-     Take parser , replace ops functions with multi dispatch versions.
+	Have code text area
 
+	Have output image
+
+	Allow saving expression and register table.
 
      a: ...
      b: ....
