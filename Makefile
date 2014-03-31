@@ -28,6 +28,7 @@ JS    = 		\
 	rghxrg.js	\
 	pxtabl.js
 
+
 JR	= 		\
 	mask.js		\
 	raster.js
@@ -45,7 +46,7 @@ lint :
 	jslint $(JX) $(JS) $(JR)
 
 
-imexam.js : imexam.jx ndarray-ops-mask.js template.js
+imexam.js : imexam.jx template.js
 	browserify -r ./imexam.jx:./imexam > imexam.js
 
 imexam.html : $(HX)
