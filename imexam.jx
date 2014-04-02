@@ -5,8 +5,11 @@
 
 var ndops =                     require("../typed-array/typed-array");
     ndops = ndops.extend(ndops, require("../typed-array/typed-array-ops"));
-    ndops = ndops.extend(ndops, require("../typed-array/typed-matrix-ops"));
-    ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
+//    ndops = ndops.extend(ndops, require("../typed-array/typed-matrix-ops"));
+//    ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
+
+    numeric = require("../typed-array/numeric-1.2.6");
+    ndops.uncmin = numeric.uncmin;
 
     ndops.rotate  = require("./typed-array-rotate");
 
@@ -171,32 +174,19 @@ ndops.hist = function(a, width, min, max) {
     return hist;
 };
 
-ndops._proj = typed(function (a, axis, proj) {
-    var iX = 0, iY = 0;
-
-    // ----
-	if ( axis === 0 ) {
-	    proj[iX] = proj[iX] + a;
-	} else {
-	    proj[iY] = proj[iY] + a;
-	}
-    // ----
-
-    return proj;
-});
-
-ndops.proj = function(a, axis, length) {
+ndops.proj = function(a, axis) {
         var sect;
 	var i;
 
-        var proj = ndops.ndarray(ndops._proj(a, axis, new Float32Array(a.shape[axis === 0 ? 1 : 0]), [a.shape[axis === 0 ? 1 : 0]]));
+        //var proj = ndops.ndarray(ndops._proj(a, axis, new Float32Array(a.shape[axis === 0 ? 1 : 0]), [a.shape[axis === 0 ? 1 : 0]]));
         
+	var proj = {};
         proj.n   = a.shape[axis === 1 ? 0 : 1];
 	proj.x   = a.shape[axis];
 
-        proj.sum = ndops.zeros([proj.n]);
-        proj.avg = ndops.zeros([proj.n]);
-        proj.med = ndops.zeros([proj.n]);
+        proj.sum = Array(proj.n);
+        proj.avg = Array(proj.n);
+        proj.med = Array(proj.n);
 
         var copy = ndops.assign(ndops.zeros(a.shape), a);
 
@@ -207,9 +197,9 @@ ndops.proj = function(a, axis, length) {
                 sect = ndops.section(copy, [[0, proj.x], [i, i+1]]);
             }
 
-            proj.sum.set(i, ndops.sum(sect));
-            proj.avg.set(i, ndops.sum(sect)/proj.n);
-            proj.med.set(i, ndops.median(sect));
+            proj.sum[i] = ndops.sum(sect);
+            proj.avg[i] = ndops.sum(sect)/proj.n;
+            proj.med[i] = ndops.median(sect);
         }
 
         return proj;
@@ -324,7 +314,7 @@ ndops.median = function(a) {
 
 	Array.prototype.sort.call(data.data, function(a, b) { return a-b; });
 
-        var reply = data.data[Math.round(data.size/2.0)];
+        var reply = data.data[Math.round((data.size-1)/2.0)];
 
         return reply;
 };
@@ -477,30 +467,28 @@ ndops.gauss1d = function(radi, x0) {
     ndops.fill(reply, function(i) {
         var x = radi.data[i]-b;
 
-        return a * Math.pow(2.71828, - x*x / (2*c*c)) + d;
+        return (a-d) * Math.pow(2.71828, - x*x / (2*c*c)) + d;
     });
 
     return reply;    
 };
 
 ndops.gsfit1d = function(radi, data, x0) {
-    //try {
-	var opt = ndops.uncmin;
 
-        return opt(function(x) {
-            var modl = ndops.gauss1d(radi, x);
+    var reply = typed.uncmin(function(x) {
+	var modl = ndops.gauss1d(radi, x);
 
-            ndops.sub(modl, modl, data);
-            ndops.mul(modl, modl, modl);
+	ndops.sub(modl, modl, data);
+	ndops.mul(modl, modl, modl);
 
-            return ndops.sum(modl);
 
-        }, x0, 0.00001).solution;
-    //}
-    //catch(err) {
-	//console.log("Error in optimization");
-        //return x0;
-    //}
+	var sum = ndops.sum(modl);
+
+	return Math.sqrt(sum/radi.shape[0]);
+
+    }, x0, 0.0001).solution;
+
+    return reply;
 };
 
 function reg2section(xreg) {
@@ -582,5 +570,6 @@ exports.reg2section = reg2section;
 exports.template = template;
 
 exports.ndops    = ndops;
+exports.typed    = ndops;
 exports.imops    = imops;
 

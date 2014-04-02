@@ -53,8 +53,8 @@
 	}
 
 
-	for ( x = 0;  x < proj.shape[0]; x++ ) {
-		xdata[x] = [x, data.get(x)];
+	for ( x = 0;  x < data.length; x++ ) {
+		xdata[x] = [x, data[x]];
 	}
 
 	$.plot(div, [xdata]);
