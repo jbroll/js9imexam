@@ -419,7 +419,7 @@ greg.ross.visualisation.JSSurfacePlot = function(x, y, width, height, colourGrad
         transformation.init();
         transformation.rotate(currentXAngle, 0.0, currentZAngle);
         transformation.scale(scale);
-        transformation.translate(drawingDim / 2.0 + marginX, drawingDim / 2.0 + marginY, 0.0);
+        transformation.translate(drawingDim / 2.0 + marginX, (drawingDim / 3.0*2) + marginY, 0.0);
         
         cameraPosition = new greg.ross.visualisation.Point3D(drawingDim / 2.0 + marginX, drawingDim / 2.0 + marginY, -1000.0);
         
