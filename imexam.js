@@ -464,11 +464,15 @@ ndops.gauss1d = function(radi, x0) {
     var c = x0[2];
     var d = x0[3];
 
+b = Math.abs(b)
+c = Math.abs(c)
+
 
     ndops.fill(reply, function(i) {
         var x = radi.data[i]-b;
 
-        return (a-d) * Math.pow(2.71828, - x*x / (2*c*c)) + d;
+        //return a * (1/(c*2.5)) * Math.pow(2.71828, - x*x / (2*c*c)) + d;
+        return a * Math.pow(2.71828, - x*x / (2*c*c)) + d;
     });
 
     return reply;    
@@ -481,15 +485,19 @@ ndops.gsfit1d = function(radi, data, x0) {
 
 	ndops.sub(modl, modl, data);
 	ndops.mul(modl, modl, modl);
-
+	ndops.fill(modl, function(i) {
+	    return modl.get(i)/(radi.get(i)*radi.get(i));
+	});
 
 	var sum = ndops.sum(modl);
 
 	return Math.sqrt(sum/radi.shape[0]);
 
-    }, x0, 0.0001).solution;
+    }, x0, 0.000001);
 
-    return reply;
+    console.log(reply.message);
+
+    return reply.solution;
 };
 
 function reg2section(xreg) {
