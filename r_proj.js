@@ -10,7 +10,6 @@
     var rproj_template = "<div style='position:absolute;right: 10px;top:10px'> \
                     <table> \
                                     <tr><td>peak        </td><td align=right>{a%.2f}</td><tr> \
-                                    <tr><td>decenter</td><td align=right>{b%.2f}</td><tr> \
                                     <tr><td>sigma       </td><td align=right>{c%.2f}</td><tr> \
                                     <tr><td>bias        </td><td align=right>{d%.2f}</td><tr> \
                     </table> \
@@ -32,9 +31,10 @@
 
             var rproj    = imexam.imops.rproj(imag, [centroid.ceny, centroid.cenx]);
 
-            var fit = imexam.ndops.gsfit1d(rproj.radi, rproj.data, [max, 1, centroid.fwhm/2.355, backgr]);
+            var fit = imexam.ndops.gsfit1d(rproj.radi, rproj.data, [max, centroid.fwhm/2.355, backgr]);
 	
-            var fitv = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
+            var fitv = { a: fit[0], b: 0, c: fit[1], d: fit[2] };
+            //var fitv = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
 
             var rdata = [];
             var rfdat = [];

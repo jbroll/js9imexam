@@ -5,11 +5,11 @@
 
 var ndops =                     require("../typed-array/typed-array");
     ndops = ndops.extend(ndops, require("../typed-array/typed-array-ops"));
-//    ndops = ndops.extend(ndops, require("../typed-array/typed-matrix-ops"));
-//    ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
+    ndops = ndops.extend(ndops, require("../typed-array/typed-matrix-ops"));
+    ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
 
-    numeric = require("../typed-array/numeric-1.2.6");
-    ndops.uncmin = numeric.uncmin;
+//    numeric = require("../typed-array/numeric-1.2.6");
+//    ndops.uncmin = numeric.uncmin;
 
     ndops.rotate  = require("./typed-array-rotate");
 
@@ -459,18 +459,13 @@ ndops.gauss1d = function(radi, x0) {
     var reply = ndops.zeros(radi.shape);
 
     var a = x0[0];
-    var b = x0[1];
-    var c = x0[2];
-    var d = x0[3];
-
-b = Math.abs(b)
-c = Math.abs(c)
-
+    var b = 0; 		// x0[1];
+    var c = x0[1];
+    var d = x0[2];
 
     ndops.fill(reply, function(i) {
         var x = radi.data[i]-b;
 
-        //return a * (1/(c*2.5)) * Math.pow(2.71828, - x*x / (2*c*c)) + d;
         return a * Math.pow(2.71828, - x*x / (2*c*c)) + d;
     });
 

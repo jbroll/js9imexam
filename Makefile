@@ -46,7 +46,11 @@ lint :
 	jslint $(JX) $(JS) $(JR)
 
 
-imexam.js : imexam.jx template.js
+TYPED = ../typed-array/typed-array.js 		\
+	../typed-array/typed-array-ops.js	\
+	../typed-array/numeric-uncmin.js
+
+imexam.js : imexam.jx template.js $(TYPED)
 	browserify -r ./imexam.jx:./imexam > imexam.js
 
 imexam.html : $(HX)
