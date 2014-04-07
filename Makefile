@@ -48,6 +48,9 @@ lint :
 
 TYPED = ../typed-array/typed-array.js 		\
 	../typed-array/typed-array-ops.js	\
+	../typed-array/typed-array-ops.js	\
+	../typed-array/typed-matrix-ops.js	\
+	../typed-array/typed-array-rotate.js	\
 	../typed-array/numeric-uncmin.js
 
 imexam.js : imexam.jx template.js $(TYPED)

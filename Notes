@@ -1,5 +1,5 @@
 
- o Move to typedArrayFunction()
+ * Move to typedArrayFunction()
  o Test page
 
 
@@ -12,18 +12,15 @@
  o Fix counts in region for each shape.
    Important : Least surprise to user. 
 
- o. Pixel table plugin attached to mouse move
+ o Pixel table plugin attached to mouse move
     Important : Shows use of mouse move callback
  
- o. Contour plugin.
+ o Contour plugin.
    Important : Shows use of plugin controlling regions on image.
 
  o Mask and ImCnts
 	o Fix circle drawing aspect ratio.
 	
-
-
-
 
  o ImCalc
 	Use typedArrayFunction 
@@ -46,15 +43,15 @@
      x = a + b
 
 
- HxRG Pix Stack - Test
+ o HxRG Pix Stack - Test
 
- Pin/UnPin control
+ o Pin/UnPin control
 
- Histogram
-	stats
+ o Histogram
+	o stats
 
- Graphs
-	Zoom stack
-	horizontal & vertical selection
+ o Graphs
+	o Zoom stack
+	o horizontal & vertical selection
 
 

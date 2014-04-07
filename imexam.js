@@ -9,10 +9,7 @@ var ndops =                     require("../typed-array/typed-array");
     ndops = ndops.extend(ndops, require("../typed-array/typed-matrix-ops"));
     ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
 
-//    numeric = require("../typed-array/numeric-1.2.6");
-//    ndops.uncmin = numeric.uncmin;
-
-    ndops.rotate  = require("./typed-array-rotate");
+    ndops.rotate  = require("../typed-array/typed-array-rotate");
 
 var typed = ndops;
 
@@ -578,9 +575,57 @@ exports.typed    = ndops;
 exports.imops    = imops;
 
 
-},{"../typed-array/numeric-uncmin":9,"../typed-array/typed-array":11,"../typed-array/typed-array-ops":10,"../typed-array/typed-matrix-ops":12,"./template":4,"./typed-array-rotate":5}],"./imexam":[function(require,module,exports){
+},{"../typed-array/numeric-uncmin":7,"../typed-array/typed-array":11,"../typed-array/typed-array-ops":8,"../typed-array/typed-array-rotate":9,"../typed-array/typed-matrix-ops":12,"./template":3}],"./imexam":[function(require,module,exports){
 module.exports=require('Ll8vMw');
 },{}],3:[function(require,module,exports){
+function template(str, data){
+    
+        return str.replace(/{([a-zA-Z0-9_.%]*)}/g,
+            function(m,key){
+                var type, prec, val;
+                var val = data;
+            
+                key = key.split("%");
+
+                if ( key.length <= 1 ) {
+                    fmt = "%s"
+                } else {
+                    fmt = key[1]
+                }
+
+                key = key[0]
+                key = key.split(".");
+
+                for ( i = 0; i < key.length; i++ ) {
+                    if ( val.hasOwnProperty(key[i]) ) {
+                        val = val[key[i]];
+                    } else {
+                        return "";
+                    }
+                }
+
+                type = fmt.substring(fmt.length-1)
+                prec = fmt.substring(1, fmt.length-1)
+
+                switch ( type ) {
+                 case "s":
+                    break;
+                 case "f":
+                    val = val.toFixed(prec);
+                    break;
+                 case "d":
+                    val = val.toFixed(0);
+                    break;
+                }
+
+                return val;
+            }
+        );
+}
+
+module.exports = template;
+
+},{}],4:[function(require,module,exports){
 "use strict"
 
 function interp1d(arr, x) {
@@ -691,154 +736,7 @@ module.exports.d1 = interp1d
 module.exports.d2 = interp2d
 module.exports.d3 = interp3d
 
-},{}],4:[function(require,module,exports){
-function template(str, data){
-    
-        return str.replace(/{([a-zA-Z0-9_.%]*)}/g,
-            function(m,key){
-                var type, prec, val;
-                var val = data;
-            
-                key = key.split("%");
-
-                if ( key.length <= 1 ) {
-                    fmt = "%s"
-                } else {
-                    fmt = key[1]
-                }
-
-                key = key[0]
-                key = key.split(".");
-
-                for ( i = 0; i < key.length; i++ ) {
-                    if ( val.hasOwnProperty(key[i]) ) {
-                        val = val[key[i]];
-                    } else {
-                        return "";
-                    }
-                }
-
-                type = fmt.substring(fmt.length-1)
-                prec = fmt.substring(1, fmt.length-1)
-
-                switch ( type ) {
-                 case "s":
-                    break;
-                 case "f":
-                    val = val.toFixed(prec);
-                    break;
-                 case "d":
-                    val = val.toFixed(0);
-                    break;
-                }
-
-                return val;
-            }
-        );
-}
-
-module.exports = template;
-
 },{}],5:[function(require,module,exports){
-/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
-
-"use strict";
-
-var warp = require("./typed-array-warp");
-
-
-function rotateImage(out, inp, theta, iX, iY, oX, oY) {
-  var c = Math.cos(theta);
-  var s = Math.sin(-theta);
-  iX = iX || inp.shape[0]/2.0;
-  iY = iY || inp.shape[1]/2.0;
-  oX = oX || out.shape[0]/2.0;
-  oY = oY || out.shape[1]/2.0;
-  var a = iX - c * oX + s * oY;
-  var b = iY - s * oX - c * oY;
-  warp(out, inp, function(y,x) {
-    y[0] = c * x[0] - s * x[1] + a;
-    y[1] = s * x[0] + c * x[1] + b;
-  });
-  return out;
-}
-
-module.exports = rotateImage;
-
-},{"./typed-array-warp":6}],6:[function(require,module,exports){
-/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
-
-"use strict";
-
-var interp = require("ndarray-linear-interpolate");
-var typed = require("../typed-array/typed-array");
-
-var do_warp = typed(function (dest, func, interp) {
-    var warped = dest.shape.slice(0);
-
-    var iX = 0, iY = 0, iZ = 0;
-
-    // ----
-	func(warped, [iX, iY, iZ]);
-	dest = interp.apply(undefined, warped);
-    // ----
-});
-        
-var do_warp_1 = typed(function (dest, func, interp, src) {
-    var warped = [0];
-    var SRC = src;
-
-    var iX = 0;
-
-    // ----
-	func(warped, [iX]);
-	dest = interp(SRC, warped[0]);
-    // ----
-});
-
-var do_warp_2 = typed(function (dest, func, interp, src) {
-    var warped = [0, 0];
-    var SRC = src;
-
-    var iX = 0, iY = 0;
-
-    // ----
-	func(warped, [iY, iX]);
-	dest = interp(SRC, warped[0], warped[1]);
-    // ----
-});
-
-var do_warp_3 = typed(function (dest, func, interp, src) {
-    var warped = [0, 0, 0];
-    var SRC = src;
-
-    var iX = 0, iY = 0, iZ = 0;
-
-    // ----
-	func(warped, [iZ, iY, iX]);
-	dest = interp(SRC, warped[0], warped[1], warped[2]);
-    // ----
-});
-
-module.exports = function warp(dest, src, func) {
-  switch(src.shape.length) {
-    case 1:
-      do_warp_1(dest, func, interp.d1, src);
-      break;
-    case 2:
-      do_warp_2(dest, func, interp.d2, src);
-      break;
-    case 3:
-      do_warp_3(dest, func, interp.d3, src);
-      break;
-    default:
-      do_warp(dest, func, interp.bind(undefined, src));
-      break;
-  }
-  return dest;
-};
-
-},{"../typed-array/typed-array":11,"ndarray-linear-interpolate":3}],7:[function(require,module,exports){
 "use strict"
 
 var iota = require("iota-array")
@@ -1196,7 +1094,7 @@ function wrappedNDArrayCtor(data, shape, stride, offset) {
 
 module.exports = wrappedNDArrayCtor
 
-},{"iota-array":8}],8:[function(require,module,exports){
+},{"iota-array":6}],6:[function(require,module,exports){
 "use strict"
 
 function iota(n) {
@@ -1208,7 +1106,7 @@ function iota(n) {
 }
 
 module.exports = iota
-},{}],9:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
 
 var numeric =                     require("../typed-array/typed-array");
@@ -1263,11 +1161,6 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
     var step,g0,g1,H1 = options.Hinv || numeric.identity(n);
     var dot = numeric.dot, sub = numeric.sub, add = numeric.add, ten = numeric.tensor, div = numeric.div, mul = numeric.mul;
 
-    //var dotVV = numeric.dotVV.baked([1], [1]);
-
-    //var addVV = numeric.add.baked([1], [1]);
-    //var mulVS = numeric.mul.baked([1], 1);
-
     var all = numeric.all, isfinite = numeric.isFinite, neg = numeric.negeq;
     var it=0,i,s,x1,y,Hy,Hs,ys,i0,t,nstep,t1,t2;
     var msg = "";
@@ -1285,10 +1178,8 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
         x1 = x0;
         while(it < maxit) {
             if(t*nstep < tol) { break; }
-
             s  = mul(step,t);
             x1 = add(x0,s);
-
             f1 = f(x1);
             if(f1-f0 >= 0.1*t*df0 || isNaN(f1)) {
                 t *= 0.5;
@@ -1319,7 +1210,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
     return {solution: x0, f: f0, gradient: g0, invHessian: H1, iterations:it, message: msg};
 }
 
-},{"../typed-array/typed-array":11,"../typed-array/typed-array-ops":10,"../typed-array/typed-matrix-ops":12}],10:[function(require,module,exports){
+},{"../typed-array/typed-array":11,"../typed-array/typed-array-ops":8,"../typed-array/typed-matrix-ops":12}],8:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true */
 /*jshint node: true, -W099: true, laxbreak:true, laxcomma:true, multistr:true, smarttabs:true */
 /*globals */ 
@@ -1508,7 +1399,106 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 }());
  
 
-},{"./typed-array":11}],11:[function(require,module,exports){
+},{"./typed-array":11}],9:[function(require,module,exports){
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
+
+"use strict";
+
+var warp = require("./typed-array-warp");
+
+
+function rotateImage(out, inp, theta, iX, iY, oX, oY) {
+  var c = Math.cos(theta);
+  var s = Math.sin(-theta);
+  iX = iX || inp.shape[0]/2.0;
+  iY = iY || inp.shape[1]/2.0;
+  oX = oX || out.shape[0]/2.0;
+  oY = oY || out.shape[1]/2.0;
+  var a = iX - c * oX + s * oY;
+  var b = iY - s * oX - c * oY;
+  warp(out, inp, function(y,x) {
+    y[0] = c * x[0] - s * x[1] + a;
+    y[1] = s * x[0] + c * x[1] + b;
+  });
+  return out;
+}
+
+module.exports = rotateImage;
+
+},{"./typed-array-warp":10}],10:[function(require,module,exports){
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
+
+"use strict";
+
+var interp = require("ndarray-linear-interpolate");
+var typed = require("./typed-array");
+
+var do_warp = typed(function (dest, func, interp) {
+    var warped = dest.shape.slice(0);
+
+    var iX = 0, iY = 0, iZ = 0;
+
+    // ----
+	func(warped, [iX, iY, iZ]);
+	dest = interp.apply(undefined, warped);
+    // ----
+});
+        
+var do_warp_1 = typed(function (dest, func, interp, src) {
+    var warped = [0];
+    var SRC = src;
+
+    var iX = 0;
+
+    // ----
+	func(warped, [iX]);
+	dest = interp(SRC, warped[0]);
+    // ----
+});
+
+var do_warp_2 = typed(function (dest, func, interp, src) {
+    var warped = [0, 0];
+    var SRC = src;
+
+    var iX = 0, iY = 0;
+
+    // ----
+	func(warped, [iY, iX]);
+	dest = interp(SRC, warped[0], warped[1]);
+    // ----
+});
+
+var do_warp_3 = typed(function (dest, func, interp, src) {
+    var warped = [0, 0, 0];
+    var SRC = src;
+
+    var iX = 0, iY = 0, iZ = 0;
+
+    // ----
+	func(warped, [iZ, iY, iX]);
+	dest = interp(SRC, warped[0], warped[1], warped[2]);
+    // ----
+});
+
+module.exports = function warp(dest, src, func) {
+  switch(src.shape.length) {
+    case 1:
+      do_warp_1(dest, func, interp.d1, src);
+      break;
+    case 2:
+      do_warp_2(dest, func, interp.d2, src);
+      break;
+    case 3:
+      do_warp_3(dest, func, interp.d3, src);
+      break;
+    default:
+      do_warp(dest, func, interp.bind(undefined, src));
+      break;
+  }
+  return dest;
+};
+
+},{"./typed-array":11,"ndarray-linear-interpolate":4}],11:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true */
 /*jshint node: true, -W099: true, laxbreak:true, laxcomma:true, multistr:true, smarttabs:true */
 /*globals */ 
@@ -1995,7 +1985,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 }());
 
 
-},{"ndarray":7}],12:[function(require,module,exports){
+},{"ndarray":5}],12:[function(require,module,exports){
 
 
 var typed   = require("./typed-array");

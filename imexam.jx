@@ -8,10 +8,7 @@ var ndops =                     require("../typed-array/typed-array");
     ndops = ndops.extend(ndops, require("../typed-array/typed-matrix-ops"));
     ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
 
-//    numeric = require("../typed-array/numeric-1.2.6");
-//    ndops.uncmin = numeric.uncmin;
-
-    ndops.rotate  = require("./typed-array-rotate");
+    ndops.rotate  = require("../typed-array/typed-array-rotate");
 
 var typed = ndops;
 
