@@ -19,7 +19,7 @@
    Important : Shows use of plugin controlling regions on image.
 
  o Mask and ImCnts
-	o Fix circle drawing aspect ratio.
+    o Fix circle drawing aspect ratio.
 	
 
  o ImCalc
@@ -44,8 +44,6 @@
 
 
  o HxRG Pix Stack - Test
-
- o Pin/UnPin control
 
  o Histogram
 	o stats
