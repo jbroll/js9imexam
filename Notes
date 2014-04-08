@@ -12,8 +12,12 @@
  o Fix counts in region for each shape.
    Important : Least surprise to user. 
 
- o Pixel table plugin attached to mouse move
+ * Pixel table plugin attached to mouse move
     Important : Shows use of mouse move callback
+
+    o Flip table up/down and left/right to match image axis signs
+    o Add CSS styling for bgcolor or row/col headers and "center" cross.
+
  
  o Contour plugin.
    Important : Shows use of plugin controlling regions on image.
