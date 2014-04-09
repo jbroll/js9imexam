@@ -10,7 +10,6 @@
 (function() {
     var raster = require("./raster");
 
-
     function hasTag(reg, tag) {
 	var i;
 

@@ -9,11 +9,12 @@
 
 
     var projToolbar = "                                      	\
-                 <select  class='proj_menu'> 			\
+                 plot: <select  class='proj_menu'>		\
                         <option>sum</option>                    \
                         <option>avg</option>                    \
                         <option>med</option>                    \
-                </select>";
+		       </select>				\
+		";
 
     function projUpdate(im, xreg) {
 	var div, proj, menx;

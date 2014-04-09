@@ -54,8 +54,8 @@
 
     function _drawPolygon(points, color, buffer, width) {
 	var i;
-	var miny = points[0].y; 			// work out the minimum and maximum y values
-	var maxy = points[0].y;
+	var miny = points[0].y-1; 			// work out the minimum and maximum y values
+	var maxy = points[0].y-1;
 
 	for ( i = 1; i < points.length; i++ ) {
 	    if ( points[i].y-1 < miny) { miny = points[i].y-1; }

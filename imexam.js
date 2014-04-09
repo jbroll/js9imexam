@@ -10,6 +10,7 @@ var ndops =                     require("../typed-array/typed-array");
     ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
 
     ndops.rotate  = require("../typed-array/typed-array-rotate");
+    ndops.mask    = require("./mask.js");
 
 var typed = ndops;
 
@@ -575,9 +576,238 @@ exports.typed    = ndops;
 exports.imops    = imops;
 
 
-},{"../typed-array/numeric-uncmin":7,"../typed-array/typed-array":11,"../typed-array/typed-array-ops":8,"../typed-array/typed-array-rotate":9,"../typed-array/typed-matrix-ops":12,"./template":3}],"./imexam":[function(require,module,exports){
+},{"../typed-array/numeric-uncmin":9,"../typed-array/typed-array":13,"../typed-array/typed-array-ops":10,"../typed-array/typed-array-rotate":11,"../typed-array/typed-matrix-ops":14,"./mask.js":3,"./template":5}],"./imexam":[function(require,module,exports){
 module.exports=require('Ll8vMw');
 },{}],3:[function(require,module,exports){
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
+/*globals $ */ 
+
+"use strict";
+
+// source
+// background
+// exclude
+
+(function() {
+    var raster = require("./raster");
+
+    function hasTag(reg, tag) {
+	var i;
+
+	for ( i = 0; i < reg.tags.length; i++ ) {
+	    if ( reg.tags[i] === tag ) { return true; }
+	}
+
+	return false;
+    }
+    exports.hasTag = hasTag;
+
+    exports.listRegions = function (regs) {
+	var i, j;
+	var reg, regno = 1;
+
+	var reply = [];
+
+	for ( i = 0; i < regs.length; i++ ) {
+	    reg = regs[i];
+
+	    switch ( reg.shape ) {
+	     case "annulus":
+		for ( j = 0; j < reg.radii.length; j++ ) {
+		    if ( reg.radii[j] !== 0.0 ) {
+			reply[regno-1] = $.extend($.extend({}, reg), { regno: regno++, shape: "circle", radius: reg.radii[j] });
+		    }
+		}
+	     	break;
+	     default:
+		reply[regno-1] = $.extend({ regno: regno++ }, reg);
+		break;
+	    }
+	}
+
+	return reply;
+    };
+
+    exports.drawRegions = function (regs, data) {
+	var reg, t, i;
+
+	var type = [ "include", "exclude" ];
+
+	for ( t = 0; t < 2; t++ ) {
+	    for ( i = regs.length - 1; i >= 0; i-- ) {
+		reg = regs[i];
+
+		if ( !hasTag(reg, type[t]) ) { continue; }
+
+		switch ( reg.shape ) {
+		 case "circle":
+		    raster.drawCircle(reg.pos.x, reg.pos.y, reg.radius, reg.regno, data.data, data.shape[0]);
+		    break;
+
+		 case "box":
+		    raster.drawBox(reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno, data.data, data.shape[0]);
+		    break;
+
+		 case "ellipse":
+		    raster.drawEllipse(reg.pos.x, reg.pos.y, reg.eradius.x, reg.eradius.y, reg.angle, reg.regno, data.data, data.shape[0]);
+		    break;
+
+		 case "polygon":
+		    raster.drawPolygon(reg.points, reg.regno, data.data, data.shape[0]);
+		    break;
+		}
+	    }
+	}
+    };
+}());
+
+
+},{"./raster":4}],4:[function(require,module,exports){
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
+/*globals */ 
+
+"use strict";
+
+(function() {
+
+    // http://cogsandlevers.blogspot.com/2013/11/scanline-based-filled-polygons.html
+    //
+    function drawHLine(x1, x2, y, k, buffer, width) {
+
+	if ( x1 < 0     ) { x1 = 0;     }
+	if ( x2 > width ) { x2 = width; }
+
+	var ofs = x1 + y * width; 			// calculate the offset into the buffer
+        var x;
+
+	for (x = x1; x < x2; x++) { 			// draw all of the pixels
+	    buffer[ofs++] = k;
+	}
+    }
+
+    function scanline(x1, y1, x2, y2, miny, edges) {
+	var x, y, xi;
+
+	if (y1 > y2) { 					// flip the points if need be
+	     y = y1; y1 = y2; y2 = y;
+	     x = x1; x1 = x2; x2 = x;
+	}
+
+	y1 = Math.floor(y1)+1
+	y2 = Math.floor(y2)
+
+	//if ( y2 < y1 ) { y2++ }
+
+	x = x1; 					// start at the start
+	var dx = (x2 - x1) / (y2 - y1); 		// change in x over change in y will give us the gradient
+	var ofs = Math.round(y1 - miny); 		// the offset the start writing at (into the array)
+
+	for ( y = y1; y <= y2; y++ ) { 		// cover all y co-ordinates in the line
+
+	    xi = Math.floor(x) + 1
+
+	    // check if we've gone over/under the max/min
+	    //
+	    if ( edges[ofs].minx > xi ) { edges[ofs].minx = xi; }
+	    if ( edges[ofs].maxx < xi ) { edges[ofs].maxx = xi; }
+
+	    x += dx; 					// move along the gradient
+	    ofs ++; 					// move along the buffer
+
+	}
+    }
+
+    function _drawPolygon(points, color, buffer, width) {
+	var i;
+	var miny = points[0].y-1; 			// work out the minimum and maximum y values
+	var maxy = points[0].y-1;
+
+	for ( i = 1; i < points.length; i++ ) {
+	    if ( points[i].y-1 < miny) { miny = points[i].y-1; }
+	    if ( points[i].y-1 > maxy) { maxy = points[i].y-1; }
+	}
+
+	var h = maxy - miny; 				// the height is the size of our edges array
+	var edges = [];
+
+	for ( i = 0; i <= h+1; i++ ) { 			// build the array with unreasonable limits
+	    edges.push({ minx:  1000000, maxx: -1000000 });
+	}
+
+	for ( i = 0; i < points.length-1; i++ ) { 	// process each line in the polygon
+	    scanline(points[i  ].x-1, points[i  ].y-1
+		   , points[i+1].x-1, points[i+1].y-1, miny, edges);
+	}
+	scanline(points[i].x-1, points[i].y-1, points[0].x-1, points[0].y-1, miny, edges);
+
+	// draw each horizontal line
+	for ( i = 0; i < edges.length; i++ ) {
+	    drawHLine( Math.floor(edges[i].minx)
+		     , Math.floor(edges[i].maxx)
+		     , Math.floor(i + miny), color, buffer, width);
+	}
+    }
+
+    function d2r(d) { return d * (Math.PI / 180); }
+
+    function rotPoints(points, angle, about) {
+	var x, y, i;
+	var reply = [];
+
+	angle = d2r(angle);
+
+	var sin = Math.sin(angle);
+	var cos = Math.cos(angle);
+
+	for ( i = 0; i < points.length; i++ ) {
+	    x = about.x + (((points[i].x-about.x) * cos) - ((points[i].y-about.y) * sin));
+	    y = about.y + (((points[i].x-about.x) * sin) + ((points[i].y-about.y) * cos));
+
+	    reply.push({ x: x, y: y });
+	}
+
+	return reply;
+    }
+
+    function polyEllipse(x, y, w, h) {
+	var ex, ey, i;
+	var reply = [];
+
+	for ( i = 0; i < 2 * Math.PI; i += 0.01 ) {
+	    ex = x + w*Math.cos(i);
+	    ey = y + h*Math.sin(i);
+
+	    reply.push({ x: ex, y: ey });
+	}
+
+	return reply;
+    }
+
+    function polyBox(x, y, w, h) {
+	return [  { x: x-w/2, y: y-h/2 }
+		, { x: x-w/2, y: y+h/2 }
+		, { x: x+w/2, y: y+h/2 }
+		, { x: x+w/2, y: y-h/2 } ];
+    }
+
+    exports.drawCircle = function (x, y, rad, color, buffer, width) {
+	_drawPolygon(polyEllipse(x, y, rad, rad), color, buffer, width);
+    };
+
+    exports.drawPolygon = function (points, color, buffer, width) {
+	_drawPolygon(points, color, buffer, width);
+    };
+
+    exports.drawEllipse = function (x, y, h, w, rot, color, buffer, width) {
+	_drawPolygon(rotPoints(polyEllipse(x, y, h, w), rot, { x: x, y: y }), color, buffer, width);
+    };
+
+    exports.drawBox = function (x, y, h, w, rot, color, buffer, width) {
+	_drawPolygon(rotPoints(polyBox(x, y, h, w), rot, { x: x, y: y }), color, buffer, width);
+    };
+}());
+
+},{}],5:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
 
 "use strict";
@@ -654,7 +884,7 @@ console.log("\n")
 
 module.exports = template;
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict"
 
 function interp1d(arr, x) {
@@ -765,7 +995,7 @@ module.exports.d1 = interp1d
 module.exports.d2 = interp2d
 module.exports.d3 = interp3d
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict"
 
 var iota = require("iota-array")
@@ -1123,7 +1353,7 @@ function wrappedNDArrayCtor(data, shape, stride, offset) {
 
 module.exports = wrappedNDArrayCtor
 
-},{"iota-array":6}],6:[function(require,module,exports){
+},{"iota-array":8}],8:[function(require,module,exports){
 "use strict"
 
 function iota(n) {
@@ -1135,7 +1365,7 @@ function iota(n) {
 }
 
 module.exports = iota
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 
 var numeric =                     require("../typed-array/typed-array");
@@ -1239,7 +1469,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
     return {solution: x0, f: f0, gradient: g0, invHessian: H1, iterations:it, message: msg};
 }
 
-},{"../typed-array/typed-array":11,"../typed-array/typed-array-ops":8,"../typed-array/typed-matrix-ops":12}],8:[function(require,module,exports){
+},{"../typed-array/typed-array":13,"../typed-array/typed-array-ops":10,"../typed-array/typed-matrix-ops":14}],10:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true */
 /*jshint node: true, -W099: true, laxbreak:true, laxcomma:true, multistr:true, smarttabs:true */
 /*globals */ 
@@ -1428,7 +1658,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 }());
  
 
-},{"./typed-array":11}],9:[function(require,module,exports){
+},{"./typed-array":13}],11:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
 
 "use strict";
@@ -1454,7 +1684,7 @@ function rotateImage(out, inp, theta, iX, iY, oX, oY) {
 
 module.exports = rotateImage;
 
-},{"./typed-array-warp":10}],10:[function(require,module,exports){
+},{"./typed-array-warp":12}],12:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
 
 "use strict";
@@ -1527,7 +1757,7 @@ module.exports = function warp(dest, src, func) {
   return dest;
 };
 
-},{"./typed-array":11,"ndarray-linear-interpolate":4}],11:[function(require,module,exports){
+},{"./typed-array":13,"ndarray-linear-interpolate":6}],13:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true */
 /*jshint node: true, -W099: true, laxbreak:true, laxcomma:true, multistr:true, smarttabs:true */
 /*globals */ 
@@ -2014,7 +2244,7 @@ module.exports = function warp(dest, src, func) {
 }());
 
 
-},{"ndarray":5}],12:[function(require,module,exports){
+},{"ndarray":7}],14:[function(require,module,exports){
 
 
 var typed   = require("./typed-array");
@@ -2159,4 +2389,4 @@ numeric.dotMM = typed({ loops: false }, numeric.dotMM);
 numeric.diag  = typed({ loops: false }, numeric.diag);
 
 
-},{"./typed-array":11}]},{},[])
+},{"./typed-array":13}]},{},[])

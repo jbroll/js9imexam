@@ -16,7 +16,6 @@ HX    = 		\
 JX    = 		\
 	imexam.jx	\
 	3dplot.jx	\
-	imcnts.jx	\
 	contour.jx
 
 JS    = 		\
@@ -26,7 +25,8 @@ JS    = 		\
 	rghist.js	\
 	enener.js	\
 	rghxrg.js	\
-	pxtabl.js
+	pxtabl.js	\
+	imcnts.js
 
 
 JR	= 		\
@@ -53,7 +53,7 @@ TYPED = ../typed-array/typed-array.js 		\
 	../typed-array/typed-array-rotate.js	\
 	../typed-array/numeric-uncmin.js
 
-imexam.js : imexam.jx template.js $(TYPED)
+imexam.js : imexam.jx template.js mask.js raster.js $(TYPED)
 	browserify -r ./imexam.jx:./imexam > imexam.js
 
 imexam.html : $(HX)
@@ -64,9 +64,6 @@ imexam.html : $(HX)
 
 contour.js : contour.jx conrec.js
 	browserify contour.jx | sed -e s%//DELETE-ME%% > contour.js
-
-imcnts.js : imcnts.jx mask.js raster.js
-	browserify imcnts.jx | sed -e s%//DELETE-ME%% > imcnts.js
 
 FORCE:
 

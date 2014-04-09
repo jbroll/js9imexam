@@ -9,6 +9,7 @@ var ndops =                     require("../typed-array/typed-array");
     ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
 
     ndops.rotate  = require("../typed-array/typed-array-rotate");
+    ndops.mask    = require("./mask.js");
 
 var typed = ndops;
 
