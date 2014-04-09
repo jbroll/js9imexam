@@ -7,17 +7,8 @@
 
 (function() {
      var imexam = require("./imexam");
+    var template = imexam.template;
     var mask = require("./mask");
-
-    function hasTag(reg, tag) {
-	var i;
-
-	for ( i = 0; i < reg.tags.length; i++ ) {
-	    if ( reg.tags[i] === tag ) { return true; }
-	}
-
-	return false;
-    }
 
     function runImCnts(im, xreg) {
 	var i;
@@ -41,18 +32,18 @@
 	var net, regno;
 
 	for ( i = 0; i < list.length; i++ ) {
-	    if ( hasTag(list[i], "background") ) {
+	    if ( mask.hasTag(list[i], "background") ) {
 		regno = list[i].regno;
 
 		backgr_cnts += cnts.cnts.get(regno);
 		backgr_area += cnts.area.get(regno);
 
-		back.push({ regno: regno, cnts: cnts.cnts[regno], area: cnts.area[regno] });
+		back.push({ regno: regno, cnts: cnts.cnts.get(regno), area: cnts.area.get(regno) });
 	    }
 	}
 
 	for ( i = 0; i < list.length; i++ ) {
-	    if ( hasTag(list[i], "source") ) {
+	    if ( mask.hasTag(list[i], "source") && !mask.hasTag(list[i], "exclude") ) {
 		regno = list[i].regno;
 
 		if ( backgr_area > 0 ) {
@@ -65,14 +56,23 @@
 	    }
 	}
 
+	imexam.ndops.sub(mimg, mimg, data);
+
 	var image = { filename: "Mask", bitpix: 32, naxis: 2
-			, axis: { 1: data.shape[0], 2: data.shape[1] } 
-			, dmin: 0, dmax: regno
+			, axis: { 1: mimg.shape[0], 2: mimg.shape[1] } 
+			, dmin: -regno, dmax: regno
 			, head: {}, data: mimg.data
 		    };
-	JS9.Load(image);
+	JS9.Load(image, { display: "mask" });
 
-	$(text).html($.map(srce, JSON.stringify).join("\n"));
+	$(text).html("Source\n"
+		   + "regno         counts       area            net\n"
+		   + "-----         ------       ----            ---\n"
+		   + srce.map(function(x, i) { return template("{regno%5d} {cnts%14.3f} {area%10.3f} {net%14.3f}", x); }).join("\n")
+		   + "\n\nBackground\n"
+		   + "regno         counts       area\n"
+		   + "-----         ------       ----\n"
+		   + back.map(function(x, i) { return template("{regno%5d} {cnts%14.3f} {area%10.3f}", x); }).join("\n"));
     }
 
 /*
@@ -139,7 +139,7 @@
 	    toolbarHTML: " ",
 
             regionchange: runImCnts,
-            winDims: [500, 250],
+            winDims: [600, 250],
     });
 }());
 
@@ -157,6 +157,17 @@
     var raster = require("./raster");
 
 
+    function hasTag(reg, tag) {
+	var i;
+
+	for ( i = 0; i < reg.tags.length; i++ ) {
+	    if ( reg.tags[i] === tag ) { return true; }
+	}
+
+	return false;
+    }
+    exports.hasTag = hasTag;
+
     exports.listRegions = function (regs) {
 	var i, j;
 	var reg, regno = 1;
@@ -168,7 +179,7 @@
 
 	    switch ( reg.shape ) {
 	     case "annulus":
-		for ( j = reg.radii.length-1; j >= 0; j-- ) {
+		for ( j = 0; j < reg.radii.length; j++ ) {
 		    if ( reg.radii[j] !== 0.0 ) {
 			reply[regno-1] = $.extend($.extend({}, reg), { regno: regno++, shape: "circle", radius: reg.radii[j] });
 		    }
@@ -184,27 +195,33 @@
     };
 
     exports.drawRegions = function (regs, data) {
-	var reg, i;
+	var reg, t, i;
 
-	for ( i = 0; i < regs.length; i++ ) {
-	    reg = regs[i];
+	var type = [ "include", "exclude" ];
 
-	    switch ( reg.shape ) {
-	     case "circle":
-		raster.drawCircle(reg.pos.x, reg.pos.y, reg.radius, reg.regno, data.data, data.shape[0]);
-	     	break;
+	for ( t = 0; t < 2; t++ ) {
+	    for ( i = regs.length - 1; i >= 0; i-- ) {
+		reg = regs[i];
 
-	     case "box":
-		raster.drawBox(reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno, data.data, data.shape[0]);
-	     	break;
+		if ( !hasTag(reg, type[t]) ) { continue; }
 
-	     case "ellipse":
-		raster.drawEllipse(reg.pos.x, reg.pos.y, reg.eradius.x, reg.eradius.y, reg.angle, reg.regno, data.data, data.shape[0]);
-	     	break;
+		switch ( reg.shape ) {
+		 case "circle":
+		    raster.drawCircle(reg.pos.x, reg.pos.y, reg.radius, reg.regno, data.data, data.shape[0]);
+		    break;
 
-	     case "polygon":
-		raster.drawPolygon(reg.points, reg.regno, data.data, data.shape[0]);
-	     	break;
+		 case "box":
+		    raster.drawBox(reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno, data.data, data.shape[0]);
+		    break;
+
+		 case "ellipse":
+		    raster.drawEllipse(reg.pos.x, reg.pos.y, reg.eradius.x, reg.eradius.y, reg.angle, reg.regno, data.data, data.shape[0]);
+		    break;
+
+		 case "polygon":
+		    raster.drawPolygon(reg.points, reg.regno, data.data, data.shape[0]);
+		    break;
+		}
 	    }
 	}
     };
@@ -222,8 +239,12 @@
     // http://cogsandlevers.blogspot.com/2013/11/scanline-based-filled-polygons.html
     //
     function drawHLine(x1, x2, y, k, buffer, width) {
-        var x;
+
+	if ( x1 < 0     ) { x1 = 0;     }
+	if ( x2 > width ) { x2 = width; }
+
 	var ofs = x1 + y * width; 			// calculate the offset into the buffer
+        var x;
 
 	for (x = x1; x < x2; x++) { 			// draw all of the pixels
 	    buffer[ofs++] = k;
@@ -231,23 +252,30 @@
     }
 
     function scanline(x1, y1, x2, y2, miny, edges) {
-	var x, y;
+	var x, y, xi;
 
 	if (y1 > y2) { 					// flip the points if need be
 	     y = y1; y1 = y2; y2 = y;
 	     x = x1; x1 = x2; x2 = x;
 	}
 
+	y1 = Math.floor(y1)+1
+	y2 = Math.floor(y2)
+
+	//if ( y2 < y1 ) { y2++ }
+
 	x = x1; 					// start at the start
 	var dx = (x2 - x1) / (y2 - y1); 		// change in x over change in y will give us the gradient
 	var ofs = Math.round(y1 - miny); 		// the offset the start writing at (into the array)
 
-	for ( y = y1; y < y2; y++ ) { 		// cover all y co-ordinates in the line
+	for ( y = y1; y <= y2; y++ ) { 		// cover all y co-ordinates in the line
+
+	    xi = Math.floor(x) + 1
 
 	    // check if we've gone over/under the max/min
 	    //
-	    if ( edges[ofs].minx > x ) { edges[ofs].minx = x; }
-	    if ( edges[ofs].maxx < x ) { edges[ofs].maxx = x; }
+	    if ( edges[ofs].minx > xi ) { edges[ofs].minx = xi; }
+	    if ( edges[ofs].maxx < xi ) { edges[ofs].maxx = xi; }
 
 	    x += dx; 					// move along the gradient
 	    ofs ++; 					// move along the buffer
@@ -261,8 +289,8 @@
 	var maxy = points[0].y;
 
 	for ( i = 1; i < points.length; i++ ) {
-	    if ( points[i].y < miny) { miny = points[i].y; }
-	    if ( points[i].y > maxy) { maxy = points[i].y; }
+	    if ( points[i].y-1 < miny) { miny = points[i].y-1; }
+	    if ( points[i].y-1 > maxy) { maxy = points[i].y-1; }
 	}
 
 	var h = maxy - miny; 				// the height is the size of our edges array
@@ -273,18 +301,18 @@
 	}
 
 	for ( i = 0; i < points.length-1; i++ ) { 	// process each line in the polygon
-	    scanline(points[i  ].x, points[i  ].y
-		   , points[i+1].x, points[i+1].y, miny, edges);
+	    scanline(points[i  ].x-1, points[i  ].y-1
+		   , points[i+1].x-1, points[i+1].y-1, miny, edges);
 	}
-	scanline(points[i].x, points[i].y, points[0].x, points[0].y, miny, edges);
+	scanline(points[i].x-1, points[i].y-1, points[0].x-1, points[0].y-1, miny, edges);
 
 	// draw each horizontal line
 	for ( i = 0; i < edges.length; i++ ) {
-	    drawHLine( Math.floor(edges[i].minx), Math.floor(edges[i].maxx),
-		Math.floor(i + miny), color, buffer, width);
+	    drawHLine( Math.floor(edges[i].minx)
+		     , Math.floor(edges[i].maxx)
+		     , Math.floor(i + miny), color, buffer, width);
 	}
     }
-
 
     function d2r(d) { return d * (Math.PI / 180); }
 
@@ -294,9 +322,12 @@
 
 	angle = d2r(angle);
 
+	var sin = Math.sin(angle);
+	var cos = Math.cos(angle);
+
 	for ( i = 0; i < points.length; i++ ) {
-	    x = about.x + (((points[i].x-about.x) * Math.cos(angle)) - ((points[i].y-about.y) * Math.sin(angle)));
-	    y = about.y + (((points[i].x-about.x) * Math.sin(angle)) + ((points[i].y-about.y) * Math.cos(angle)));
+	    x = about.x + (((points[i].x-about.x) * cos) - ((points[i].y-about.y) * sin));
+	    y = about.y + (((points[i].x-about.x) * sin) + ((points[i].y-about.y) * cos));
 
 	    reply.push({ x: x, y: y });
 	}

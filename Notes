@@ -18,7 +18,9 @@
     o Flip table up/down and left/right to match image axis signs
     o Add CSS styling for bgcolor or row/col headers and "center" cross.
 
- 
+ * X, Y projection
+    o Add gausain fit.
+
  o Contour plugin.
    Important : Shows use of plugin controlling regions on image.
 

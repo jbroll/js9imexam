@@ -11,6 +11,17 @@
     var raster = require("./raster");
 
 
+    function hasTag(reg, tag) {
+	var i;
+
+	for ( i = 0; i < reg.tags.length; i++ ) {
+	    if ( reg.tags[i] === tag ) { return true; }
+	}
+
+	return false;
+    }
+    exports.hasTag = hasTag;
+
     exports.listRegions = function (regs) {
 	var i, j;
 	var reg, regno = 1;
@@ -22,7 +33,7 @@
 
 	    switch ( reg.shape ) {
 	     case "annulus":
-		for ( j = reg.radii.length-1; j >= 0; j-- ) {
+		for ( j = 0; j < reg.radii.length; j++ ) {
 		    if ( reg.radii[j] !== 0.0 ) {
 			reply[regno-1] = $.extend($.extend({}, reg), { regno: regno++, shape: "circle", radius: reg.radii[j] });
 		    }
@@ -38,27 +49,33 @@
     };
 
     exports.drawRegions = function (regs, data) {
-	var reg, i;
+	var reg, t, i;
 
-	for ( i = 0; i < regs.length; i++ ) {
-	    reg = regs[i];
+	var type = [ "include", "exclude" ];
 
-	    switch ( reg.shape ) {
-	     case "circle":
-		raster.drawCircle(reg.pos.x, reg.pos.y, reg.radius, reg.regno, data.data, data.shape[0]);
-	     	break;
+	for ( t = 0; t < 2; t++ ) {
+	    for ( i = regs.length - 1; i >= 0; i-- ) {
+		reg = regs[i];
 
-	     case "box":
-		raster.drawBox(reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno, data.data, data.shape[0]);
-	     	break;
+		if ( !hasTag(reg, type[t]) ) { continue; }
 
-	     case "ellipse":
-		raster.drawEllipse(reg.pos.x, reg.pos.y, reg.eradius.x, reg.eradius.y, reg.angle, reg.regno, data.data, data.shape[0]);
-	     	break;
+		switch ( reg.shape ) {
+		 case "circle":
+		    raster.drawCircle(reg.pos.x, reg.pos.y, reg.radius, reg.regno, data.data, data.shape[0]);
+		    break;
 
-	     case "polygon":
-		raster.drawPolygon(reg.points, reg.regno, data.data, data.shape[0]);
-	     	break;
+		 case "box":
+		    raster.drawBox(reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno, data.data, data.shape[0]);
+		    break;
+
+		 case "ellipse":
+		    raster.drawEllipse(reg.pos.x, reg.pos.y, reg.eradius.x, reg.eradius.y, reg.angle, reg.regno, data.data, data.shape[0]);
+		    break;
+
+		 case "polygon":
+		    raster.drawPolygon(reg.points, reg.regno, data.data, data.shape[0]);
+		    break;
+		}
 	    }
 	}
     };

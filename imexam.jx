@@ -228,7 +228,7 @@ ndops.qcenter = typed(function (a) {
 	return idx;
 });
 
-ndops._imcnts = typed(function (c, a, b) { c[b] += a; });
+ndops._imcnts = typed({ consider: { a: true, b: true } }, function (c, a, b) { c[b] += a; });
 
 ndops.imcnts = function (a, b, n) {
     var reply = {};

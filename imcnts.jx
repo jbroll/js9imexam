@@ -6,17 +6,8 @@
 
 (function() {
     //DELETE-ME var imexam = require("./imexam");
+    var template = imexam.template;
     var mask = require("./mask");
-
-    function hasTag(reg, tag) {
-	var i;
-
-	for ( i = 0; i < reg.tags.length; i++ ) {
-	    if ( reg.tags[i] === tag ) { return true; }
-	}
-
-	return false;
-    }
 
     function runImCnts(im, xreg) {
 	var i;
@@ -40,18 +31,18 @@
 	var net, regno;
 
 	for ( i = 0; i < list.length; i++ ) {
-	    if ( hasTag(list[i], "background") ) {
+	    if ( mask.hasTag(list[i], "background") ) {
 		regno = list[i].regno;
 
 		backgr_cnts += cnts.cnts.get(regno);
 		backgr_area += cnts.area.get(regno);
 
-		back.push({ regno: regno, cnts: cnts.cnts[regno], area: cnts.area[regno] });
+		back.push({ regno: regno, cnts: cnts.cnts.get(regno), area: cnts.area.get(regno) });
 	    }
 	}
 
 	for ( i = 0; i < list.length; i++ ) {
-	    if ( hasTag(list[i], "source") ) {
+	    if ( mask.hasTag(list[i], "source") && !mask.hasTag(list[i], "exclude") ) {
 		regno = list[i].regno;
 
 		if ( backgr_area > 0 ) {
@@ -64,14 +55,23 @@
 	    }
 	}
 
+	imexam.ndops.sub(mimg, mimg, data);
+
 	var image = { filename: "Mask", bitpix: 32, naxis: 2
-			, axis: { 1: data.shape[0], 2: data.shape[1] } 
-			, dmin: 0, dmax: regno
+			, axis: { 1: mimg.shape[0], 2: mimg.shape[1] } 
+			, dmin: -regno, dmax: regno
 			, head: {}, data: mimg.data
 		    };
-	JS9.Load(image);
+	JS9.Load(image, { display: "mask" });
 
-	$(text).html($.map(srce, JSON.stringify).join("\n"));
+	$(text).html("Source\n"
+		   + "regno         counts       area            net\n"
+		   + "-----         ------       ----            ---\n"
+		   + srce.map(function(x, i) { return template("{regno%5d} {cnts%14.3f} {area%10.3f} {net%14.3f}", x); }).join("\n")
+		   + "\n\nBackground\n"
+		   + "regno         counts       area\n"
+		   + "-----         ------       ----\n"
+		   + back.map(function(x, i) { return template("{regno%5d} {cnts%14.3f} {area%10.3f}", x); }).join("\n"));
     }
 
 /*
@@ -138,6 +138,6 @@
 	    toolbarHTML: " ",
 
             regionchange: runImCnts,
-            winDims: [500, 250],
+            winDims: [600, 250],
     });
 }());
