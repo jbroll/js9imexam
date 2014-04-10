@@ -14,7 +14,7 @@
                         <option>avg</option>            \
                         <option>med</option>            \
 		 </select>				\
-		 <input type=checkbox name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\
+		 <input type=checkbox class="proj_chek" name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\
 		";
 
     function projUpdate(im, xreg) {
@@ -24,14 +24,19 @@
 	    div  = xreg.div;
 	    proj = xreg.proj;
 	    menx = xreg.menu;
+	    chek = xreg.chek;
 	} else {
 	    div  = this.div; 
 	    menx = $(this.toolbar).find(".proj_menu")[0];
+	    chek = $(this.toolbar).find(".proj_chek")[0];
 
             proj = imexam.ndops.proj(imexam.getRegionData(im, xreg), this.plugin.opts.xyproj);
 
 	    $(menx).change(function (event) {
-		    projUpdate(undefined, { div: div, proj: proj, menu: menx });
+		    projUpdate(undefined, { div: div, proj: proj, menu: menx, chek: chek });
+		});
+	    $(chek).change(function (event) {
+		    projUpdate(undefined, { div: div, proj: proj, menu: menx, chek: chek });
 		});
 	}
 
@@ -41,6 +46,7 @@
 	var x;
 
 	var proj_type = menx.options[menx.selectedIndex].value;
+	
 
 	$(div).empty();
 

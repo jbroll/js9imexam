@@ -628,7 +628,7 @@ module.exports=require('Ll8vMw');
 	return reply;
     };
 
-    exports.drawRegions = function (regs, data) {
+    exports.drawRegions = function (regs, buffer, width) {
 	var reg, t, i;
 
 	var type = [ "include", "exclude" ];
@@ -640,21 +640,10 @@ module.exports=require('Ll8vMw');
 		if ( !hasTag(reg, type[t]) ) { continue; }
 
 		switch ( reg.shape ) {
-		 case "circle":
-		    raster.drawCircle(reg.pos.x, reg.pos.y, reg.radius, reg.regno, data.data, data.shape[0]);
-		    break;
-
-		 case "box":
-		    raster.drawBox(reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno, data.data, data.shape[0]);
-		    break;
-
-		 case "ellipse":
-		    raster.drawEllipse(reg.pos.x, reg.pos.y, reg.eradius.x, reg.eradius.y, reg.angle, reg.regno, data.data, data.shape[0]);
-		    break;
-
-		 case "polygon":
-		    raster.drawPolygon(reg.points, reg.regno, data.data, data.shape[0]);
-		    break;
+		 case "polygon": raster.drawPolygon(buffer, width, reg.points,                       reg.regno); 				 break;
+		 case "circle":  raster.drawCircle( buffer, width, reg.pos.x, reg.pos.y, reg.radius, reg.regno); 				 break;
+		 case "box":     raster.drawBox(    buffer, width, reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno); break;
+		 case "ellipse": raster.drawEllipse(buffer, width, reg.pos.x, reg.pos.y, reg.eradius.x,  reg.eradius.y,   reg.angle, reg.regno); break;
 		}
 	    }
 	}
@@ -672,7 +661,7 @@ module.exports=require('Ll8vMw');
 
     // http://cogsandlevers.blogspot.com/2013/11/scanline-based-filled-polygons.html
     //
-    function drawHLine(x1, x2, y, k, buffer, width) {
+    function drawHLine(buffer, width, x1, x2, y, k) {
 
 	if ( x1 < 0     ) { x1 = 0;     }
 	if ( x2 > width ) { x2 = width; }
@@ -717,7 +706,7 @@ module.exports=require('Ll8vMw');
 	}
     }
 
-    function _drawPolygon(points, color, buffer, width) {
+    function _drawPolygon(buffer, width, points, color) {
 	var i;
 	var miny = points[0].y-1; 			// work out the minimum and maximum y values
 	var maxy = points[0].y-1;
@@ -742,9 +731,10 @@ module.exports=require('Ll8vMw');
 
 	// draw each horizontal line
 	for ( i = 0; i < edges.length; i++ ) {
-	    drawHLine( Math.floor(edges[i].minx)
+	    drawHLine( buffer, width
+		     , Math.floor(edges[i].minx)
 		     , Math.floor(edges[i].maxx)
-		     , Math.floor(i + miny), color, buffer, width);
+		     , Math.floor(i + miny), color);
 	}
     }
 
@@ -790,21 +780,10 @@ module.exports=require('Ll8vMw');
 		, { x: x+w/2, y: y-h/2 } ];
     }
 
-    exports.drawCircle = function (x, y, rad, color, buffer, width) {
-	_drawPolygon(polyEllipse(x, y, rad, rad), color, buffer, width);
-    };
-
-    exports.drawPolygon = function (points, color, buffer, width) {
-	_drawPolygon(points, color, buffer, width);
-    };
-
-    exports.drawEllipse = function (x, y, h, w, rot, color, buffer, width) {
-	_drawPolygon(rotPoints(polyEllipse(x, y, h, w), rot, { x: x, y: y }), color, buffer, width);
-    };
-
-    exports.drawBox = function (x, y, h, w, rot, color, buffer, width) {
-	_drawPolygon(rotPoints(polyBox(x, y, h, w), rot, { x: x, y: y }), color, buffer, width);
-    };
+    exports.drawPolygon = function (buffer, width, points,    color)       { _drawPolygon(buffer, width, points,                      color); };
+    exports.drawCircle  = function (buffer, width, x, y, rad, color)       { _drawPolygon(buffer, width, polyEllipse(x, y, rad, rad), color); };
+    exports.drawEllipse = function (buffer, width, x, y, h, w, rot, color) { _drawPolygon(buffer, width, rotPoints(polyEllipse(x, y, h, w), rot, { x: x, y: y }), color); };
+    exports.drawBox     = function (buffer, width, x, y, h, w, rot, color) { _drawPolygon(buffer, width, rotPoints(polyBox    (x, y, h, w), rot, { x: x, y: y }), color); };
 }());
 
 },{}],5:[function(require,module,exports){
@@ -1410,7 +1389,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
     if(typeof options === "undefined") { options = {}; }
     if(typeof tol === "undefined") { tol = 1e-8; }
     if(typeof gradient === "undefined") { gradient = function(x) { return grad(f,x); }; }
-    if(typeof maxit === "undefined") maxit = 10000;
+    if(typeof maxit === "undefined") maxit = 1000;
     x0 = numeric.clone(x0);
     var n = x0.length;
     var f0 = f(x0),f1,df0;
@@ -1420,7 +1399,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
     var step,g0,g1,H1 = options.Hinv || numeric.identity(n);
     var dot = numeric.dot, sub = numeric.sub, add = numeric.add, ten = numeric.tensor, div = numeric.div, mul = numeric.mul;
 
-    var all = numeric.all, isfinite = numeric.isFinite, neg = numeric.negeq;
+    var all = numeric.all, isfinite = numeric.isFinite, neg = numeric.neg;
     var it=0,i,s,x1,y,Hy,Hs,ys,i0,t,nstep,t1,t2;
     var msg = "";
     g0 = gradient(x0);
