@@ -47,7 +47,7 @@
 	return reply;
     };
 
-    exports.drawRegions = function (regs, data) {
+    exports.drawRegions = function (regs, buffer, width) {
 	var reg, t, i;
 
 	var type = [ "include", "exclude" ];
@@ -59,21 +59,10 @@
 		if ( !hasTag(reg, type[t]) ) { continue; }
 
 		switch ( reg.shape ) {
-		 case "circle":
-		    raster.drawCircle(reg.pos.x, reg.pos.y, reg.radius, reg.regno, data.data, data.shape[0]);
-		    break;
-
-		 case "box":
-		    raster.drawBox(reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno, data.data, data.shape[0]);
-		    break;
-
-		 case "ellipse":
-		    raster.drawEllipse(reg.pos.x, reg.pos.y, reg.eradius.x, reg.eradius.y, reg.angle, reg.regno, data.data, data.shape[0]);
-		    break;
-
-		 case "polygon":
-		    raster.drawPolygon(reg.points, reg.regno, data.data, data.shape[0]);
-		    break;
+		 case "polygon": raster.drawPolygon(buffer, width, reg.points,                       reg.regno); 				 break;
+		 case "circle":  raster.drawCircle( buffer, width, reg.pos.x, reg.pos.y, reg.radius, reg.regno); 				 break;
+		 case "box":     raster.drawBox(    buffer, width, reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno); break;
+		 case "ellipse": raster.drawEllipse(buffer, width, reg.pos.x, reg.pos.y, reg.eradius.x,  reg.eradius.y,   reg.angle, reg.regno); break;
 		}
 	    }
 	}

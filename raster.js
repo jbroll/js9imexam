@@ -7,7 +7,7 @@
 
     // http://cogsandlevers.blogspot.com/2013/11/scanline-based-filled-polygons.html
     //
-    function drawHLine(x1, x2, y, k, buffer, width) {
+    function drawHLine(buffer, width, x1, x2, y, k) {
 
 	if ( x1 < 0     ) { x1 = 0;     }
 	if ( x2 > width ) { x2 = width; }
@@ -52,7 +52,7 @@
 	}
     }
 
-    function _drawPolygon(points, color, buffer, width) {
+    function _drawPolygon(buffer, width, points, color) {
 	var i;
 	var miny = points[0].y-1; 			// work out the minimum and maximum y values
 	var maxy = points[0].y-1;
@@ -77,9 +77,10 @@
 
 	// draw each horizontal line
 	for ( i = 0; i < edges.length; i++ ) {
-	    drawHLine( Math.floor(edges[i].minx)
+	    drawHLine( buffer, width
+		     , Math.floor(edges[i].minx)
 		     , Math.floor(edges[i].maxx)
-		     , Math.floor(i + miny), color, buffer, width);
+		     , Math.floor(i + miny), color);
 	}
     }
 
@@ -125,19 +126,8 @@
 		, { x: x+w/2, y: y-h/2 } ];
     }
 
-    exports.drawCircle = function (x, y, rad, color, buffer, width) {
-	_drawPolygon(polyEllipse(x, y, rad, rad), color, buffer, width);
-    };
-
-    exports.drawPolygon = function (points, color, buffer, width) {
-	_drawPolygon(points, color, buffer, width);
-    };
-
-    exports.drawEllipse = function (x, y, h, w, rot, color, buffer, width) {
-	_drawPolygon(rotPoints(polyEllipse(x, y, h, w), rot, { x: x, y: y }), color, buffer, width);
-    };
-
-    exports.drawBox = function (x, y, h, w, rot, color, buffer, width) {
-	_drawPolygon(rotPoints(polyBox(x, y, h, w), rot, { x: x, y: y }), color, buffer, width);
-    };
+    exports.drawPolygon = function (buffer, width, points,    color)       { _drawPolygon(buffer, width, points,                      color); };
+    exports.drawCircle  = function (buffer, width, x, y, rad, color)       { _drawPolygon(buffer, width, polyEllipse(x, y, rad, rad), color); };
+    exports.drawEllipse = function (buffer, width, x, y, h, w, rot, color) { _drawPolygon(buffer, width, rotPoints(polyEllipse(x, y, h, w), rot, { x: x, y: y }), color); };
+    exports.drawBox     = function (buffer, width, x, y, h, w, rot, color) { _drawPolygon(buffer, width, rotPoints(polyBox    (x, y, h, w), rot, { x: x, y: y }), color); };
 }());

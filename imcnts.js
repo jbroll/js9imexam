@@ -20,7 +20,7 @@
 	var mimg = imexam.ndops.zeros(data.shape, Int32Array);
 
 	var list = mask.listRegions(regs);
-	           mask.drawRegions(list, mimg);
+	           mask.drawRegions(list, mimg.data, mimg.shape[0]);
 
 	var cnts = imexam.ndops.imcnts(data, mimg, list.length+1);
 

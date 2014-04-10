@@ -8,12 +8,13 @@
     var imexam = require("./imexam");
 
 
-    var projToolbar = "                                      	\
-                 plot: <select  class='proj_menu'>		\
-                        <option>sum</option>                    \
-                        <option>avg</option>                    \
-                        <option>med</option>                    \
-		       </select>				\
+    var projToolbar = "                                	\
+                 <select  class='proj_menu'>		\
+                        <option>sum</option>            \
+                        <option>avg</option>            \
+                        <option>med</option>            \
+		 </select>				\
+		 <input type=checkbox name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\
 		";
 
     function projUpdate(im, xreg) {
