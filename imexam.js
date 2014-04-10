@@ -183,9 +183,9 @@ ndops.proj = function(a, axis) {
         proj.n   = a.shape[axis === 1 ? 0 : 1];
 	proj.x   = a.shape[axis];
 
-        proj.sum = Array(proj.n);
-        proj.avg = Array(proj.n);
-        proj.med = Array(proj.n);
+        proj.sum = new Array(proj.n);
+        proj.avg = new Array(proj.n);
+        proj.med = new Array(proj.n);
 
         var copy = ndops.assign(ndops.zeros(a.shape), a);
 
@@ -574,9 +574,10 @@ exports.template = template;
 exports.ndops    = ndops;
 exports.typed    = ndops;
 exports.imops    = imops;
+exports.flot     = require("./zoom");;
 
 
-},{"../typed-array/numeric-uncmin":9,"../typed-array/typed-array":13,"../typed-array/typed-array-ops":10,"../typed-array/typed-array-rotate":11,"../typed-array/typed-matrix-ops":14,"./mask.js":3,"./template":5}],"./imexam":[function(require,module,exports){
+},{"../typed-array/numeric-uncmin":10,"../typed-array/typed-array":14,"../typed-array/typed-array-ops":11,"../typed-array/typed-array-rotate":12,"../typed-array/typed-matrix-ops":15,"./mask.js":3,"./template":5,"./zoom":6}],"./imexam":[function(require,module,exports){
 module.exports=require('Ll8vMw');
 },{}],3:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
@@ -637,13 +638,13 @@ module.exports=require('Ll8vMw');
 	    for ( i = regs.length - 1; i >= 0; i-- ) {
 		reg = regs[i];
 
-		if ( !hasTag(reg, type[t]) ) { continue; }
-
-		switch ( reg.shape ) {
-		 case "polygon": raster.drawPolygon(buffer, width, reg.points,                       reg.regno); 				 break;
-		 case "circle":  raster.drawCircle( buffer, width, reg.pos.x, reg.pos.y, reg.radius, reg.regno); 				 break;
-		 case "box":     raster.drawBox(    buffer, width, reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno); break;
-		 case "ellipse": raster.drawEllipse(buffer, width, reg.pos.x, reg.pos.y, reg.eradius.x,  reg.eradius.y,   reg.angle, reg.regno); break;
+		if ( hasTag(reg, type[t]) ) {
+		    switch ( reg.shape ) {
+		     case "polygon": raster.drawPolygon(buffer, width, reg.points,                       reg.regno); 				 break;
+		     case "circle":  raster.drawCircle( buffer, width, reg.pos.x, reg.pos.y, reg.radius, reg.regno); 				 break;
+		     case "box":     raster.drawBox(    buffer, width, reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno); break;
+		     case "ellipse": raster.drawEllipse(buffer, width, reg.pos.x, reg.pos.y, reg.eradius.x,  reg.eradius.y,   reg.angle, reg.regno); break;
+		    }
 		}
 	    }
 	}
@@ -682,8 +683,8 @@ module.exports=require('Ll8vMw');
 	     x = x1; x1 = x2; x2 = x;
 	}
 
-	y1 = Math.floor(y1)+1
-	y2 = Math.floor(y2)
+	y1 = Math.floor(y1)+1;
+	y2 = Math.floor(y2);
 
 	//if ( y2 < y1 ) { y2++ }
 
@@ -693,7 +694,7 @@ module.exports=require('Ll8vMw');
 
 	for ( y = y1; y <= y2; y++ ) { 		// cover all y co-ordinates in the line
 
-	    xi = Math.floor(x) + 1
+	    xi = Math.floor(x) + 1;
 
 	    // check if we've gone over/under the max/min
 	    //
@@ -864,6 +865,67 @@ console.log("\n")
 module.exports = template;
 
 },{}],6:[function(require,module,exports){
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
+/*globals $, JS9 */ 
+
+"use strict";
+
+
+(function() {
+    function zoomStackIn(plot, event, ranges, func) {
+	var axes = plot.getAxes();
+
+	var r = {};
+	r.xmin = axes.xaxis.min;
+	r.xmax = axes.xaxis.max;
+	r.ymin = axes.yaxis.min;
+	r.ymax = axes.yaxis.max;
+
+	plot.stack.push(r);
+
+	axes.xaxis.options.min = ranges.xaxis.from;
+	axes.xaxis.options.max = ranges.xaxis.to;
+	axes.yaxis.options.min = ranges.yaxis.from;
+	axes.yaxis.options.max = ranges.yaxis.to;
+
+	plot.clearSelection(true);
+
+	plot.setupGrid();
+	plot.draw();
+
+	if ( func !== undefined ) { func(plot, r); }
+    }
+
+    function zoomStackOut(plot, func) {
+	var r = plot.stack.pop();
+
+	plot.getAxes().xaxis.options.min = r.xmin;
+	plot.getAxes().xaxis.options.max = r.xmax;
+	plot.getAxes().yaxis.options.min = r.ymin;
+	plot.getAxes().yaxis.options.max = r.ymax;
+
+	plot.clearSelection(true);
+
+	plot.setupGrid();
+	plot.draw();
+
+	if ( func !== undefined ) { func(plot, r); }
+    }
+
+    exports.zoomStack = function (plot, func) {
+	plot.stack = [];
+	var div = plot.getPlaceholder();
+
+	$(div).append("<div style='position:relative'><div style='position:absolute;right:12;top:12;z-index:2'>		\
+		<image class='zoomout'  src=plugins/imexam/4arrow.png></div></div>");
+
+	$(div).bind("plotselected", function (event, ranges) { zoomStackIn (plot, event, ranges, func); });
+	$(div).find(".zoomout").click(function ()            { zoomStackOut(plot, func); });
+    };
+}());
+
+
+},{}],7:[function(require,module,exports){
 "use strict"
 
 function interp1d(arr, x) {
@@ -974,7 +1036,7 @@ module.exports.d1 = interp1d
 module.exports.d2 = interp2d
 module.exports.d3 = interp3d
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict"
 
 var iota = require("iota-array")
@@ -1332,7 +1394,7 @@ function wrappedNDArrayCtor(data, shape, stride, offset) {
 
 module.exports = wrappedNDArrayCtor
 
-},{"iota-array":8}],8:[function(require,module,exports){
+},{"iota-array":9}],9:[function(require,module,exports){
 "use strict"
 
 function iota(n) {
@@ -1344,7 +1406,7 @@ function iota(n) {
 }
 
 module.exports = iota
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
 
 var numeric =                     require("../typed-array/typed-array");
@@ -1448,7 +1510,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
     return {solution: x0, f: f0, gradient: g0, invHessian: H1, iterations:it, message: msg};
 }
 
-},{"../typed-array/typed-array":13,"../typed-array/typed-array-ops":10,"../typed-array/typed-matrix-ops":14}],10:[function(require,module,exports){
+},{"../typed-array/typed-array":14,"../typed-array/typed-array-ops":11,"../typed-array/typed-matrix-ops":15}],11:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true */
 /*jshint node: true, -W099: true, laxbreak:true, laxcomma:true, multistr:true, smarttabs:true */
 /*globals */ 
@@ -1637,7 +1699,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 }());
  
 
-},{"./typed-array":13}],11:[function(require,module,exports){
+},{"./typed-array":14}],12:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
 
 "use strict";
@@ -1663,7 +1725,7 @@ function rotateImage(out, inp, theta, iX, iY, oX, oY) {
 
 module.exports = rotateImage;
 
-},{"./typed-array-warp":12}],12:[function(require,module,exports){
+},{"./typed-array-warp":13}],13:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
 
 "use strict";
@@ -1736,7 +1798,7 @@ module.exports = function warp(dest, src, func) {
   return dest;
 };
 
-},{"./typed-array":13,"ndarray-linear-interpolate":6}],13:[function(require,module,exports){
+},{"./typed-array":14,"ndarray-linear-interpolate":7}],14:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true */
 /*jshint node: true, -W099: true, laxbreak:true, laxcomma:true, multistr:true, smarttabs:true */
 /*globals */ 
@@ -2223,7 +2285,7 @@ module.exports = function warp(dest, src, func) {
 }());
 
 
-},{"ndarray":7}],14:[function(require,module,exports){
+},{"ndarray":8}],15:[function(require,module,exports){
 
 
 var typed   = require("./typed-array");
@@ -2368,4 +2430,4 @@ numeric.dotMM = typed({ loops: false }, numeric.dotMM);
 numeric.diag  = typed({ loops: false }, numeric.diag);
 
 
-},{"./typed-array":13}]},{},[])
+},{"./typed-array":14}]},{},[])

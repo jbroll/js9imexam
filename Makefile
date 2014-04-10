@@ -28,17 +28,21 @@ JS    = 		\
 	pxtabl.js	\
 	imcnts.js
 
+ICON = 4arrow.png
+
+
 
 JR	= 		\
+	zoom.js		\
 	mask.js		\
 	raster.js
 
 all:	$(JX:.jx=.js) imexam.html
 
-install: $(JX:.jx=.js) imexam.html FORCE
+install: FORCE
 	mkdir -p $(JS9JS)
 	cp -p $(HTML) $(JS9)
-	cp -p $(JX:.jx=.js) $(JS) $(JS9JS)/.
+	cp -p $(JX:.jx=.js) $(JS) $(ICON) $(JS9JS)/.
 	cp -p imexam.html $(JS9JS)/.
 
 
@@ -53,7 +57,7 @@ TYPED = ../typed-array/typed-array.js 		\
 	../typed-array/typed-array-rotate.js	\
 	../typed-array/numeric-uncmin.js
 
-imexam.js : imexam.jx template.js mask.js raster.js $(TYPED)
+imexam.js : imexam.jx template.js mask.js raster.js zoom.js $(TYPED)
 	browserify -r ./imexam.jx:./imexam > imexam.js
 
 imexam.html : $(HX)

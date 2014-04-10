@@ -182,9 +182,9 @@ ndops.proj = function(a, axis) {
         proj.n   = a.shape[axis === 1 ? 0 : 1];
 	proj.x   = a.shape[axis];
 
-        proj.sum = Array(proj.n);
-        proj.avg = Array(proj.n);
-        proj.med = Array(proj.n);
+        proj.sum = new Array(proj.n);
+        proj.avg = new Array(proj.n);
+        proj.med = new Array(proj.n);
 
         var copy = ndops.assign(ndops.zeros(a.shape), a);
 
@@ -573,4 +573,5 @@ exports.template = template;
 exports.ndops    = ndops;
 exports.typed    = ndops;
 exports.imops    = imops;
+exports.flot     = require("./zoom");;
 

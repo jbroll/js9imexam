@@ -7,7 +7,7 @@
 (function() {
     var imexam = require("./imexam");
 
-    var rproj_template = "<div style='position:absolute;right: 10px;top:10px'> \
+    var rproj_template = "<div style='position:absolute;right: 10px;top:30px'> \
                     <table> \
                                     <tr><td>peak        </td><td align=right>{a%.2f}</td><tr> \
                                     <tr><td>sigma       </td><td align=right>{c%.2f}</td><tr> \
@@ -56,8 +56,14 @@
             }
 
             $(div).empty();
-            $.plot(div, [{ data: rdata, points: { radius: 1, show: true } }, { data: rfdat }]);
+            var plot = $.plot(div, [{ data: rdata, points: { radius: 1, show: true } }, { data: rfdat }]
+		    , { selection: { mode: "xy" } });
+	    imexam.flot.zoomStack(plot);
+
             $(div).append(imexam.template(rproj_template, fitv));
+
+
+
     }
 
     function rprojInit() {

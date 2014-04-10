@@ -28,8 +28,8 @@
 	     x = x1; x1 = x2; x2 = x;
 	}
 
-	y1 = Math.floor(y1)+1
-	y2 = Math.floor(y2)
+	y1 = Math.floor(y1)+1;
+	y2 = Math.floor(y2);
 
 	//if ( y2 < y1 ) { y2++ }
 
@@ -39,7 +39,7 @@
 
 	for ( y = y1; y <= y2; y++ ) { 		// cover all y co-ordinates in the line
 
-	    xi = Math.floor(x) + 1
+	    xi = Math.floor(x) + 1;
 
 	    // check if we've gone over/under the max/min
 	    //

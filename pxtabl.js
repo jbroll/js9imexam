@@ -21,7 +21,7 @@
 
     function strrep(str, n, x) {
         var i;
-	var rx = RegExp(x, "g");
+	var rx = new RegExp(x, "g");
 
 	var s = '';
 	for ( i = 0; i < n; i++ ) {
@@ -31,8 +31,8 @@
     }
 
     function htmlTable(x, y) {
-	var t = "<table cellpadding=0 cellspacing=0>"
-	//t    += strrep("<column group>", y);
+	var t = "<table cellpadding=0 cellspacing=0>";
+
 	t      += strrep( "<tr>"
 		+ strrep("<td ><input type=entry size=7 name=cell%y.%x value=0></td>", x, "%x") 
 		+ "</tr>\n", y, "%y");
@@ -55,9 +55,9 @@
 
 	    pxtabl["cell" + j + "." + i].value = "col/row";
 
-	    j = 0
+	    j = 0;
 	    for ( i = 1; i < 11; i++ ) {
-		x = point.x + i - 5
+		x = point.x + i - 5;
 
 		if ( x > 0 && x <= im.raw.width ) {
 		    pxtabl["cell" + j + "." + i].value = x;
@@ -66,9 +66,9 @@
 		}
 	    }
 
-	    i = 0
+	    i = 0;
 	    for ( j = 1; j < 11; j++ ) {
-		y = point.y + j - 5
+		y = point.y + j - 5;
 
 		if ( y > 0 && y <= im.raw.height ) {
 		    pxtabl["cell" + j + "." + i].value = y;
@@ -79,8 +79,8 @@
 
 	    for ( j = 1; j < 11; j++ ) {
 	    for ( i = 1; i < 11; i++ ) {
-		x = point.x + i - 5 - 1
-		y = point.y + j - 5 - 1
+		x = point.x + i - 5 - 1;
+		y = point.y + j - 5 - 1;
 
 		if ( x >= 0 && x < im.raw.width && y >= 0 && y < im.raw.height ) {
 		    pxtabl["cell" + j + "." + i].value = im_2d.get(y, x).toPrecision(5);

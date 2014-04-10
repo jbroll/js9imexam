@@ -14,11 +14,11 @@
                         <option>avg</option>            \
                         <option>med</option>            \
 		 </select>				\
-		 <input type=checkbox class="proj_chek" name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\
+		 <input type=checkbox class='proj_chek' name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\
 		";
 
     function projUpdate(im, xreg) {
-	var div, proj, menx;
+	var div, proj, menx, chek;
 
         if ( im === undefined ) {
 	    div  = xreg.div;
@@ -65,7 +65,8 @@
 		xdata[x] = [x, data[x]];
 	}
 
-	$.plot(div, [xdata]);
+	var plot = $.plot(div, [xdata], { selection: { mode: "xy" } });
+	imexam.flot.zoomStack(plot);
     }
 
     function projInit() {

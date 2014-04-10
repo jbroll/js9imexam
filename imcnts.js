@@ -1,5 +1,5 @@
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
-/*globals $, JS9, imexam, Uint32Array */ 
+/*globals $, JS9, imexam, Int32Array */ 
 
 "use strict";
 

@@ -7,6 +7,11 @@
 (function() {
     var imexam = require("./imexam");
 
+
+    function histStats(div, data, range) {
+	console.log(range);
+    }
+
     function histUpdate(im, xreg) {
         var div = this.div;
 
@@ -33,8 +38,11 @@
 		    h++;
 		}
             }
+	    
+	    histStats(div, hist);
 
-            $.plot(div, [hdata]);
+            var plot = $.plot(div, [hdata], { selection: { mode: "x" } });
+	    imexam.flot.zoomStack(plot, function(plot, range) { histStats(div, hist, range); });
     }
 
     function histInit() {
