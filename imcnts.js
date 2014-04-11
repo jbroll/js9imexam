@@ -55,15 +55,6 @@
 	    }
 	}
 
-	imexam.ndops.sub(mimg, mimg, data);
-
-	var image = { filename: "Mask", bitpix: 32, naxis: 2
-			, axis: { 1: mimg.shape[0], 2: mimg.shape[1] } 
-			, dmin: -regno, dmax: regno
-			, head: {}, data: mimg.data
-		    };
-	JS9.Load(image, { display: "mask" });
-
 	$(text).html("Source\n"
 		   + "regno         counts       area            net\n"
 		   + "-----         ------       ----            ---\n"
