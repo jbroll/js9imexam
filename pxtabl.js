@@ -34,7 +34,7 @@
 	var t = "<table cellpadding=0 cellspacing=0>";
 
 	t      += strrep( "<tr>"
-		+ strrep("<td ><input type=entry size=7 name=cell%y.%x value=0></td>", x, "%x") 
+		+ strrep("<td ><input class='col%x row%y' type=entry size=7 name=cell%y.%x value=0></td>", x, "%x") 
 		+ "</tr>\n", y, "%y");
 	t    += "</table>";
 
@@ -53,10 +53,10 @@
 
 	    var pxtabl = $(this.div).find(".pxtabl")[0];
 
-	    pxtabl["cell" + j + "." + i].value = "col/row";
+	    pxtabl["cell" + j + "." + i].value = "col\\row";
 
 	    j = 0;
-	    for ( i = 1; i < 11; i++ ) {
+	    for ( i = 1; i < 10; i++ ) {
 		x = point.x + i - 5;
 
 		if ( x > 0 && x <= im.raw.width ) {
@@ -67,7 +67,7 @@
 	    }
 
 	    i = 0;
-	    for ( j = 1; j < 11; j++ ) {
+	    for ( j = 1; j < 10; j++ ) {
 		y = point.y + j - 5;
 
 		if ( y > 0 && y <= im.raw.height ) {
@@ -77,8 +77,8 @@
 		}
 	    }
 
-	    for ( j = 1; j < 11; j++ ) {
-	    for ( i = 1; i < 11; i++ ) {
+	    for ( j = 1; j < 10; j++ ) {
+	    for ( i = 1; i < 10; i++ ) {
 		x = point.x + i - 5 - 1;
 		y = point.y + j - 5 - 1;
 
@@ -89,14 +89,14 @@
 		}
 	    }
 	    }
-
-
     }
 
     function pxtablInit() {
 	imexam.fixupDiv(this);
 
-	$(this.div).html("<form class=pxtabl>" + htmlTable(10+1, 10+1) + "</form>");
+	$(this.div).html("<form class=pxtabl>" + htmlTable(10, 10) + "</form>");
+	$(this.div).find(".row5").css("background", "lightblue");
+	$(this.div).find(".col5").css("background", "lightblue");
     }
 
     JS9.RegisterPlugin("ImExam", "PxTabl", pxtablInit, {
