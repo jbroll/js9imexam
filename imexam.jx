@@ -3,17 +3,16 @@
 
 "use strict";
 
-var ndops =                     require("../typed-array/typed-array");
-    ndops = ndops.extend(ndops, require("../typed-array/typed-array-ops"));
-    ndops = ndops.extend(ndops, require("../typed-array/typed-matrix-ops"));
-    ndops = ndops.extend(ndops, require("../typed-array/numeric-uncmin"));
+var ndops =                     require("typed-array-function");
+    ndops = ndops.extend(ndops, require("typed-array-ops"));
+    ndops = ndops.extend(ndops, require("typed-numeric-uncmin"));
 
-    ndops.rotate  = require("../typed-array/typed-array-rotate");
-    ndops.mask    = require("./mask.js");
+    ndops.rotate  = require("typed-array-rotate");
+
+ndops.mask    = require("./mask.js");
+var template  = require("./template");
 
 var typed = ndops;
-
-var template  = require("./template");
 
 ndops.zeros   = function zeros(shape, Type) {
   var i, sz = 1;
@@ -29,11 +28,9 @@ ndops.zeros   = function zeros(shape, Type) {
 };
 
 ndops.fill = typed(function (a, func) {
-    var iX = 0, iY = 0, iZ = 0, iU = 0, iV = 0, iW = 0;
+    var index;
     // ----
-	a = func(iX, iY, iZ, iU, iV, iW);
-    // ----
-    return a;
+	a = func.apply(undefined, index);
 });
 
 
@@ -204,11 +201,17 @@ ndops.proj = function(a, axis) {
 };
 
 ndops.qcenter = typed(function (a) {
+	var start, end;
 	var max = Number.MIN_VALUE;
 	var idx;
 	var iX = 0, iY = 0;
 
-	// ---- // [1:-1][1:-1]
+	start[0]++;
+	start[1]++;
+	  end[0]--;
+	  end[1]--;
+
+	// ----
 	    var sum = 
 		    + a[iY-1][iX-1] 
 		    + a[iY-1][iX  ] 
@@ -229,7 +232,7 @@ ndops.qcenter = typed(function (a) {
 	return idx;
 });
 
-ndops._imcnts = typed({ consider: { a: true, b: true } }, function (c, a, b) { c[b] += a; });
+ndops._imcnts = typed({ consider: { c: false } }, function (c, a, b) { c[b] += a; });
 
 ndops.imcnts = function (a, b, n) {
     var reply = {};

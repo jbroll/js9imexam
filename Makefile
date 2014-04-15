@@ -50,14 +50,7 @@ lint :
 	jslint $(JX) $(JS) $(JR)
 
 
-TYPED = ../typed-array/typed-array.js 		\
-	../typed-array/typed-array-ops.js	\
-	../typed-array/typed-array-ops.js	\
-	../typed-array/typed-matrix-ops.js	\
-	../typed-array/typed-array-rotate.js	\
-	../typed-array/numeric-uncmin.js
-
-imexam.js : imexam.jx template.js mask.js raster.js zoom.js $(TYPED)
+imexam.js : imexam.jx template.js mask.js raster.js zoom.js 
 	browserify -r ./imexam.jx:./imexam > imexam.js
 
 imexam.html : $(HX)
