@@ -110,7 +110,7 @@
 	    toolbarHTML: " ",
 
             mousemove: pxtablUpdate,
-            winDims: [675, 275],
+            winDims: [650, 250],
     });
 }());
 
