@@ -1,0 +1,26 @@
+{
+  "name": "simple-raster",
+  "version": "0.1.30",
+  "description": "Rasterize simple 2d shapes into a typed data array",
+  "main": "raster.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://github.com/jbroll/js9imexam/blob/master/npm/raster",
+  "repository": {
+    "type": "git",
+    "url": " git://github.com/jbroll/js9imexam.git"
+  },
+  "keywords": [
+    "raster",
+    "graphic",
+    "2d",
+    "draw",
+    "image",
+    "array"
+  ],
+  "author": "john@cfa.harvard.edu",
+  "license": "MIT"
+}

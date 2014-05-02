@@ -43,6 +43,7 @@ install: FORCE
 	mkdir -p $(JS9JS)
 	cp -p $(HTML) $(JS9)
 	cp -p $(JX:.jx=.js) $(JS) $(ICON) $(JS9JS)/.
+	cp -p imexam.min.js    $(JS9JS)/.
 	cp -p imexam.html $(JS9JS)/.
 
 
@@ -52,6 +53,8 @@ lint :
 
 imexam.js : imexam.jx template.js mask.js raster.js zoom.js 
 	browserify -r ./imexam.jx:./imexam > imexam.js
+	browserify -r ./imexam.jx:./imexam | uglifyjs > imexam.min.js
+	ls -ltr imexam.*
 
 imexam.html : $(HX)
 	cat $(HX) > imexam.html
@@ -61,6 +64,14 @@ imexam.html : $(HX)
 
 contour.js : contour.jx conrec.js
 	browserify contour.jx | sed -e s%//DELETE-ME%% > contour.js
+
+
+npm-install:
+	npm install			\
+	    typed-array-function	\
+	    typed-array-ops		\
+	    typed-array-rotate		\
+	    typed-numeric-uncmin 
 
 FORCE:
 
