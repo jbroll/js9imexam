@@ -5,8 +5,10 @@
 
 
 (function() {
-    //DELETE-ME var imexam = require("./imexam");
+    var imexam = require("./imexam");
     var conrec = require("./conrec");
+
+    require("./regions");
 
     function drawContours(div, display) {
 	var i;
@@ -26,10 +28,11 @@
 		, imexam.ndops.iota(data.shape[0]), imexam.ndops.iota(data.shape[1])
 		, level.length, level);
 
-	var contours = c.contourList();
-	for ( i = 0; i < contours.length; i++ ) {
-	    JS9.Regions(im, { shape: "polygon", points: contours[i] });
-	}
+	var contours = c.contourList().map(function(contour) {
+		return { shape: "polygon", points: contour };
+		});
+	    
+	JS9.AddRegions(im, "regions", contours, JS9.Catalog.opts);
     }
 
     function getMinMax(div, display) {

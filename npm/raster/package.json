@@ -1,6 +1,6 @@
 {
   "name": "simple-raster",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "Rasterize simple 2d shapes into a typed data array",
   "main": "raster.js",
   "dependencies": {},

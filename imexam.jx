@@ -576,5 +576,5 @@ exports.template = template;
 exports.ndops    = ndops;
 exports.typed    = ndops;
 exports.imops    = imops;
-exports.flot     = require("./zoom");;
+exports.flot     = require("./zoom");
 

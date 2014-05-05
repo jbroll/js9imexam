@@ -6,7 +6,7 @@
 
 
 (function () {
-     var imexam = require("./imexam");
+    var imexam = require("./imexam");
 
     require("./JSSurfacePlot-V1.7/javascript/SurfacePlot");
     require("./JSSurfacePlot-V1.7/javascript/ColourGradient");

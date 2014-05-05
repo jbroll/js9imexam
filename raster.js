@@ -17,8 +17,8 @@
 
 	switch ( rop ) { 				// draw all of the pixels
 	 case undefined:
-	 case "set": for (x = x1; x < x2; x++) { buffer[ofs++]  = k; }; break;
-	 case "add": for (x = x1; x < x2; x++) { buffer[ofs++] += k; }; break;
+	 case "set": for (x = x1; x < x2; x++) { buffer[ofs++]  = k; } break;
+	 case "add": for (x = x1; x < x2; x++) { buffer[ofs++] += k; } break;
 	}
     }
 

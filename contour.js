@@ -530,8 +530,10 @@ if (typeof exports !== "undefined") {
 
 
 (function() {
-     var imexam = require("./imexam");
+    var imexam = require("./imexam");
     var conrec = require("./conrec");
+
+    require("./regions");
 
     function drawContours(div, display) {
 	var i;
@@ -551,10 +553,11 @@ if (typeof exports !== "undefined") {
 		, imexam.ndops.iota(data.shape[0]), imexam.ndops.iota(data.shape[1])
 		, level.length, level);
 
-	var contours = c.contourList();
-	for ( i = 0; i < contours.length; i++ ) {
-	    JS9.Regions(im, { shape: "polygon", points: contours[i] });
-	}
+	var contours = c.contourList().map(function(contour) {
+		return { shape: "polygon", points: contour };
+		});
+	    
+	JS9.AddRegions(im, "regions", contours, JS9.Catalog.opts);
     }
 
     function getMinMax(div, display) {
@@ -645,4 +648,42 @@ if (typeof exports !== "undefined") {
     });
 }());
 
-},{"./conrec":1}]},{},[2])
+},{"./conrec":1,"./regions":3}],3:[function(require,module,exports){
+
+JS9.AddRegions = function(id, layer, regions, opts){
+    var i, region, shape;
+    var im = JS9.GetImage(id);
+
+    var empty = {};
+
+    if( typeof opts === "string" ){ 			// opts can be an object or a string
+	try{ opts = JSON.parse(opts); }
+	catch(e1){
+	    JS9.error("can't parse catalog opts: " + opts, e1);
+	    return null;
+	}
+    }
+
+    im.getShapeLayer(layer, $.extend({}, opts, JS9.Fabric.opts));	// initialize catalog layer, if necessary
+
+    for ( i = 0; i < regions.length; i++ ) { 		// add individual object to the group
+
+	// combine global opts with defaults opts with object-specific opts
+	//
+	region = jQuery.extend(true, empty, opts, regions[i]);
+
+	region.redraw = false; 				// don't redraw on every shape addition
+	shape = im.addShape(layer, region.shape, region);
+	shape.params.ipos = {x: region.x, y: region.y};
+	shape.params.obj = regions[i];
+    }
+    im.redrawShapeLayer(layer); 			// now we can re-render the layer
+
+    return this; 					// allow chaining
+};
+
+
+
+
+
+},{}]},{},[2])

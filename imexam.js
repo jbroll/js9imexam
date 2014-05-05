@@ -577,7 +577,7 @@ exports.template = template;
 exports.ndops    = ndops;
 exports.typed    = ndops;
 exports.imops    = imops;
-exports.flot     = require("./zoom");;
+exports.flot     = require("./zoom");
 
 
 },{"./mask.js":3,"./template":11,"./zoom":12,"typed-array-function":4,"typed-array-ops":5,"typed-array-rotate":6,"typed-numeric-uncmin":9}],"./imexam":[function(require,module,exports){
@@ -871,7 +871,7 @@ module.exports=require('Ll8vMw');
 
 		if ( id === "index" ) { hasIndex = true; }
 
-		for ( k = 0; k < indx.length; i++ ) {
+		for ( k = 0; k < indx.length; k++ ) {
 		    indx[k] = replaceArrayRefs(indx[k]);
 		}
 
@@ -1273,7 +1273,6 @@ module.exports=require('Ll8vMw');
 		    , "isFinite", "isNaN" ]; 
 
       for( i = 0; i < math_unary.length; i++ ) {
-	if ( math_unary.hasOwnProperty(opname) ) {
 	    opname = op = math_unary[i];
 		
 	    ops[opname + "2"]            = typed("function (a, b   )    {            a = " + op + "(b); }");
@@ -1283,7 +1282,6 @@ module.exports=require('Ll8vMw');
 
 	    ops[opname]       = onefourtwo     (ops[opname + "2"]);
 	    ops[opname].baked = onefourtwo_bake(ops[opname + "2"]);
-	}
       }
 
     var math_comm = [ "max", "min" ];
@@ -1621,7 +1619,7 @@ numeric.diag  = typed({ loops: false }, numeric.diag);
 
 
 },{"typed-array-function":4}],9:[function(require,module,exports){
-/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true, bitwise: true */
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true, bitwise: true, continue:true */
 
 "use strict";
 
@@ -1736,7 +1734,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 
     // http://cogsandlevers.blogspot.com/2013/11/scanline-based-filled-polygons.html
     //
-    function drawHLine(buffer, width, x1, x2, y, k) {
+    function drawHLine(buffer, width, x1, x2, y, k, rop) {
 
 	if ( x1 < 0     ) { x1 = 0;     }
 	if ( x2 > width ) { x2 = width; }
@@ -1744,8 +1742,10 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 	var ofs = x1 + y * width; 			// calculate the offset into the buffer
         var x;
 
-	for (x = x1; x < x2; x++) { 			// draw all of the pixels
-	    buffer[ofs++] = k;
+	switch ( rop ) { 				// draw all of the pixels
+	 case undefined:
+	 case "set": for (x = x1; x < x2; x++) { buffer[ofs++]  = k; } break;
+	 case "add": for (x = x1; x < x2; x++) { buffer[ofs++] += k; } break;
 	}
     }
 
@@ -1781,7 +1781,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 	}
     }
 
-    function _drawPolygon(buffer, width, points, color) {
+    function _drawPolygon(buffer, width, points, color, rop) {
 	var i;
 	var miny = points[0].y-1; 			// work out the minimum and maximum y values
 	var maxy = points[0].y-1;
@@ -1809,7 +1809,7 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 	    drawHLine( buffer, width
 		     , Math.floor(edges[i].minx)
 		     , Math.floor(edges[i].maxx)
-		     , Math.floor(i + miny), color);
+		     , Math.floor(i + miny), color, rop);
 	}
     }
 
@@ -1855,10 +1855,10 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
 		, { x: x+w/2, y: y-h/2 } ];
     }
 
-    exports.drawPolygon = function (buffer, width, points,    color)       { _drawPolygon(buffer, width, points,                      color); };
-    exports.drawCircle  = function (buffer, width, x, y, rad, color)       { _drawPolygon(buffer, width, polyEllipse(x, y, rad, rad), color); };
-    exports.drawEllipse = function (buffer, width, x, y, h, w, rot, color) { _drawPolygon(buffer, width, rotPoints(polyEllipse(x, y, h, w), rot, { x: x, y: y }), color); };
-    exports.drawBox     = function (buffer, width, x, y, h, w, rot, color) { _drawPolygon(buffer, width, rotPoints(polyBox    (x, y, h, w), rot, { x: x, y: y }), color); };
+    exports.drawPolygon = function (buffer, width, points,    color, rop)       { _drawPolygon(buffer, width, points,                      color, rop); };
+    exports.drawCircle  = function (buffer, width, x, y, rad, color, rop)       { _drawPolygon(buffer, width, polyEllipse(x, y, rad, rad), color, rop); };
+    exports.drawEllipse = function (buffer, width, x, y, h, w, rot, color, rop) { _drawPolygon(buffer, width, rotPoints(polyEllipse(x, y, h, w), rot, { x: x, y: y }), color, rop); };
+    exports.drawBox     = function (buffer, width, x, y, h, w, rot, color, rop) { _drawPolygon(buffer, width, rotPoints(polyBox    (x, y, h, w), rot, { x: x, y: y }), color, rop); };
 }());
 
 },{}],11:[function(require,module,exports){
@@ -1876,9 +1876,6 @@ exports.uncmin = function uncmin(f,x0,tol,gradient,maxit,callback,options) {
     }
 
 function template(text,data) {
-	    
-console.log("\n")
-
     return text.replace(/\{([a-zA-Z0-9_.%]*)\}/g,
 	function(m,key){
 	    var type, prec, widt = 0, fmt, i;
