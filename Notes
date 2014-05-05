@@ -16,7 +16,7 @@
     Important : Shows use of mouse move callback
 
     o Flip table up/down and left/right to match image axis signs
-    o Add CSS styling for bgcolor or row/col headers and "center" cross.
+    * Add CSS styling for bgcolor or row/col headers and "center" cross.
 
  * X, Y projection
     o Add gausain fit.
@@ -54,9 +54,10 @@
 
  o Histogram
 	o stats
+	o stats on horizontal selection
 
- o Graphs
-	o Zoom stack
-	o horizontal & vertical selection
+ * Graphs
+	* Zoom stack
+	* horizontal & vertical selection
 
 

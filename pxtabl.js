@@ -38,8 +38,6 @@
 		+ "</tr>\n", y, "%y");
 	t    += "</table>";
 
-	console.log(t);
-
 	return t;
     }
 
@@ -71,9 +69,9 @@
 		y = point.y + j - 5;
 
 		if ( y > 0 && y <= im.raw.height ) {
-		    pxtabl["cell" + j + "." + i].value = y;
+		    pxtabl["cell" + (10-j) + "." + i].value = y;
 		} else {
-		    pxtabl["cell" + j + "." + i].value = "";
+		    pxtabl["cell" + (10-j) + "." + i].value = "";
 		}
 	    }
 
@@ -83,9 +81,9 @@
 		y = point.y + j - 5 - 1;
 
 		if ( x >= 0 && x < im.raw.width && y >= 0 && y < im.raw.height ) {
-		    pxtabl["cell" + j + "." + i].value = im_2d.get(y, x).toPrecision(5);
+		    pxtabl["cell" + (10-j) + "." + i].value = im_2d.get(y, x).toPrecision(5);
 		} else {
-		    pxtabl["cell" + j + "." + i].value = "";
+		    pxtabl["cell" + (10-j) + "." + i].value = "";
 		}
 	    }
 	    }
