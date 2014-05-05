@@ -22,13 +22,13 @@
         
 
         surf.getNumberOfRows = function () {
-            return this.shape[0];
-        };
-        surf.getNumberOfColumns = function () {
             return this.shape[1];
         };
+        surf.getNumberOfColumns = function () {
+            return this.shape[0];
+        };
         surf.getFormattedValue = function (i, j) {
-            return this.get(i, j).toString();
+            return this.get(j, i).toString();
         };
 
 
@@ -65,7 +65,7 @@
 
         for (i = 0; i < numRows; i++) {
             for (j = 0; j < numCols; j++) {
-                value = data.get(i, j);
+                value = data.get(j, i);
 
                 surf.set(j, i, (value-minvalue)/(range*2.25));
 

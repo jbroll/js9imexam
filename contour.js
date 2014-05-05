@@ -650,7 +650,7 @@ if (typeof exports !== "undefined") {
 
 },{"./conrec":1,"./regions":3}],3:[function(require,module,exports){
 
-JS9.AddRegions = function(id, layer, regions, opts){
+JS9.AddShapes = function(id, layer, shapes, opts){
     var i, region, shape;
     var im = JS9.GetImage(id);
 
@@ -664,18 +664,16 @@ JS9.AddRegions = function(id, layer, regions, opts){
 	}
     }
 
-    im.getShapeLayer(layer, $.extend({}, opts, JS9.Fabric.opts));	// initialize catalog layer, if necessary
+    im.getShapeLayer(layer, JQuery.extend({}, opts, JS9.Fabric.opts));	// initialize catalog layer, if necessary
 
-    for ( i = 0; i < regions.length; i++ ) { 		// add individual object to the group
+    for ( i = 0; i < shapes.length; i++ ) { 		// add individual object to the group
 
 	// combine global opts with defaults opts with object-specific opts
 	//
-	region = jQuery.extend(true, empty, opts, regions[i]);
+	region = jQuery.extend(true, empty, opts, shapes[i]);
 
 	region.redraw = false; 				// don't redraw on every shape addition
 	shape = im.addShape(layer, region.shape, region);
-	shape.params.ipos = {x: region.x, y: region.y};
-	shape.params.obj = regions[i];
     }
     im.redrawShapeLayer(layer); 			// now we can re-render the layer
 
