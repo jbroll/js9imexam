@@ -81,7 +81,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: " ",
 
-            regionchange: rprojUpdate,
+            onregionschange: rprojUpdate,
             winDims: [250, 250],
     });
 

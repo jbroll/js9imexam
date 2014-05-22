@@ -266,7 +266,7 @@ var Conrec = (function() {
        * @param endY      - end coordinate for Y
        * @param contourLevel - Contour level for line.
        */
-      this.drawContour = function(startX, startY, endX, endY, contourLevel, k) {
+      this.drawContour = function(startY, startX, endY, endX, contourLevel, k) {
         var cb = c.contours[k];
         if (!cb) {
           cb = c.contours[k] = new ContourBuilder(contourLevel);
@@ -533,8 +533,6 @@ if (typeof exports !== "undefined") {
     var imexam = require("./imexam");
     var conrec = require("./conrec");
 
-    require("./regions");
-
     function drawContours(div, display) {
 	var i;
 	var im   = JS9.GetImage(display);
@@ -550,14 +548,16 @@ if (typeof exports !== "undefined") {
 
 	c.contour(data
 		, 0, data.shape[0]-1, 0, data.shape[1]-1
-		, imexam.ndops.iota(data.shape[0]), imexam.ndops.iota(data.shape[1])
+		, imexam.ndops.iota(1, data.shape[0]), imexam.ndops.iota(1, data.shape[1])
 		, level.length, level);
 
 	var contours = c.contourList().map(function(contour) {
-		return { shape: "polygon", points: contour };
+		return { shape: "polygon", pts: contour };
 		});
-	    
-	JS9.AddRegions(im, "regions", contours, JS9.Catalog.opts);
+
+	JS9.NewShapeLayer(im, "contour", JS9.Catalogs.opts);
+	JS9.RemoveShapes(im, "contour");
+	JS9.AddShapes(im, "contour", contours, {color: "yellow"});
     }
 
     function getMinMax(div, display) {
@@ -584,7 +584,7 @@ if (typeof exports !== "undefined") {
 	    var min   = Number(form.min.value);
 	    var max   = Number(form.max.value);
 
-	    imexam.ndops.divs(level, level, 10);		// Try 10 levels from min to max.
+	    imexam.ndops.divs(level, level, form.nlevel.value-1);		// Try n levels from min to max.
 	    imexam.ndops.muls(level, level, max-min);
 	    imexam.ndops.adds(level, level, min);
 
@@ -648,40 +648,4 @@ if (typeof exports !== "undefined") {
     });
 }());
 
-},{"./conrec":1,"./regions":3}],3:[function(require,module,exports){
-
-JS9.AddShapes = function(id, layer, shapes, opts){
-    var i, region, shape;
-    var im = JS9.GetImage(id);
-
-    var empty = {};
-
-    if( typeof opts === "string" ){ 			// opts can be an object or a string
-	try{ opts = JSON.parse(opts); }
-	catch(e1){
-	    JS9.error("can't parse catalog opts: " + opts, e1);
-	    return null;
-	}
-    }
-
-    im.getShapeLayer(layer, JQuery.extend({}, opts, JS9.Fabric.opts));	// initialize catalog layer, if necessary
-
-    for ( i = 0; i < shapes.length; i++ ) { 		// add individual object to the group
-
-	// combine global opts with defaults opts with object-specific opts
-	//
-	region = jQuery.extend(true, empty, opts, shapes[i]);
-
-	region.redraw = false; 				// don't redraw on every shape addition
-	shape = im.addShape(layer, region.shape, region);
-    }
-    im.redrawShapeLayer(layer); 			// now we can re-render the layer
-
-    return this; 					// allow chaining
-};
-
-
-
-
-
-},{}]},{},[2])
+},{"./conrec":1}]},{},[2])

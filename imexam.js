@@ -526,7 +526,6 @@ function reg2section(xreg) {
 
        	case "polygon":
             xreg.size = {};
-            xreg.pos  = {};
 
 	    var i, xx = 0, yy = 0, minx = 1000000, maxx = 0, miny = 1000000, maxy = 0;
 
@@ -540,8 +539,8 @@ function reg2section(xreg) {
 		if ( xreg.points[i].y < miny ) { miny = xreg.points[i].y; }
 	    }
 
-	    xreg.pos.x = xx/xreg.points.length;
-	    xreg.pos.y = yy/xreg.points.length;
+	    xreg.x = xx/xreg.points.length;
+	    xreg.y = yy/xreg.points.length;
 
 	    xreg.size.width  = maxx - minx;
 	    xreg.size.height = maxy - miny;
@@ -551,7 +550,7 @@ function reg2section(xreg) {
        	default:
     }
 
-    return imops.mksection(xreg.pos.x, xreg.pos.y, xreg.size.width, xreg.size.height);
+    return imops.mksection(xreg.x, xreg.y, xreg.size.width, xreg.size.height);
 }
 
 exports.getRegionData = function (im, xreg) {
@@ -562,7 +561,7 @@ exports.getRegionData = function (im, xreg) {
     if ( xreg.angle && xreg.angle !== 0 ) {
 	imag = ndops.zeros([xreg.size.width, xreg.size.height]);
 
-	ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.pos.y, xreg.pos.x);
+	ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.y, xreg.x);
     } else {
 	imag = ndops.section(im_2d, section);
     }
@@ -1080,9 +1079,13 @@ module.exports=require('Ll8vMw');
 	return typed.assign(typed.array(typed.dim(x), x), x);
     }
 
-    function iota(n) {
-	var i, result = [];
-	for ( i = 0; i<n; ++i ) { result[i] = i; }   
+    function iota(i, n) {
+	if ( n === undefined ) {
+	    n = i;
+	    i = 0;
+	}
+	var j, result = [];
+	for ( j = 0; j<n; j++ ) { result[j] = i; i += 1; }   
 
 	return result;
     }

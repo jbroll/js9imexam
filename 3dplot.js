@@ -100,7 +100,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: " ",
 
-            regionchange: pluginUpdate,
+            onregionschange: pluginUpdate,
             winDims: [250, 250],
     });
 }());

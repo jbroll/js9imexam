@@ -64,7 +64,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: " ",
 
-            regionchange: energUpdate,
+            onregionschange: energUpdate,
             winDims: [250, 250],
     });
 

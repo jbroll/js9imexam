@@ -64,7 +64,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: " ",
 
-            regionchange: pixtUpdate,
+            onregionschange: pixtUpdate,
             winDims: [250, 250],
     });
 

@@ -84,7 +84,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: projToolbar,
 
-            regionchange: projUpdate,
+            onregionschange: projUpdate,
 
             winDims: [250, 250],
 
@@ -101,7 +101,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: projToolbar,
 
-            regionchange: projUpdate,
+            onregionschange: projUpdate,
 
             winDims: [250, 250],
 

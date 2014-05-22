@@ -128,7 +128,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: " ",
 
-            regionchange: runImCnts,
+            onregionschange: runImCnts,
             winDims: [600, 250],
     });
 }());

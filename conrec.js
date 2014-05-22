@@ -265,7 +265,7 @@ var Conrec = (function() {
        * @param endY      - end coordinate for Y
        * @param contourLevel - Contour level for line.
        */
-      this.drawContour = function(startX, startY, endX, endY, contourLevel, k) {
+      this.drawContour = function(startY, startX, endY, endX, contourLevel, k) {
         var cb = c.contours[k];
         if (!cb) {
           cb = c.contours[k] = new ContourBuilder(contourLevel);

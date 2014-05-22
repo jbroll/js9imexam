@@ -60,7 +60,7 @@
 	    toolbarSeparate: true,
 	    toolbarHTML: " ",
 
-            regionchange: histUpdate,
+            onregionschange: histUpdate,
             winDims: [250, 250],
     });
 
