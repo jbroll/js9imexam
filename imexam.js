@@ -501,56 +501,48 @@ function reg2section(xreg) {
     switch ( xreg.shape ) {
 
 	case "annulus":
-            xreg.size = {};
-
-            xreg.size.width  = xreg.radii[xreg.radii.length-1]*2;
-            xreg.size.height = xreg.radii[xreg.radii.length-1]*2;
+            xreg.width  = xreg.radii[xreg.radii.length-1]*2;
+            xreg.height = xreg.radii[xreg.radii.length-1]*2;
 
             break;
 
        	case "circle":
-            xreg.size = {};
-
-            xreg.size.width  = xreg.radius*2;
-            xreg.size.height = xreg.radius*2;
+            xreg.width  = xreg.radius*2;
+            xreg.height = xreg.radius*2;
 
             break;
 
        	case "ellipse":
-            xreg.size = {};
-
-            xreg.size.width  = xreg.eradius.x*2;
-            xreg.size.height = xreg.eradius.y*2;
+            xreg.width  = xreg.r1*2;
+            xreg.height = xreg.r2*2;
 
             break;
 
        	case "polygon":
-            xreg.size = {};
-
 	    var i, xx = 0, yy = 0, minx = 1000000, maxx = 0, miny = 1000000, maxy = 0;
 
-	    for ( i = 0; i < xreg.points.length; i++ ) {
-		xx += xreg.points[i].x;
-		yy += xreg.points[i].y;
+	    for ( i = 0; i < xreg.pts.length; i++ ) {
+		xx += xreg.pts[i].x;
+		yy += xreg.pts[i].y;
 
-		if ( xreg.points[i].x > maxx ) { maxx = xreg.points[i].x; }
-		if ( xreg.points[i].x < minx ) { minx = xreg.points[i].x; }
-		if ( xreg.points[i].y > maxy ) { maxy = xreg.points[i].y; }
-		if ( xreg.points[i].y < miny ) { miny = xreg.points[i].y; }
+		if ( xreg.pts[i].x > maxx ) { maxx = xreg.pts[i].x; }
+		if ( xreg.pts[i].x < minx ) { minx = xreg.pts[i].x; }
+		if ( xreg.pts[i].y > maxy ) { maxy = xreg.pts[i].y; }
+		if ( xreg.pts[i].y < miny ) { miny = xreg.pts[i].y; }
 	    }
 
-	    xreg.x = xx/xreg.points.length;
-	    xreg.y = yy/xreg.points.length;
+	    xreg.x = xx/xreg.pts.length;
+	    xreg.y = yy/xreg.pts.length;
 
-	    xreg.size.width  = maxx - minx;
-	    xreg.size.height = maxy - miny;
+	    xreg.width  = maxx - minx;
+	    xreg.height = maxy - miny;
 
 	    break;
 
        	default:
     }
 
-    return imops.mksection(xreg.x, xreg.y, xreg.size.width, xreg.size.height);
+    return imops.mksection(xreg.x, xreg.y, xreg.width, xreg.height);
 }
 
 exports.getRegionData = function (im, xreg) {
@@ -559,7 +551,7 @@ exports.getRegionData = function (im, xreg) {
     var imag;
 
     if ( xreg.angle && xreg.angle !== 0 ) {
-	imag = ndops.zeros([xreg.size.width, xreg.size.height]);
+	imag = ndops.zeros([xreg.width, xreg.height]);
 
 	ndops.rotate(imag, im_2d, xreg.angle/57.29577951, xreg.y, xreg.x);
     } else {
@@ -642,10 +634,10 @@ module.exports=require('Ll8vMw');
 
 		if ( hasTag(reg, type[t]) ) {
 		    switch ( reg.shape ) {
-		     case "polygon": raster.drawPolygon(buffer, width, reg.points,                       reg.regno); 				 break;
-		     case "circle":  raster.drawCircle( buffer, width, reg.pos.x, reg.pos.y, reg.radius, reg.regno); 				 break;
-		     case "box":     raster.drawBox(    buffer, width, reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno); break;
-		     case "ellipse": raster.drawEllipse(buffer, width, reg.pos.x, reg.pos.y, reg.eradius.x,  reg.eradius.y,   reg.angle, reg.regno); break;
+		     case "polygon": raster.drawPolygon(buffer, width, reg.pts,                          reg.regno); 				 break;
+		     case "circle":  raster.drawCircle( buffer, width, reg.x, reg.y, reg.radius, reg.regno); 				 break;
+		     case "box":     raster.drawBox(    buffer, width, reg.x, reg.y, reg.width,  reg.height, reg.angle, reg.regno); break;
+		     case "ellipse": raster.drawEllipse(buffer, width, reg.x, reg.y, reg.r1,     reg.r2,   reg.angle, reg.regno); break;
 		    }
 		}
 	    }

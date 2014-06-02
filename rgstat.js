@@ -10,10 +10,10 @@
 
     var statTemplate = "                                                                                \
         <table width=100%>                                                                              \
-            <tr><td align=right>Position X</td><td align=right>{reg.pos.x%.2f}          </td>           \
-            <td align=right>Y</td>              <td align=right>{reg.pos.y%.2f}         </td></tr>      \
-            <tr><td align=right>width</td>      <td align=right>{reg.size.width%.2f}    </td>           \
-            <td align=right>height</td>         <td align=right>{reg.size.height%.2f}   </td></tr>      \
+            <tr><td align=right>Position X</td> <td align=right>{reg.x%.2f}              </td>          \
+            <td align=right>Y</td>              <td align=right>{reg.y%.2f}             </td></tr>      \
+            <tr><td align=right>width</td>      <td align=right>{reg.width%.2f}         </td>           \
+            <td align=right>height</td>         <td align=right>{reg.height%.2f}        </td></tr>      \
             <tr><td align=right>min</td>        <td align=right>{min%.2f}               </td>           \
             <td align=right>max</td>            <td align=right>{max%.2f}               </td></tr>      \
             <tr><td align=right>Counts</td>     <td align=right colspan=3>{centroid.sum%.2f}</tr>       \
@@ -22,7 +22,7 @@
             <tr><td align=right>Centroid X</td> <td align=right>{centroid.cenx%.2f}     </td>           \
             <td align=right>Y</td>              <td align=right>{centroid.ceny%.2f}     </td></tr>      \
             <tr><td align=right>FWHM</td>       <td align=right>{centroid.fwhm%.2f}     </td>           \
-            <td align=right></td>            <td align=right>{centroid.rms%.2f}      </td></tr>      \
+            <td align=right></td>            <td align=right>{centroid.rms%.2f}      </td></tr>         \
         </table>";
 
     function statUpdate(im, xreg) {

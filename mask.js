@@ -58,10 +58,10 @@
 
 		if ( hasTag(reg, type[t]) ) {
 		    switch ( reg.shape ) {
-		     case "polygon": raster.drawPolygon(buffer, width, reg.points,                       reg.regno); 				 break;
-		     case "circle":  raster.drawCircle( buffer, width, reg.pos.x, reg.pos.y, reg.radius, reg.regno); 				 break;
-		     case "box":     raster.drawBox(    buffer, width, reg.pos.x, reg.pos.y, reg.size.width, reg.size.height, reg.angle, reg.regno); break;
-		     case "ellipse": raster.drawEllipse(buffer, width, reg.pos.x, reg.pos.y, reg.eradius.x,  reg.eradius.y,   reg.angle, reg.regno); break;
+		     case "polygon": raster.drawPolygon(buffer, width, reg.pts,                          reg.regno); 				 break;
+		     case "circle":  raster.drawCircle( buffer, width, reg.x, reg.y, reg.radius, reg.regno); 				 break;
+		     case "box":     raster.drawBox(    buffer, width, reg.x, reg.y, reg.width,  reg.height, reg.angle, reg.regno); break;
+		     case "ellipse": raster.drawEllipse(buffer, width, reg.x, reg.y, reg.r1,     reg.r2,   reg.angle, reg.regno); break;
 		    }
 		}
 	    }
