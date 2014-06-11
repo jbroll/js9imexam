@@ -58,7 +58,7 @@
 		x = point.x + i - 5;
 
 		if ( x > 0 && x <= im.raw.width ) {
-		    pxtabl["cell" + j + "." + i].value = x;
+		    pxtabl["cell" + j + "." + i].value = x.toFixed(0);
 		} else {
 		    pxtabl["cell" + j + "." + i].value = "";
 		}
@@ -69,7 +69,7 @@
 		y = point.y + j - 5;
 
 		if ( y > 0 && y <= im.raw.height ) {
-		    pxtabl["cell" + (10-j) + "." + i].value = y;
+		    pxtabl["cell" + (10-j) + "." + i].value = y.toFixed(0);
 		} else {
 		    pxtabl["cell" + (10-j) + "." + i].value = "";
 		}
@@ -81,7 +81,7 @@
 		y = point.y + j - 5 - 1;
 
 		if ( x >= 0 && x < im.raw.width && y >= 0 && y < im.raw.height ) {
-		    pxtabl["cell" + (10-j) + "." + i].value = im_2d.get(y, x).toPrecision(5);
+		    pxtabl["cell" + (10-j) + "." + i].value = im_2d.get(y, x).toPrecision(4);
 		} else {
 		    pxtabl["cell" + (10-j) + "." + i].value = "";
 		}
@@ -95,6 +95,7 @@
 	$(this.div).html("<form class=pxtabl>" + htmlTable(10, 10) + "</form>");
 	$(this.div).find(".row5").css("background", "lightblue");
 	$(this.div).find(".col5").css("background", "lightblue");
+	$(this.div).find(":input").css("font-size", "11");
     }
 
     JS9.RegisterPlugin("ImExam", "PxTabl", pxtablInit, {
@@ -108,7 +109,7 @@
 	    toolbarHTML: " ",
 
             onmousemove: pxtablUpdate,
-            winDims: [650, 250],
+            winDims: [625, 240],
     });
 }());
 

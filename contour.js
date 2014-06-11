@@ -579,12 +579,13 @@ if (typeof exports !== "undefined") {
 	if ( im ) {
 	    var form = $(div).find(".contour-form")[0];
 
-	    var level = imexam.ndops.ndarray(imexam.ndops.iota(Number(form.nlevel.value)));
+	    var n     = Number(form.nlevel.value);
+	    var level = imexam.ndops.ndarray(imexam.ndops.iota(1, n));
 
 	    var min   = Number(form.min.value);
 	    var max   = Number(form.max.value);
 
-	    imexam.ndops.divs(level, level, form.nlevel.value-1);		// Try n levels from min to max.
+	    imexam.ndops.divs(level, level, n+1);		// Try n levels from min to max.
 	    imexam.ndops.muls(level, level, max-min);
 	    imexam.ndops.adds(level, level, min);
 

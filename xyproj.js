@@ -14,8 +14,10 @@
                         <option>avg</option>            \
                         <option>med</option>            \
 		 </select>				\
-		 <input type=checkbox class='proj_chek' name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\
 		";
+
+
+		// <input type=checkbox class='proj_chek' name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\
 
     function projUpdate(im, xreg) {
 	var div, proj, menx, chek;
