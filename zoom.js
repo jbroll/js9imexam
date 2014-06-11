@@ -7,6 +7,7 @@
 (function() {
     function zoomStackIn(plot, event, ranges, func) {
 	var axes = plot.getAxes();
+	var div  = plot.getPlaceholder();
 
 	var r = {};
 	r.xmin = axes.xaxis.min;
@@ -26,11 +27,18 @@
 	plot.setupGrid();
 	plot.draw();
 
+	$(div).find(".zoomout").css("visibility", "visible");
+
 	if ( func !== undefined ) { func(plot, r); }
     }
 
     function zoomStackOut(plot, func) {
-	var r = plot.stack.pop();
+	var r    = plot.stack.pop();
+	var div  = plot.getPlaceholder();
+
+	if (  plot.stack.length === 0 ) {
+	    $(div).find(".zoomout").css("visibility", "hidden");
+	}
 
 	plot.getAxes().xaxis.options.min = r.xmin;
 	plot.getAxes().xaxis.options.max = r.xmax;
@@ -54,6 +62,8 @@
 
 	$(div).bind("plotselected", function (event, ranges) { zoomStackIn (plot, event, ranges, func); });
 	$(div).find(".zoomout").click(function ()            { zoomStackOut(plot, func); });
+
+	$(div).find(".zoomout").css("visibility", "hidden");
     };
 }());
 
