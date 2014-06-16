@@ -7,7 +7,6 @@
       <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
       <link type="text/css" rel="stylesheet" href="js9.css">
       <script type="text/javascript" src="js/jquery.min.js"></script>
-      <script type="text/javascript" src="js/kinetic.min.js"></script>
       <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
       <script type="text/javascript" src="js/jquery.flot.min.js"></script>
       <script type="text/javascript" src="js/jquery.flot.errorbars.min.js"></script>
@@ -20,21 +19,28 @@
       ***********************************************/
       </script>
 
-      <script type="text/javascript" src="js/fitsy.js"></script>
+      <script language="javascript" type="text/javascript" src="http://www.cfa.harvard.edu/~john/flot/jquery.flot.selection.min.js"></script>
+      <script type="text/javascript" src="plugins/imexam/flot-zoom.js"></script>
+
+      <script type="text/javascript" src="plugins/fitsy/fitsy.js"></script>
+
+  <script type="text/javascript" src="js/fabric.js"></script>
       <script type="text/javascript" src="js/astrolib.js"></script>
       <script type="text/javascript" src="js9.js"></script>
 
+      <script type="text/javascript" src="plugins/fitsy/pako_inflate.min.js"></script>
+      <script type="text/javascript" src="plugins/fitsy/bzip2.js"></script>
+      <script type="text/javascript" src="plugins/fitsy/lzma_worker.js"></script>
 
       <script type="text/javascript" src="plugins/imexam/imexam.js"></script>
-      <script type="text/javascript" src="plugins/imexam/rgstat.js"></script>
+      <script type="text/javascript" src="plugins/imexam/regstat.js"></script>
       <script type="text/javascript" src="plugins/imexam/xyproj.js"></script>
-      <script type="text/javascript" src="plugins/imexam/r_proj.js"></script>
-      <script type="text/javascript" src="plugins/imexam/enener.js"></script>
-      <script type="text/javascript" src="plugins/imexam/rghist.js"></script>
+      <script type="text/javascript" src="plugins/imexam/reghist.js"></script>
+      <script type="text/javascript" src="plugins/imexam/radproj.js"></script>
       <script type="text/javascript" src="plugins/imexam/3dplot.js"></script>
-      <script type="text/javascript" src="plugins/imexam/pxtabl.js"></script>
-      <script type="text/javascript" src="plugins/imexam/rghxrg.js"></script>
+      <script type="text/javascript" src="plugins/imexam/encircled.js"></script>
 
+      <script type="text/javascript" src="plugins/imexam/pixtable.js"></script>
       <script type="text/javascript" src="plugins/imexam/contour.js"></script>
 
     </head>
@@ -52,7 +58,23 @@
     <li><A href="javascript:Fitsy.fetchURL('dot.fits', 'fits/dot.fits', undefined, window.JS9.Load)">A Dot</A></li>
     </ul>
 
-    <div class="JS9Menubar"></div>
-    <div class="JS9"></div>
+    <table>
+    <tr valign="top">
+    <td>
+    <div class="JS9Menubar" id="JS9Menubar"></div>
+    <div class="JS9" id="JS9"></div>
+    </td>
+    <td>
+    <table>
+    <tr><td><div class="ImExamRegionStats" data-js9id="JS9"></div></td>
+        <td><div class="ImExam3dPlot"      data-js9id="JS9"></div></td></tr>
+    <tr><td><div class="ImExamXProj"       data-js9id="JS9"></div></td>
+        <td><div class="ImExamYProj"       data-js9id="JS9"></div></td></tr>
+    </table>
+    </td>
+    </tr>
+    </table>
+
+
     </body>
 </html>

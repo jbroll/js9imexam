@@ -93,6 +93,7 @@ var Conrec = (function() {
   }
 
   var ContourBuilder = function(level) {
+    this.count = 0;
     this.level = level;
     this.s = null;
     this.count = 0;
@@ -116,6 +117,10 @@ var Conrec = (function() {
     var mb = null;
     var prependA = false;
     var prependB = false;
+
+    if ( this.count++ > 100000 ) {
+	throw new Error("Too many calls to coutour AddSegment");
+    }
 
     while (ss) {
       if (ma == null) {
@@ -546,10 +551,16 @@ if (typeof exports !== "undefined") {
 
 	var c      = new conrec.Conrec();
 
-	c.contour(data
-		, 0, data.shape[0]-1, 0, data.shape[1]-1
-		, imexam.ndops.iota(1, data.shape[0]), imexam.ndops.iota(1, data.shape[1])
-		, level.length, level);
+	try {
+	    c.contour(data
+		    , 0, data.shape[0]-1, 0, data.shape[1]-1
+		    , imexam.ndops.iota(1, data.shape[0]), imexam.ndops.iota(1, data.shape[1])
+		    , level.length, level);
+	} catch (e) {
+	    alert("Too many coutour segments: Check your coutour levels.\n\nAre you trying to coutour the background levels of an image?");
+	}
+
+	return;
 
 	var contours = c.contourList().map(function(contour) {
 		return { shape: "polygon", pts: contour };
@@ -604,7 +615,7 @@ if (typeof exports !== "undefined") {
 
 	div.innerHTML = '<form class="contour-form">							\
 	    <table><tr>	<td>N</td>									\
-			<td><input type=text name=nlevel value=10 size=10></td>			\
+			<td><input type=text name=nlevel value=10 size=10></td>				\
 		       	<td><input type=button value="Draw Contours" class="drw-contour"></td></tr>	\
 	           <tr>	<td>Min</td>									\
 			<td><input type=text name=min size=10></td>					\

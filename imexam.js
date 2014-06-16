@@ -39,34 +39,26 @@ ndops.fill = typed(function (a, func) {
 
       exports.fixupDiv = function (plugin) {
 	var type   = plugin.winType;
-	var div    = plugin.div;
-	var parent = $(div).parent();
+	var div    = plugin.divjq;
 
 	var opts = plugin.plugin.opts;
 
 	if ( type === "div" ) {
-	    $(parent).css("border", "1px solid black");
 
-	    plugin.toolbar = $(parent).find(".JS9PluginToolbar-div");
-	    plugin.toolbar.css("width", "95%");
+	    $(div).parent().css("border", "1px solid black");
+
+	    plugin.toolbar = div.parent().find(".JS9PluginToolbar-div");
 	    plugin.toolbar.css("cursor", "default");
 	    plugin.toolbar.css("text-align", "left");
+	    plugin.toolbar.css("right", 10);
 
 	    if ( opts.toolbarHTML !== " " ) {
 		plugin.toolbar.html("<div style='float: right;'>" + opts.toolbarHTML + "</div>" + opts.winTitle);
 	    } else {
 		plugin.toolbar.html(opts.winTitle);
 	    }
-	    
-	    if ( $(div).height() <= 0 ) {
-		$(plugin.div).css("height", opts.winDims[1]);
-		$(plugin.div).css("width",  opts.winDims[0]);
-	    }
-
-	    $(plugin.div).height($(parent).parent().height()-25);
 	} else {
-	    plugin.toolbar = $(parent).parent().find(".JS9PluginToolbar-light");
-	    $(plugin.div).css("height", "100%");
+	    plugin.toolbar = div.parent().parent().find(".JS9PluginToolbar-light");
 	}
       };
 

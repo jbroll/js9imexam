@@ -92,6 +92,7 @@ var Conrec = (function() {
   }
 
   var ContourBuilder = function(level) {
+    this.count = 0;
     this.level = level;
     this.s = null;
     this.count = 0;
@@ -115,6 +116,10 @@ var Conrec = (function() {
     var mb = null;
     var prependA = false;
     var prependB = false;
+
+    if ( this.count++ > 100000 ) {
+	throw new Error("Too many calls to coutour AddSegment");
+    }
 
     while (ss) {
       if (ma == null) {

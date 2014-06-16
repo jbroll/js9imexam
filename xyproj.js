@@ -29,8 +29,8 @@
 	    chek = xreg.chek;
 	} else {
 	    div  = this.div; 
-	    menx = $(this.toolbar).find(".proj_menu")[0];
-	    chek = $(this.toolbar).find(".proj_chek")[0];
+	    menx = this.toolbar.find(".proj_menu")[0];
+	    chek = this.toolbar.find(".proj_chek")[0];
 
             proj = imexam.ndops.proj(imexam.getRegionData(im, xreg), this.plugin.opts.xyproj);
 
@@ -67,8 +67,8 @@
 		xdata[x] = [x, data[x]];
 	}
 
-	var plot = $.plot(div, [xdata], { selection: { mode: "xy" } });
-	imexam.flot.zoomStack(plot);
+	var plot = $.plot(div, [xdata], { zoomStack: true, selection: { mode: "xy" } });
+	//imexam.flot.zoomStack(plot);
     }
 
     function projInit() {

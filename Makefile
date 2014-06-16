@@ -2,14 +2,14 @@
 JS9   = ../js9
 JS9JS = $(JS9)/plugins/imexam
 
-HTML  = js9Imexam.html 
+HTML  = js9Imexam.html js9imexam.html
 
 HX    = 		\
-	rgstat.html	\
+	regstat.html	\
 	xyproj.html	\
-	r_proj.html	\
-	rghist.html	\
-	enener.html	\
+	radproj.html	\
+	reghist.html	\
+	encircled.html	\
 	3dplot.html
 	
 
@@ -20,12 +20,12 @@ JX    = 		\
 
 JS    = 		\
 	xyproj.js	\
-	r_proj.js	\
-	rgstat.js	\
-	rghist.js	\
-	enener.js	\
+	radproj.js	\
+	regstat.js	\
+	reghist.js	\
+	encircled.js	\
 	rghxrg.js	\
-	pxtabl.js	\
+	pixtable.js	\
 	imcnts.js
 
 ICON = 4arrow.png
