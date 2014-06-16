@@ -44,15 +44,11 @@ ndops.fill = typed(function (a, func) {
 	var opts = plugin.plugin.opts;
 
 	if ( type === "div" ) {
-
-	    $(div).parent().css("border", "1px solid black");
-
 	    plugin.toolbar = div.parent().find(".JS9PluginToolbar-div");
+
 	    plugin.toolbar.css("cursor", "default");
 	    plugin.toolbar.css("text-align", "left");
 	    plugin.toolbar.css("right", 10);
-	} else {
-	    plugin.toolbar = div.parent().parent().find(".JS9PluginToolbar-light");
 	}
       };
 

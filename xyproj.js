@@ -30,8 +30,8 @@
 	    chek = xreg.chek;
 	} else {
 	    div  = this.div; 
-	    menx = this.toolbar.find(".proj_menu")[0];
-	    chek = this.toolbar.find(".proj_chek")[0];
+	    menx = this.outerdivjq.find(".proj_menu")[0];
+	    chek = this.outerdivjq.find(".proj_chek")[0];
 
             proj = imexam.ndops.proj(imexam.getRegionData(im, xreg), this.plugin.opts.xyproj);
 
