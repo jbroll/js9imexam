@@ -55,18 +55,18 @@ TYPED = node_modules/typed-array-function.js		\
 	node_modules/typed-array-ops.js
 
 imexam.js : imexam.jx template.js mask.js raster.js zoom.js $(TYPED)
-	browserify -r ./imexam.jx:./imexam > imexam.js
-	browserify -r ./imexam.jx:./imexam | uglifyjs > imexam.min.js
+	browserify -r ./imexam.jx:./imexam > imexam.js				; echo >> imexam.js
+	browserify -r ./imexam.jx:./imexam | uglifyjs > imexam.min.js		; echo >> imexam.min.js
 	ls -ltr imexam.*
 
 imexam.html : $(HX)
 	cat $(HX) > imexam.html
 
 3dplot.js: 3dplot.jx ./JSSurfacePlot-V1.7/javascript/SurfacePlot.js ./JSSurfacePlot-V1.7/javascript/ColourGradient.js
-	browserify -u imexam.js 3dplot.jx > 3dplot.js
+	browserify -u imexam.js 3dplot.jx > 3dplot.js				; echo >> 3dplot.js
 
 contour.js : contour.jx conrec.js regions.js
-	browserify -u imexam.js contour.jx > contour.js
+	browserify -u imexam.js contour.jx > contour.js				; echo >> contour.js
 
 
 npm-install:

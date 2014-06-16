@@ -51,12 +51,6 @@ ndops.fill = typed(function (a, func) {
 	    plugin.toolbar.css("cursor", "default");
 	    plugin.toolbar.css("text-align", "left");
 	    plugin.toolbar.css("right", 10);
-
-	    if ( opts.toolbarHTML !== " " ) {
-		plugin.toolbar.html("<div style='float: right;'>" + opts.toolbarHTML + "</div>" + opts.winTitle);
-	    } else {
-		plugin.toolbar.html(opts.winTitle);
-	    }
 	} else {
 	    plugin.toolbar = div.parent().parent().find(".JS9PluginToolbar-light");
 	}

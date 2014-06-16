@@ -9,12 +9,13 @@
 
 
     var projToolbar = "                                	\
+		<div style='float: right;'>		\
                  <select  class='proj_menu'>		\
                         <option>sum</option>            \
                         <option>avg</option>            \
                         <option>med</option>            \
 		 </select>				\
-		";
+		</div> $title";
 
 
 		// <input type=checkbox class='proj_chek' name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\

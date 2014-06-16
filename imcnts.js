@@ -126,7 +126,7 @@
 	    help:     "imexam/imcnts.html",
 
 	    toolbarSeparate: true,
-	    toolbarHTML: " ",
+	    toolbarHTML: "$title",
 
             onregionschange: runImCnts,
             winDims: [600, 250],

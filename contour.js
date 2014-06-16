@@ -558,9 +558,9 @@ if (typeof exports !== "undefined") {
 		    , level.length, level);
 	} catch (e) {
 	    alert("Too many coutour segments: Check your coutour levels.\n\nAre you trying to coutour the background levels of an image?");
+	    return;
 	}
 
-	return;
 
 	var contours = c.contourList().map(function(contour) {
 		return { shape: "polygon", pts: contour };
@@ -654,10 +654,11 @@ if (typeof exports !== "undefined") {
 	    help:     "imexam/coutours.html",
 
 	    toolbarSeparate: true,
-	    toolbarHTML: " ",
+	    toolbarHTML: "$title",
 
             winDims: [250, 250],
     });
 }());
+
 
 },{"./conrec":1}]},{},[2])
