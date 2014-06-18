@@ -45,8 +45,7 @@ ndops.fill = typed(function (a, func) {
 	    plugin.toolbar = plugin.outerdivjq.find(".JS9PluginToolbar-div");
 
 	    plugin.toolbar.css("cursor", "default");
-	    plugin.toolbar.css("right", 10);
-	    plugin.toolbar.css("text-align", "left");
+	    plugin.toolbar.css("right", 0);
 	}
       };
 
