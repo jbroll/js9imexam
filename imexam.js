@@ -42,10 +42,10 @@ ndops.fill = typed(function (a, func) {
 	if ( plugin.winType === "div" ) {
 	    plugin.outerdivjq.find(".drag-handle").html(plugin.plugin.opts.winTitle);
 
-	    plugin.toolbar = plugin.outerdivjq.find(".JS9PluginToolbar-div");
+	    var toolbar = plugin.outerdivjq.find(".JS9PluginToolbar-div");
 
-	    plugin.toolbar.css("cursor", "default");
-	    plugin.toolbar.css("right", 0);
+	    toolbar.css("cursor", "default");
+	    toolbar.css("right", 0);
 	}
       };
 
