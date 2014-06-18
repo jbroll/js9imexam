@@ -44,7 +44,6 @@ install: FORCE
 	cp -p $(HTML) $(JS9)
 	cp -p $(JX:.jx=.js) $(JS) $(ICON) $(JS9JS)/.
 	cp -p imexam.html $(JS9JS)/.
-	#cp -p imexam.min.js    $(JS9JS)/.
 
 
 lint :
@@ -57,8 +56,6 @@ TYPED = node_modules/typed-array-function.js		\
 imexam.js : imexam.jx template.js mask.js raster.js zoom.js $(TYPED)
 	browserify -r ./imexam.jx:./imexam > imexam.js
 	echo "" >> imexam.js
-	#browserify -r ./imexam.jx:./imexam | uglifyjs > imexam.min.js
-	#echo "" >> imexam.min.js
 	ls -ltr imexam.*
 
 imexam.html : $(HX)
