@@ -79,7 +79,6 @@
 	    help:     "imexam/imexam.html#r_proj",
 
 	    toolbarSeparate: true,
-	    toolbarHTML: "$title",
 
             onregionschange: rprojUpdate,
             winDims: [250, 250],

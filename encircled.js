@@ -62,7 +62,6 @@
 	    help:     "imexam/imexam.html#enener",
 
 	    toolbarSeparate: true,
-	    toolbarHTML: "$title",
 
             onregionschange: energUpdate,
             winDims: [250, 250],

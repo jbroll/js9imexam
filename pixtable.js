@@ -106,7 +106,6 @@
 	    help:     "imexam/imexam.html#pxtabl",
 
 	    toolbarSeparate: true,
-	    toolbarHTML: "$title",
 
             onmousemove: pxtablUpdate,
             winDims: [625, 240],

@@ -98,7 +98,6 @@
 	    help:     "imexam/3dplot.html",
 
 	    toolbarSeparate: true,
-	    toolbarHTML: "$title",
 
             onregionschange: pluginUpdate,
             winDims: [250, 250],

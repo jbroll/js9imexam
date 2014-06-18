@@ -64,7 +64,6 @@
 	    help:     "imexam/imexam.html#rgstat",
 
 	    toolbarSeparate: true,
-	    toolbarHTML: "$title",
 
             onregionschange: statUpdate,
             winDims: [250, 250],

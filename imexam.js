@@ -38,17 +38,15 @@ ndops.fill = typed(function (a, func) {
 
 
       exports.fixupDiv = function (plugin) {
-	var type   = plugin.winType;
-	var div    = plugin.divjq;
 
-	var opts = plugin.plugin.opts;
+	if ( plugin.winType === "div" ) {
+	    plugin.outerdivjq.find(".drag-handle").html(plugin.plugin.opts.winTitle);
 
-	if ( type === "div" ) {
-	    plugin.toolbar = div.parent().find(".JS9PluginToolbar-div");
+	    plugin.toolbar = plugin.outerdivjq.find(".JS9PluginToolbar-div");
 
 	    plugin.toolbar.css("cursor", "default");
-	    plugin.toolbar.css("text-align", "left");
 	    plugin.toolbar.css("right", 10);
+	    plugin.toolbar.css("text-align", "left");
 	}
       };
 

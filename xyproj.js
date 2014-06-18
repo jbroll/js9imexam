@@ -15,7 +15,7 @@
                         <option>avg</option>            \
                         <option>med</option>            \
 		 </select>				\
-		</div> $title";
+		</div>";
 
 
 		// <input type=checkbox class='proj_chek' name=fit><span style='width: 40px; float:right; text-align: left;'>fit</span>	\
