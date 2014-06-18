@@ -2,7 +2,7 @@
 JS9   = ../js9
 JS9JS = $(JS9)/plugins/imexam
 
-HTML  = js9Imexam.html js9imexam.html
+HTML  = js9Imexam1.html js9Imexam2.html
 
 HX    = 		\
 	regstat.html	\
