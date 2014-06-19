@@ -95,7 +95,7 @@
 
             menuItem: "3dPlot",
             winTitle: "3dPlot",
-	    help:     "imexam/3dplot.html",
+	    help:     "imexam/imexam.html#3dplot",
 
 	    toolbarSeparate: true,
 

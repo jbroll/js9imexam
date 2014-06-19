@@ -103,7 +103,6 @@
 
             menuItem: "Pixel Table",
             winTitle: "Pixel Table",
-	    help:     "imexam/imexam.html#pxtabl",
 
 	    toolbarSeparate: true,
 

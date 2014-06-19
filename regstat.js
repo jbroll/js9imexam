@@ -16,7 +16,7 @@
             <td align=right>height</td>         <td align=right>{reg.height%.2f}        </td></tr>      \
             <tr><td align=right>min</td>        <td align=right>{min%.2f}               </td>           \
             <td align=right>max</td>            <td align=right>{max%.2f}               </td></tr>      \
-            <tr><td align=right>Counts</td>     <td align=right colspan=3>{centroid.sum%.2f}</tr>       \
+            <tr><td align=right>counts</td>     <td align=right colspan=3>{centroid.sum%.2f}</tr>       \
             <tr><td align=right>bkgrnd</td>     <td align=right>{backgr.value%.2f}      </td>           \
             <td align=right>noise</td>          <td align=right>{backgr.noise%.2f}      </td></tr>      \
             <tr><td align=right>Centroid x</td> <td align=right>{centroid.cenx%.2f}     </td>           \

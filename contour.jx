@@ -6,7 +6,7 @@
 
 (function() {
       var imexam = require("./imexam");
-    //var conrec = require("./conrec");
+      var conrec = require("./conrec");
       var contfv = require("./contfv");
 
     function drawContours(div, display) {
@@ -145,7 +145,6 @@
 	    help:     "imexam/coutours.html",
 
 	    toolbarSeparate: true,
-	    toolbarHTML: "$title",
 
             winDims: [250, 250],
     });
