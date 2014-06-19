@@ -553,6 +553,10 @@ if (typeof exports !== "undefined") {
       for ( c=0; c < levels.length; c++ ) {
 	level = levels[c];
 
+	for ( ii=0; ii < xdim*ydim; ii++) {
+	  used[ii] = 0;
+	}
+
 	//  Search outer edges
 	//
 	//  Search top
