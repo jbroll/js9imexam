@@ -702,7 +702,7 @@ if (typeof exports !== "undefined") {
 
 },{}],3:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
-/*globals $, JS9, imexam */ 
+/*globals $, JS9, imexam, alert */ 
 
 "use strict";
 
@@ -713,7 +713,6 @@ if (typeof exports !== "undefined") {
       var contfv = require("./contfv");
 
     function drawContours(div, display) {
-	var i;
 	var im   = JS9.GetImage(display);
 	var form = $(div).find(".contour-form")[0];
 
@@ -722,6 +721,8 @@ if (typeof exports !== "undefined") {
 	var levelString = form.level.value;
 
 	var level = JSON.parse("[" + levelString.split(/\s+/).join(",") + "]");
+
+	var contours;
 
 	if ( false ) {
 	    var c      = new conrec.Conrec();
@@ -737,12 +738,13 @@ if (typeof exports !== "undefined") {
 	    }
 
 
-	    var contours = c.contourList().map(function(contour) {
+	    contours = c.contourList().map(function(contour) {
 		    return { shape: "polygon", pts: contour };
 		    });
 	} else {
-	    var contours = [];
 	    var points   = [];
+
+	    contours = [];
 
 	    contours.push({ shape: "polygon", pts: points });
 
@@ -849,7 +851,7 @@ if (typeof exports !== "undefined") {
 
 	    toolbarSeparate: true,
 
-            winDims: [250, 250],
+            winDims: [300, 300],
     });
 }());
 

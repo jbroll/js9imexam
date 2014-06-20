@@ -68,8 +68,7 @@
 		xdata[x] = [x, data[x]];
 	}
 
-	var plot = $.plot(div, [xdata], { zoomStack: true, selection: { mode: "xy" } });
-	//imexam.flot.zoomStack(plot);
+	$.plot(div, [xdata], { zoomStack: true, selection: { mode: "xy" } });
     }
 
     function projInit() {
