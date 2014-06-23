@@ -70,7 +70,9 @@
 
                 surf.set(j, i, (value-minvalue)/(range*2.25));
 
-                tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value.toFixed(2);
+                if ( value !== undefined ) {
+		    tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value.toFixed(2);
+		}
                 idx++;
             }
         }

@@ -7,9 +7,28 @@
 (function() {
     var imexam = require("./imexam");
 
+    var reghistemplate = "<div class='annotation' style='position:absolute;right: 10px;top:30px'> \
+                    <table> \
+                                    <tr><td>rms        </td><td align=right>{rms%.2f}</td><tr> \
+                                    <tr><td>mean       </td><td align=right>{mean%.2f}</td><tr> \
+                    </table> \
+                    </div>";
 
-    function histStats(div, data, range) {
-	console.log(range);
+    function histStats(div, plot, range) {
+        var i, j = 0;
+        var axes = plot.getAxes();
+
+    	var xmin = axes.xaxis.options.min;
+    	var xmax = axes.xaxis.options.max;
+	var hist = $(div).data("hist");
+ 	var data = hist.raw;
+
+	var rms  = imexam.ndops.rmsClipped( data, xmin, xmax);
+	var mean = imexam.ndops.meanClipped(data, xmin, xmax);
+
+	$(div).find(".annotation").empty();
+
+	$(div).append(imexam.template(reghistemplate, { rms: rms, mean: mean }));
     }
 
     function histUpdate(im, xreg) {
@@ -19,6 +38,8 @@
 
             var hist    = imexam.ndops.hist(imag);
             hist.sum    = imexam.ndops.sum(hist.data);
+
+	    $(div).data("hist", hist);
 
             var n = 0;
             var skip = hist.sum * 0.001;
@@ -32,17 +53,20 @@
                 n += hist.data.get(i);
 
                 if ( n > skip &&  n < hist.sum - skip ) { 
-		    value = hist.data.get(h);
+		    value = hist.data.get(i);
 
 		    hdata[h] = [i*hist.width+hist.min, value];
 		    h++;
 		}
             }
-	    
-	    histStats(div, hist);
 
-            var plot = $.plot(div, [hdata], { selection: { mode: "x" } });
-	    imexam.flot.zoomStack(plot, function(plot, range) { histStats(div, hist, range); });
+            var plot = $.plot(div, [hdata], { zoomStack: true, zoomFunc: histStats, selection: { mode: "x" } });
+
+	    histStats(div, plot, undefined);
+
+//	    $.plot.zoomStackIn(plot, undefined, { xaxis: { from: xmin 		, to: xmax }
+//		    				, yaxis: { from: axes.yaxis.min , to: axes.yaxis.max } }
+//					, histStats);
     }
 
     function histInit() {

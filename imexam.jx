@@ -138,6 +138,8 @@ ndops.hist = function(a, width, min, max) {
         width = Math.max(1, (max-min) / 250);
     }
 
+    hist.raw   = a;
+
     hist.min   = min;
     hist.max   = max;
     hist.width = width;
@@ -311,6 +313,36 @@ ndops.rms = typed(function (a) {
     var mean = sum/a.size;
 
     return Math.sqrt((squ - 2*mean*sum + a.size*mean*mean)/(a.size-1));
+});
+
+ndops.rmsClipped = typed(function (a, min, max) {
+    var n = 0;
+    var sum = 0;
+    var squ = 0;
+    // ----
+	if ( (min === null || a > min) && (max === null || a < max) ) {
+	    n++;
+	    sum +=   a;
+	    squ += a*a;
+	}
+    // ----
+
+    var mean = sum/n;
+
+    return Math.sqrt((squ - 2*mean*sum + n*mean*mean)/(n-1));
+});
+
+ndops.meanClipped = typed(function (a, min, max) {
+    var n = 0;
+    var sum = 0;
+    // ----
+	if ( (min === null || a > min) && (max === null || a < max) ) {
+	    n++;
+	    sum +=   a;
+	}
+    // ----
+
+    return sum/n;
 });
 
 imops.backgr = function(data, width) {

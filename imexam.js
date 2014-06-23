@@ -139,6 +139,8 @@ ndops.hist = function(a, width, min, max) {
         width = Math.max(1, (max-min) / 250);
     }
 
+    hist.raw   = a;
+
     hist.min   = min;
     hist.max   = max;
     hist.width = width;
@@ -181,7 +183,7 @@ ndops.proj = function(a, axis) {
 };
 
 ndops.qcenter = typed(function (a) {
-	var start, end;
+	var start = [], end = [];
 	var max = Number.MIN_VALUE;
 	var idx;
 	var iX = 0, iY = 0;
@@ -312,6 +314,36 @@ ndops.rms = typed(function (a) {
     var mean = sum/a.size;
 
     return Math.sqrt((squ - 2*mean*sum + a.size*mean*mean)/(a.size-1));
+});
+
+ndops.rmsClipped = typed(function (a, min, max) {
+    var n = 0;
+    var sum = 0;
+    var squ = 0;
+    // ----
+	if ( (min === null || a > min) && (max === null || a < max) ) {
+	    n++;
+	    sum +=   a;
+	    squ += a*a;
+	}
+    // ----
+
+    var mean = sum/n;
+
+    return Math.sqrt((squ - 2*mean*sum + n*mean*mean)/(n-1));
+});
+
+ndops.meanClipped = typed(function (a, min, max) {
+    var n = 0;
+    var sum = 0;
+    // ----
+	if ( (min === null || a > min) && (max === null || a < max) ) {
+	    n++;
+	    sum +=   a;
+	}
+    // ----
+
+    return sum/n;
 });
 
 imops.backgr = function(data, width) {
@@ -540,9 +572,9 @@ exports.getRegionData = function (im, xreg) {
     return imag;
 };
 
-exports.convolve1d = typed(function(kernal, data, output) {
-    var i, j, x
-    var half = Math.round(kernal.shape[0]/2.0);
+exports.convolve1d = typed(function(kernel, data, output) {
+    var i, j, x;
+    var half = Math.round(kernel.shape[0]/2.0);
 
     for ( i = 0; i < data.shape[0]; i++ ) {
 	for ( j = 0; j < kernel.shape[0]; j++ ) {
@@ -555,12 +587,14 @@ exports.convolve1d = typed(function(kernal, data, output) {
     }
 });
 
-exports.convolve2dSep = function(kernal, data, output) {
+exports.convolve2dSep = function(kernel, data, output) {
     var x, y, i, xx, yy; 
 
-    var nx =   data.shape[1]
-    var ny =   data.shape[0]
-    var nk = kernal.shape[0]
+    var nx =   data.shape[1];
+    var ny =   data.shape[0];
+    var nk = kernel.shape[0];
+
+    var half = Math.floor(nk/2.0);
 
     // Run the kernel 1d over each row
     //
@@ -572,7 +606,7 @@ exports.convolve2dSep = function(kernal, data, output) {
 		xx = x+i-half;
 
 		if ( xx > 0 && xx < nx ) {
-		    output[y][x] += data[y][xx]*kernel[i]
+		    output[y][x] += data[y][xx]*kernel[i];
 		}
 	    }
 	}
@@ -587,12 +621,12 @@ exports.convolve2dSep = function(kernal, data, output) {
 		yy = y+i-half;
 
 		if ( yy > 0 && yy < ny ) {
-		    output[y][x] += data[y+i][x]*kernel[i]
+		    output[y][x] += data[y+i][x]*kernel[i];
 		}
 	    }
 	}
     }
-}
+};
 
 
 exports.reg2section = reg2section;
@@ -848,7 +882,7 @@ module.exports=require('Ll8vMw');
 	var func;
 
 	for ( i = 0; i < args.length; i++ ) {
-	    if ( actuals[i] !== undefined && typeof actuals[i] === "object"
+	    if ( actuals[i] !== null && actuals[i] !== undefined && typeof actuals[i] === "object"
 	     && (opts.consider === undefined || ( typeof opts.consider === "object" && opts.consider[args[i]] !== false )) ) {
 
 		hash[args[i]] = actuals[i];

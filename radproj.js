@@ -57,8 +57,7 @@
 
             $(div).empty();
             var plot = $.plot(div, [{ data: rdata, points: { radius: 1, show: true } }, { data: rfdat }]
-		    , { selection: { mode: "xy" } });
-	    imexam.flot.zoomStack(plot);
+		    , { zoomStack: true, selection: { mode: "xy" } });
 
             $(div).append(imexam.template(rproj_template, fitv));
 
