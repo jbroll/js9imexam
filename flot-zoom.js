@@ -29,7 +29,7 @@
 
 	$(div).find(".zoomout").css("visibility", "visible");
 
-	if ( func !== undefined ) { func(plot, r); }
+	if ( func !== undefined ) { func(div, plot, r); }
     }
 
     function zoomStackOut(plot, func) {
@@ -50,10 +50,11 @@
 	plot.setupGrid();
 	plot.draw();
 
-	if ( func !== undefined ) { func(plot, r); }
+	if ( func !== undefined ) { func(div, plot, r); }
     }
 
-    var enabled = 0;
+    var enabled  = 0;
+    var zoomFunc = undefined;
 
     function zoomStack(plot, ctx) {
 	if ( enabled ) {
@@ -63,8 +64,10 @@
 	    $(div).append("<div style='position:relative'><div style='z-index:100;position:absolute;right:12;top:12;z-index:2'>		\
 		    <image class='zoomout'  src=plugins/imexam/4arrow.png></div></div>");
 
-	    $(div).bind("plotselected", function (event, ranges) { zoomStackIn (plot, event, ranges, options.zoomFunc); });
-	    $(div).find(".zoomout").click(function ()            { zoomStackOut(plot, options.zoomFunc); });
+	    var func = zoomFunc;
+
+	    $(div).bind("plotselected", function (event, ranges) { zoomStackIn (plot, event, ranges, func); });
+	    $(div).find(".zoomout").click(function ()            { zoomStackOut(plot, func); });
 
 	    $(div).find(".zoomout").css("visibility", "hidden");
 
@@ -74,7 +77,8 @@
 
     function zoomOptions(plot, options) {
 	if ( options.zoomStack ) {
-	    enabled = 1;
+	    enabled  = 1;
+	    zoomFunc = options.zoomFunc;
 	    plot.hooks.drawOverlay.push(zoomStack);
 	}
     }
@@ -88,6 +92,7 @@
 	, zoomFunc: undefined
     };
 
+    $.plot.zoomStackIn = zoomStackIn;
     $.plot.plugins.push({ init: init, options: options, name: "zoomStack", version: 0.1 });
 }($));
 
