@@ -635,10 +635,9 @@ exports.template = template;
 exports.ndops    = ndops;
 exports.typed    = ndops;
 exports.imops    = imops;
-exports.flot     = require("./zoom");
 
 
-},{"./mask.js":3,"./template":11,"./zoom":12,"typed-array-function":4,"typed-array-ops":5,"typed-array-rotate":6,"typed-numeric-uncmin":9}],"./imexam":[function(require,module,exports){
+},{"./mask.js":3,"./template":11,"typed-array-function":4,"typed-array-ops":5,"typed-array-rotate":6,"typed-numeric-uncmin":9}],"./imexam":[function(require,module,exports){
 module.exports=require('Ll8vMw');
 },{}],3:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
@@ -1082,16 +1081,9 @@ module.exports=require('Ll8vMw');
 
 
     function typedArrayFunctionExecute() {
-	var func = typedArrayFunctionConstructor.apply(this, arguments);
+	var func  = typedArrayFunctionConstructor.apply(this, arguments);
 
-	try {
-	    var reply = func.apply(typed, arguments);
-	} catch (e) {
-	    console.log(typeof func, func)
-	    console.log(arguments)
-	    console.log(e)
-	    reply = undefined;
-	}
+	var reply = func.apply(typed, arguments);
 
 	return reply;
     }
@@ -1223,7 +1215,7 @@ module.exports=require('Ll8vMw');
 }());
 
 
-},{"ndarray-nobuffer":14}],5:[function(require,module,exports){
+},{"ndarray-nobuffer":13}],5:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true */
 /*globals */ 
 
@@ -1538,7 +1530,7 @@ module.exports = function warp(dest, src, func) {
   return dest;
 };
 
-},{"ndarray-linear-interpolate":13,"typed-array-function":4}],8:[function(require,module,exports){
+},{"ndarray-linear-interpolate":12,"typed-array-function":4}],8:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true, bitwise: true */
 /*jshint node: true, -W099: true, laxbreak:true, laxcomma:true, multistr:true, smarttabs:true */
 /*globals */ 
@@ -2007,77 +1999,6 @@ function template(text,data) {
 module.exports = template;
 
 },{}],12:[function(require,module,exports){
-/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
-/*globals $, JS9 */ 
-
-"use strict";
-
-
-(function() {
-    function zoomStackIn(plot, event, ranges, func) {
-	var axes = plot.getAxes();
-	var div  = plot.getPlaceholder();
-
-	var r = {};
-	r.xmin = axes.xaxis.min;
-	r.xmax = axes.xaxis.max;
-	r.ymin = axes.yaxis.min;
-	r.ymax = axes.yaxis.max;
-
-	plot.stack.push(r);
-
-	axes.xaxis.options.min = ranges.xaxis.from;
-	axes.xaxis.options.max = ranges.xaxis.to;
-	axes.yaxis.options.min = ranges.yaxis.from;
-	axes.yaxis.options.max = ranges.yaxis.to;
-
-	plot.clearSelection(true);
-
-	plot.setupGrid();
-	plot.draw();
-
-	$(div).find(".zoomout").css("visibility", "visible");
-
-	if ( func !== undefined ) { func(plot, r); }
-    }
-
-    function zoomStackOut(plot, func) {
-	var r    = plot.stack.pop();
-	var div  = plot.getPlaceholder();
-
-	if (  plot.stack.length === 0 ) {
-	    $(div).find(".zoomout").css("visibility", "hidden");
-	}
-
-	plot.getAxes().xaxis.options.min = r.xmin;
-	plot.getAxes().xaxis.options.max = r.xmax;
-	plot.getAxes().yaxis.options.min = r.ymin;
-	plot.getAxes().yaxis.options.max = r.ymax;
-
-	plot.clearSelection(true);
-
-	plot.setupGrid();
-	plot.draw();
-
-	if ( func !== undefined ) { func(plot, r); }
-    }
-
-    exports.zoomStack = function (plot, func) {
-	plot.stack = [];
-	var div = plot.getPlaceholder();
-
-	$(div).append("<div style='position:relative'><div style='position:absolute;right:12;top:12;z-index:2'>		\
-		<image class='zoomout'  src=plugins/imexam/4arrow.png></div></div>");
-
-	$(div).bind("plotselected", function (event, ranges) { zoomStackIn (plot, event, ranges, func); });
-	$(div).find(".zoomout").click(function ()            { zoomStackOut(plot, func); });
-
-	$(div).find(".zoomout").css("visibility", "hidden");
-    };
-}());
-
-
-},{}],13:[function(require,module,exports){
 "use strict"
 
 function interp1d(arr, x) {
@@ -2188,7 +2109,7 @@ module.exports.d1 = interp1d
 module.exports.d2 = interp2d
 module.exports.d3 = interp3d
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict"
 
 var iota = require("iota-array")
@@ -2579,7 +2500,7 @@ function wrappedNDArrayCtor(data, shape, stride, offset) {
 
 module.exports = wrappedNDArrayCtor
 
-},{"iota-array":15}],15:[function(require,module,exports){
+},{"iota-array":14}],14:[function(require,module,exports){
 "use strict"
 
 function iota(n) {
