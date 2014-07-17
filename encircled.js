@@ -44,7 +44,6 @@
             $(div).empty();
 	    var plot = $.plot(div, [edata]
 		    , { selection: { mode: "xy" } });
-	    imexam.flot.zoomStack(plot);
 
 	    $(div).append(imexam.template(encen_template, stat));
     }
