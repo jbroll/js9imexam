@@ -34,7 +34,7 @@
 	var t = "<table cellpadding=0 cellspacing=0>";
 
 	t      += strrep( "<tr>"
-		+ strrep("<td ><input class='col%x row%y' type=entry size=7 name=cell%y.%x value=0></td>", x, "%x") 
+		+ strrep("<td ><input class='col%x row%y' type=entry size=6 name=cell%y.%x value=0></td>", x, "%x") 
 		+ "</tr>\n", y, "%y");
 	t    += "</table>";
 

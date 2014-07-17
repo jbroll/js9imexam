@@ -28,7 +28,7 @@ ndops.zeros   = function zeros(shape, Type) {
 };
 
 ndops.fill = typed(function (a, func) {
-    var index = 0;
+    var index = [];
     // ----
 	a = func.apply(undefined, index);
 });

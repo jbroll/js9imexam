@@ -34,7 +34,6 @@
             var fit = imexam.ndops.gsfit1d(rproj.radi, rproj.data, [max, centroid.fwhm/2.355, backgr]);
 	
             var fitv = { a: fit[0], b: 0, c: fit[1], d: fit[2] };
-            //var fitv = { a: fit[0], b: fit[1], c: fit[2], d: fit[3] };
 
             var rdata = [];
             var rfdat = [];
@@ -60,9 +59,6 @@
 		    , { zoomStack: true, selection: { mode: "xy" } });
 
             $(div).append(imexam.template(rproj_template, fitv));
-
-
-
     }
 
     function rprojInit() {

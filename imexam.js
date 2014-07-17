@@ -29,7 +29,7 @@ ndops.zeros   = function zeros(shape, Type) {
 };
 
 ndops.fill = typed(function (a, func) {
-    var index = 0;
+    var index = [];
     // ----
 	a = func.apply(undefined, index);
 });
@@ -1070,12 +1070,12 @@ module.exports=require('Ll8vMw');
 	func += "// " + type + "\n";
 	func += "return function (" + args.join(",") + ") {\n'use strict';\n\n" + init + prep + setp + body + post + "\n}";
 
-	if ( this.cache       === undefined ) { this.cache = {}; }
-	if ( this.cache[type] === undefined ) {
-	     if ( typed.debug ) { console.log(func); }
-	     func = new Function(func)();
-	     this.cache[type] = func;
-	}
+	if ( typed.debug ) { console.log(func); }
+
+	if ( this.cache === undefined ) { this.cache = {}; }
+
+	func = new Function(func)();
+	this.cache[type] = func;
 
 	return func;
     }
@@ -1084,7 +1084,16 @@ module.exports=require('Ll8vMw');
     function typedArrayFunctionExecute() {
 	var func = typedArrayFunctionConstructor.apply(this, arguments);
 
-	return func.apply(typed, arguments);
+	try {
+	    var reply = func.apply(typed, arguments);
+	} catch (e) {
+	    console.log(typeof func, func)
+	    console.log(arguments)
+	    console.log(e)
+	    reply = undefined;
+	}
+
+	return reply;
     }
 
     function typed(opts, func) {
