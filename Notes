@@ -6,8 +6,8 @@
  * Standard plugin help button + help text for each plugin
     Important : Gets help standard in place before release.
 
- o Standard plugin "pin/unpin" button
-    Important : Allows comparison of data analyses from two parts of the image. 
+ o Multiple instanciations of the same plugin
+    o Standard plugin "pin/unpin" button
 
  o Fix counts in region for each shape.
    Important : Least surprise to user. 
@@ -21,13 +21,21 @@
  * X, Y projection
     o Add gausain fit.
 
- o Contour plugin.
+ * Histogram
+    * stats
+    * update stats on horizontal selection
+    o Add gausain fit.
+
+
+ * Contour plugin.
    Important : Shows use of plugin controlling regions on image.
 
  * Mask and ImCnts
     * Fix circle drawing aspect ratio.
     o Force monospaced font
 	
+
+ o Backside plugin parameters page
 
  o ImCalc
 	Use typedArrayFunction 
@@ -51,10 +59,6 @@
 
 
  o HxRG Pix Stack - Test
-
- o Histogram
-	o stats
-	o stats on horizontal selection
 
  * Graphs
 	* Zoom stack
