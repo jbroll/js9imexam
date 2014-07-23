@@ -49,6 +49,7 @@
 	    var i = 0, j = 0;
 	    var x, y;
 
+
 	    var pxtabl = $(this.div).find(".pxtabl")[0];
 
 	    pxtabl["cell" + j + "." + i].value = "col\\row";
@@ -77,8 +78,8 @@
 
 	    for ( j = 1; j < 10; j++ ) {
 	    for ( i = 1; i < 10; i++ ) {
-		x = point.x + i - 5 - 1;
-		y = point.y + j - 5 - 1;
+		x = (point.x + i - 5 - 0.5)|0;
+		y = (point.y + j - 5 - 0.5)|0;
 
 		if ( x >= 0 && x < im.raw.width && y >= 0 && y < im.raw.height ) {
 		    pxtabl["cell" + (10-j) + "." + i].value = im_2d.get(y, x).toPrecision(4);
