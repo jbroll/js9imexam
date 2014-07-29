@@ -67,7 +67,7 @@
 	    var func = zoomFunc;
 
 	    $(div).bind("plotselected", function (event, ranges) { zoomStackIn (plot, event, ranges, func); });
-	    $(div).find(".zoomout").click(function ()            { zoomStackOut(plot, func); });
+	    $(div).find(".zoomout").on("mouseup", function ()            { zoomStackOut(plot, func); });
 
 	    $(div).find(".zoomout").css("visibility", "hidden");
 
