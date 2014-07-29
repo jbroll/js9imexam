@@ -112,8 +112,8 @@
 	    </form>';
 
 	//var display = this.display;
-	//$(div).find(".run-imcnts").click(function ()  { runImCnts (div, display); });
-	//$(div).find(".get-regions").click(function () { getRegions(div, display); });
+	//$(div).find(".run-imcnts").on("mouseup", function ()  { runImCnts (div, display); });
+	//$(div).find(".get-regions").on("mouseup", function () { getRegions(div, display); });
 
 	imexam.fixupDiv(this);
     }

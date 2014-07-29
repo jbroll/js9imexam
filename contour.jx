@@ -16,52 +16,60 @@
 	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 
 	var levelString = form.level.value;
+	var quality	= $(form).find("input[type=radio]:checked").val();
 
 	var level = JSON.parse("[" + levelString.split(/\s+/).join(",") + "]");
 
 	var contours;
 
-	if ( false ) {
-	    var c      = new conrec.Conrec();
-
+	JS9.waiting(true);
+	setTimeout(function() {
 	    try {
-		c.contour(data
-			, 0, data.shape[0]-1, 0, data.shape[1]-1
-			, imexam.ndops.iota(1, data.shape[0]), imexam.ndops.iota(1, data.shape[1])
-			, level.length, level);
-	    } catch (e) {
-		alert("Too many coutour segments: Check your coutour levels.\n\nAre you trying to coutour the background levels of an image?");
-		return;
-	    }
 
+		if ( quality === "better" ) {
+		    var c      = new conrec.Conrec();
 
-	    contours = c.contourList().map(function(contour) {
-		    return { shape: "polygon", pts: contour };
-		    });
-	} else {
-	    var points   = [];
-
-	    contours = [];
-
-	    contours.push({ shape: "polygon", pts: points });
-
-	    contfv(level, data.shape[0], data.shape[1], data.data
-		, function(x, y, level) {
-		    if ( level === undefined ) {
-			points = [];
-			contours.push({ shape: "polygon", pts: points });
-		    } else {
-			points.push({ x: x+0.5, y: y+0.5 });
+		    try {
+			c.contour(data
+				, 0, data.shape[0]-1, 0, data.shape[1]-1
+				, imexam.ndops.iota(1, data.shape[0]), imexam.ndops.iota(1, data.shape[1])
+				, level.length, level);
+		    } catch (e) {
+			alert("Too many coutour segments: Check your coutour levels.\n\nAre you trying to coutour the background levels of an image?");
+			return;
 		    }
-		  });
-	}
 
-	contours.length = contours.length-1;
+		    contours = c.contourList().map(function(contour) {
+			    return { shape: "polygon", pts: contour };
+			    });
+		} else {
+		    var points   = [];
 
+		    contours = [];
 
-	JS9.NewShapeLayer(im, "contour", JS9.Catalogs.opts);
-	JS9.RemoveShapes(im, "contour");
-	JS9.AddShapes(im, "contour", contours, {color: "yellow"});
+		    contours.push({ shape: "polygon", pts: points });
+
+		    contfv(level, data.shape[0], data.shape[1], data.data
+			, function(x, y, level) {
+			    if ( level === undefined ) {
+				points = [];
+				contours.push({ shape: "polygon", pts: points });
+			    } else {
+				points.push({ x: x+0.5, y: y+0.5 });
+			    }
+			  });
+		}
+
+		contours.length = contours.length-1;
+
+		JS9.NewShapeLayer(im, "contour", JS9.Catalogs.opts);
+		JS9.RemoveShapes(im, "contour");
+		JS9.AddShapes(im, "contour", contours, {color: "yellow"});
+	    }
+	    finally {
+		JS9.waiting(false);
+	    }
+	}, 200);
     }
 
     function getMinMax(div, display) {
@@ -116,9 +124,14 @@
 	           <tr>	<td>Max</td>									\
 			<td><input type=text name=max size=10></td></tr>				\
 	           <tr>	<td valign=top>Levels:</td>							\
-	    		<td><textarea type=textarea rows=12 cols=10 name=level class="contour-levels">	\
+	    		<td rowspan=2><textarea type=textarea rows=12 cols=10 name=level class="contour-levels">	\
 			    </textarea>									\
 		       	<td valign=top><input type=button value="Make Levels" class="make-levels"></td>	\
+		   </tr>										\
+		   <tr>	<td></td><td align=center valign=top><br>Quality:				\
+				<br>&nbsp;<input type=radio name=quality value=faster checked>Faster		\
+				<br>&nbsp;<input type=radio name=quality value=better>Better		\
+			</td>										\
 		   </tr>										\
 	    </table>											\
 	    <p>												\
@@ -126,9 +139,9 @@
 
 	var display = this.display;
 
-	$(div).find(".drw-contour").click(function () { drawContours(div, display); });
-	$(div).find(".get-min-max").click(function () { getMinMax(div, display); });
-	$(div).find(".make-levels").click(function () { makeLevel(div, display); });
+	$(div).find(".drw-contour").on("mouseup", function () { drawContours(div, display); });
+	$(div).find(".get-min-max").on("mouseup", function () { getMinMax(div, display); });
+	$(div).find(".make-levels").on("mouseup", function () { makeLevel(div, display); });
 
 
 	if ( im !== undefined ) {
