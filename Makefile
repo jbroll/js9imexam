@@ -64,9 +64,11 @@ imexam.html : $(HX)
 3dplot.js: 3dplot.jx ./JSSurfacePlot-V1.7/javascript/SurfacePlot.js ./JSSurfacePlot-V1.7/javascript/ColourGradient.js
 	browserify -u imexam.js 3dplot.jx > 3dplot.js
 	echo "" >> 3dplot.js
+	echo "" >> contour.js
 
 contour.js : contour.jx contfv.js conrec.js regions.js
 	browserify -u imexam.js contour.jx > contour.js
+	echo "" >> contour.js
 	echo "" >> contour.js
 
 

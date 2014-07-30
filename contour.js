@@ -721,7 +721,7 @@ if (typeof exports !== "undefined") {
 	var levelString = form.level.value;
 	var quality	= $(form).find("input[type=radio]:checked").val();
 
-	var level = JSON.parse("[" + levelString.split(/\s+/).join(",") + "]");
+	var level = JSON.parse("[" + levelString.trim().split(/\s+/).join(",") + "]");
 
 	var contours;
 
@@ -747,23 +747,25 @@ if (typeof exports !== "undefined") {
 			    });
 		} else {
 		    var points   = [];
-
-		    contours = [];
+		        contours = [];
 
 		    contours.push({ shape: "polygon", pts: points });
 
 		    contfv(level, data.shape[0], data.shape[1], data.data
 			, function(x, y, level) {
 			    if ( level === undefined ) {
+//console.log("")
 				points = [];
 				contours.push({ shape: "polygon", pts: points });
 			    } else {
+//console.log(level, x+0.5, y+0.5)
 				points.push({ x: x+0.5, y: y+0.5 });
 			    }
 			  });
 		}
 
 		contours.length = contours.length-1;
+
 
 		JS9.NewShapeLayer(im, "contour", JS9.Catalogs.opts);
 		JS9.RemoveShapes(im, "contour");
@@ -870,3 +872,4 @@ if (typeof exports !== "undefined") {
 
 
 },{"./conrec":1,"./contfv":2}]},{},[3])
+
