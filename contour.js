@@ -1,4 +1,82 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, bitwise: true */
+/*globals $, JS9, imexam, alert */ 
+
+
+(function() {
+    "use strict";
+
+    var imexam = require("./imexam");
+
+    exports.bin1d = imexam.typed(function (data, n) {
+	    
+		var shape = imexam.typed.clone(data.shape).map(function(x) { return (x/n+0.5)|0; });
+		var reply = imexam.typed.array(data.type, shape);
+		var iX = 0;
+
+		// ----
+		    reply[(iX/n)|0] += data;
+		// ----
+
+		return reply;
+	    });
+
+    exports.bin2d = imexam.typed(function (data, n) {
+	    
+		var shape = imexam.typed.clone(data.shape).map(function(x) { return (x/n+0.5)|0; });
+		var reply = imexam.typed.array(data.type, shape);
+		var iX = 0;
+		var iY = 0;
+
+		// ----
+		    reply[(iX/n)|0][(iY/n)|0] += data;
+		// ----
+
+		return reply;
+	    });
+
+    exports.smooth_gaussian2d = function(data, sigma) {
+	var xdat = imexam.typed.array("float32", data.shape);
+	var ydat = imexam.typed.array("float32", data.shape);
+
+	var kern = imexam.ndops.gauss1d(imexam.ndops.iota(10), [.0, sigma, 0.0]);
+	var i, j, k;
+
+	for ( i = 0; i < kern.shape[0]; i++ ) {
+	    if ( kern[i] < 0.001 ) { 
+		break;
+	    }
+	}
+	kern.length = i-1;					// Clip
+	kern = imexam.typed.clone(kern).reverse().concat(kern);	// Dup
+
+	kern = imexam.typed.div(kern, imexam.typed.sum(kern));		// Normalize
+
+	for ( j = 0; j < data.shape[0]; j++ ) {
+	    for ( i = 0; i < data.shape[1]; i++ ) {
+		for ( k = 0; kern.shape[0]; k++ ) {
+		    if ( j + k < data.shape[1] ) {
+			xdat[i][j] += kern[k] * data[i][j+k];
+		    }
+		}
+	    }
+	}
+	for ( j = 0; j < data.shape[0]; j++ ) {
+	    for ( i = 0; i < data.shape[1]; i++ ) {
+		for ( k = 0; kern.shape[0]; k++ ) {
+		    if ( i + k < data.shape[1] ) {
+			ydat[i][j] += kern[k] * xdat[i+k][j];
+		    }
+		}
+	    }
+	}
+
+	return ydat;
+    };
+
+}());
+
+},{}],2:[function(require,module,exports){
 /**
  * Copyright (c) 2010, Jason Davies.
  *
@@ -527,7 +605,7 @@ if (typeof exports !== "undefined") {
   exports.Conrec = Conrec;
 }
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true, evil: true, regexp: true, bitwise: true */
 /*globals typed, Int8Array */
 
@@ -700,23 +778,28 @@ if (typeof exports !== "undefined") {
 }());
 
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
 /*globals $, JS9, imexam, alert */ 
 
-"use strict";
-
 
 (function() {
+    "use strict";
+
       var imexam = require("./imexam");
       var conrec = require("./conrec");
       var contfv = require("./contfv");
+
+      var binner = require("./bin");
+
 
     function drawContours(div, display) {
 	var im   = JS9.GetImage(display);
 	var form = $(div).find(".contour-form")[0];
 
 	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+
+	data = binner.smooth_gaussian2d(data);
 
 	var levelString = form.level.value;
 	var quality	= $(form).find("input[type=radio]:checked").val();
@@ -754,18 +837,15 @@ if (typeof exports !== "undefined") {
 		    contfv(level, data.shape[0], data.shape[1], data.data
 			, function(x, y, level) {
 			    if ( level === undefined ) {
-//console.log("")
 				points = [];
 				contours.push({ shape: "polygon", pts: points });
 			    } else {
-//console.log(level, x+0.5, y+0.5)
 				points.push({ x: x+0.5, y: y+0.5 });
 			    }
 			  });
 		}
 
 		contours.length = contours.length-1;
-
 
 		JS9.NewShapeLayer(im, "contour", JS9.Catalogs.opts);
 		JS9.RemoveShapes(im, "contour");
@@ -857,6 +937,7 @@ if (typeof exports !== "undefined") {
 	imexam.fixupDiv(this);
     }
 
+console.log("Here")
     JS9.RegisterPlugin("ImExam", "Contours", contInit, {
 	    menu: "view",
 
@@ -871,5 +952,5 @@ if (typeof exports !== "undefined") {
 }());
 
 
-},{"./conrec":1,"./contfv":2}]},{},[3])
+},{"./bin":1,"./conrec":2,"./contfv":3}]},{},[4])
 

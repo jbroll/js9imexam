@@ -1,19 +1,24 @@
 /*jslint white: true, vars: true, plusplus: true, nomen: true, unparam: true */
 /*globals $, JS9, imexam, alert */ 
 
-"use strict";
-
 
 (function() {
+    "use strict";
+
       var imexam = require("./imexam");
       var conrec = require("./conrec");
       var contfv = require("./contfv");
+
+      var binner = require("./bin");
+
 
     function drawContours(div, display) {
 	var im   = JS9.GetImage(display);
 	var form = $(div).find(".contour-form")[0];
 
 	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
+
+	data = binner.smooth_gaussian2d(data);
 
 	var levelString = form.level.value;
 	var quality	= $(form).find("input[type=radio]:checked").val();
@@ -51,11 +56,9 @@
 		    contfv(level, data.shape[0], data.shape[1], data.data
 			, function(x, y, level) {
 			    if ( level === undefined ) {
-//console.log("")
 				points = [];
 				contours.push({ shape: "polygon", pts: points });
 			    } else {
-//console.log(level, x+0.5, y+0.5)
 				points.push({ x: x+0.5, y: y+0.5 });
 			    }
 			  });
@@ -153,6 +156,7 @@
 	imexam.fixupDiv(this);
     }
 
+console.log("Here")
     JS9.RegisterPlugin("ImExam", "Contours", contInit, {
 	    menu: "view",
 

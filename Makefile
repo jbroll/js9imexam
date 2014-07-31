@@ -66,7 +66,7 @@ imexam.html : $(HX)
 	echo "" >> 3dplot.js
 	echo "" >> contour.js
 
-contour.js : contour.jx contfv.js conrec.js regions.js
+contour.js : contour.jx contfv.js conrec.js regions.js bin.js
 	browserify -u imexam.js contour.jx > contour.js
 	echo "" >> contour.js
 	echo "" >> contour.js

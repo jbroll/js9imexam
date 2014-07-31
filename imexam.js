@@ -469,7 +469,7 @@ ndops.indexof = function(a, x) {
 };
 
 ndops.gauss1d = function(radi, x0) {
-    var reply = ndops.zeros(radi.shape);
+    var reply = ndops.zeros(radi.shape || [radi.length]);
 
     var a = x0[0];
     var b = 0; 		// x0[1];
