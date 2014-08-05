@@ -18,12 +18,23 @@
 
 	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 
-	data = binner.smooth_gaussian2d(data);
-
 	var levelString = form.level.value;
+	var binning	= $(form).find("#binning").val();;
+	var smooth	= $(form).find("#smooth").val();;
 	var quality	= $(form).find("input[type=radio]:checked").val();
 
-	var level = JSON.parse("[" + levelString.trim().split(/\s+/).join(",") + "]");
+
+	if ( binning === "None" ) {
+	    binning = 1;
+	} else {
+	    data = binner.bin2d(data, parseInt(binning));
+	}
+
+	var level = JSON.parse("[" + levelString.trim().split(/\s+/).join(",") + "]").map(function(x) { return x*binning*binning; });
+	
+	if ( smooth !== "None" ) {
+	    data = binner.smooth_gaussian2d(data, parseFloat(smooth));
+	}
 
 	var contours;
 
@@ -37,7 +48,8 @@
 		    try {
 			c.contour(data
 				, 0, data.shape[0]-1, 0, data.shape[1]-1
-				, imexam.ndops.iota(1, data.shape[0]), imexam.ndops.iota(1, data.shape[1])
+				, imexam.ndops.iota(1, data.shape[0]).map(function(x) { return x*binning-binning/2+0.5 })
+				, imexam.ndops.iota(1, data.shape[1]).map(function(x) { return x*binning-binning/2+0.5 })
 				, level.length, level);
 		    } catch (e) {
 			alert("Too many coutour segments: Check your coutour levels.\n\nAre you trying to coutour the background levels of an image?");
@@ -59,7 +71,7 @@
 				points = [];
 				contours.push({ shape: "polygon", pts: points });
 			    } else {
-				points.push({ x: x+0.5, y: y+0.5 });
+				points.push({ x: x*binning+0.5, y: y*binning+0.5 });
 			    }
 			  });
 		}
@@ -128,12 +140,36 @@
 	           <tr>	<td>Max</td>									\
 			<td><input type=text name=max size=10></td></tr>				\
 	           <tr>	<td valign=top>Levels:</td>							\
-	    		<td rowspan=2><textarea type=textarea rows=12 cols=10 name=level class="contour-levels">	\
+	    		<td rowspan=5><textarea type=textarea rows=12 cols=10 name=level class="contour-levels">	\
 			    </textarea>									\
 		       	<td valign=top><input type=button value="Make Levels" class="make-levels"></td>	\
 		   </tr>										\
+		   <tr><td><br></td></tr>										\
+		   <tr>	<td></td><td align=center valign=top>						\
+				Binning									\
+				<select id=binning name=binpix>						\
+				<option>None</option>							\
+				<option>2</option>							\
+				<option>3</option>							\
+				<option>4</option>							\
+				<option>5</option>							\
+				</select>								\
+				pix									\
+			</td>										\
+		   </tr>										\
+		   <tr>	<td></td><td align=center valign=top>						\
+				Smooth									\
+				<select id=smooth name=smopix>						\
+				<option>None</option>							\
+				<option value=0.75>3</option>							\
+				<option value=1.00>5</option>							\
+				<option value=1.25>7</option>							\
+				</select>								\
+				pix									\
+			</td>										\
+		   </tr>										\
 		   <tr>	<td></td><td align=center valign=top><br>Quality:				\
-				<br>&nbsp;<input type=radio name=quality value=faster checked>Faster		\
+				<br>&nbsp;<input type=radio name=quality value=faster checked>Faster	\
 				<br>&nbsp;<input type=radio name=quality value=better>Better		\
 			</td>										\
 		   </tr>										\
@@ -156,7 +192,6 @@
 	imexam.fixupDiv(this);
     }
 
-console.log("Here")
     JS9.RegisterPlugin("ImExam", "Contours", contInit, {
 	    menu: "view",
 
@@ -166,7 +201,7 @@ console.log("Here")
 
 	    toolbarSeparate: true,
 
-            winDims: [300, 300],
+            winDims: [325, 300],
     });
 }());
 

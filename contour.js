@@ -21,51 +21,81 @@
 		return reply;
 	    });
 
-    exports.bin2d = imexam.typed(function (data, n) {
+    var _bin2d = imexam.typed(function (data, reply, n) {
 	    
-		var shape = imexam.typed.clone(data.shape).map(function(x) { return (x/n+0.5)|0; });
-		var reply = imexam.typed.array(data.type, shape);
 		var iX = 0;
 		var iY = 0;
 
 		// ----
-		    reply[(iX/n)|0][(iY/n)|0] += data;
+		    reply[(iY/n)|0][(iX/n)|0] += data;
 		// ----
 
 		return reply;
 	    });
 
-    exports.smooth_gaussian2d = function(data, sigma) {
-	var xdat = imexam.typed.array("float32", data.shape);
-	var ydat = imexam.typed.array("float32", data.shape);
+    exports.bin2d = function (data, n) {
+		var shape = imexam.typed.clone(data.shape).map(function(x) { return (x/n+0.5)|0; });
+		var reply = imexam.typed.array(shape, data);
+		
+		return _bin2d(data, reply, n);
+	    };
 
-	var kern = imexam.ndops.gauss1d(imexam.ndops.iota(10), [.0, sigma, 0.0]);
+
+
+
+    exports.smooth_gaussian2d = function(data, sigma) {
+	var xdat = imexam.typed.array(data.shape, "float32");
+	var ydat = imexam.typed.array(data.shape, "float32");
+
+	
+	var a = 1;
+	var b = 0;
+	var c = sigma;
+	var d = 0;
+
+	var kern = [];
+
+	for ( i = 0; i < 10; i++ ) {
+	    kern[i] = a * Math.pow(2.71828, - i*i / (2*c*c)) + d;
+	};
+
 	var i, j, k;
 
-	for ( i = 0; i < kern.shape[0]; i++ ) {
+	for ( i = 0; i < kern.length; i++ ) {
 	    if ( kern[i] < 0.001 ) { 
 		break;
 	    }
 	}
 	kern.length = i-1;					// Clip
-	kern = imexam.typed.clone(kern).reverse().concat(kern);	// Dup
 
-	kern = imexam.typed.div(kern, imexam.typed.sum(kern));		// Normalize
+	var nerk = imexam.typed.clone(kern);
+	var kern = kern.reverse();
 
-	for ( j = 0; j < data.shape[0]; j++ ) {
-	    for ( i = 0; i < data.shape[1]; i++ ) {
-		for ( k = 0; kern.shape[0]; k++ ) {
-		    if ( j + k < data.shape[1] ) {
-			xdat[i][j] += kern[k] * data[i][j+k];
+	for ( i = 1; i < nerk.length; i++ ) {
+	    kern[kern.length] = nerk[i];			// Dup
+	}
+	kern.shape[0] = kern.length;				// Fix shape
+
+	kern = imexam.typed.div(kern, imexam.typed.sum(kern));	// Normalize
+
+	var nx = data.shape[1];
+	var ny = data.shape[0];
+	var nk = kern.shape[0];
+
+	for ( j = 0; j < ny; j++ ) {
+	    for ( i = 0; i < nx; i++ ) {
+		for ( k = -nk/2|0; k < nk/2|0; k++ ) {
+		    if ( i+k >= 0 && i+k < ny ) {
+			xdat.data[j*nx + i] += kern[k+nk/2|0] * data.data[j*nx+i+k];
 		    }
 		}
 	    }
 	}
-	for ( j = 0; j < data.shape[0]; j++ ) {
-	    for ( i = 0; i < data.shape[1]; i++ ) {
-		for ( k = 0; kern.shape[0]; k++ ) {
-		    if ( i + k < data.shape[1] ) {
-			ydat[i][j] += kern[k] * xdat[i+k][j];
+	for ( j = 0; j < ny; j++ ) {
+	    for ( i = 0; i < nx; i++ ) {
+		for ( k = -nk/2|0; k < nk/2|0; k++ ) {
+		    if ( j+k >= 0 && j+k < ny ) {
+			ydat.data[j*nx + i] += kern[k+nk/2|0] * xdat.data[(j+k)*nx+i];
 		    }
 		}
 	    }
@@ -799,12 +829,25 @@ if (typeof exports !== "undefined") {
 
 	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 
-	data = binner.smooth_gaussian2d(data);
-
 	var levelString = form.level.value;
+	var binning	= $(form).find("#binning").val();;
+	var smooth	= $(form).find("#smooth").val();;
 	var quality	= $(form).find("input[type=radio]:checked").val();
 
-	var level = JSON.parse("[" + levelString.trim().split(/\s+/).join(",") + "]");
+
+	if ( binning === "None" ) {
+	    binning = 1;
+	} else {
+	    data = binner.bin2d(data, parseInt(binning));
+
+	console.log(data.shape);
+	}
+
+	var level = JSON.parse("[" + levelString.trim().split(/\s+/).join(",") + "]").map(function(x) { return x*binning*binning; });
+	
+	if ( smooth !== "None" ) {
+	    data = binner.smooth_gaussian2d(data, parseFloat(smooth));
+	}
 
 	var contours;
 
@@ -818,7 +861,8 @@ if (typeof exports !== "undefined") {
 		    try {
 			c.contour(data
 				, 0, data.shape[0]-1, 0, data.shape[1]-1
-				, imexam.ndops.iota(1, data.shape[0]), imexam.ndops.iota(1, data.shape[1])
+				, imexam.ndops.iota(1, data.shape[0]).map(function(x) { return x*binning-binning/2+0.5 })
+				, imexam.ndops.iota(1, data.shape[1]).map(function(x) { return x*binning-binning/2+0.5 })
 				, level.length, level);
 		    } catch (e) {
 			alert("Too many coutour segments: Check your coutour levels.\n\nAre you trying to coutour the background levels of an image?");
@@ -840,7 +884,7 @@ if (typeof exports !== "undefined") {
 				points = [];
 				contours.push({ shape: "polygon", pts: points });
 			    } else {
-				points.push({ x: x+0.5, y: y+0.5 });
+				points.push({ x: x*binning+0.5, y: y*binning+0.5 });
 			    }
 			  });
 		}
@@ -909,12 +953,36 @@ if (typeof exports !== "undefined") {
 	           <tr>	<td>Max</td>									\
 			<td><input type=text name=max size=10></td></tr>				\
 	           <tr>	<td valign=top>Levels:</td>							\
-	    		<td rowspan=2><textarea type=textarea rows=12 cols=10 name=level class="contour-levels">	\
+	    		<td rowspan=5><textarea type=textarea rows=12 cols=10 name=level class="contour-levels">	\
 			    </textarea>									\
 		       	<td valign=top><input type=button value="Make Levels" class="make-levels"></td>	\
 		   </tr>										\
+		   <tr><td><br></td></tr>										\
+		   <tr>	<td></td><td align=center valign=top>						\
+				Binning									\
+				<select id=binning name=binpix>						\
+				<option>None</option>							\
+				<option>2</option>							\
+				<option>3</option>							\
+				<option>4</option>							\
+				<option>5</option>							\
+				</select>								\
+				pix									\
+			</td>										\
+		   </tr>										\
+		   <tr>	<td></td><td align=center valign=top>						\
+				Smooth									\
+				<select id=smooth name=smopix>						\
+				<option>None</option>							\
+				<option value=0.75>3</option>							\
+				<option value=1.00>5</option>							\
+				<option value=1.25>7</option>							\
+				</select>								\
+				pix									\
+			</td>										\
+		   </tr>										\
 		   <tr>	<td></td><td align=center valign=top><br>Quality:				\
-				<br>&nbsp;<input type=radio name=quality value=faster checked>Faster		\
+				<br>&nbsp;<input type=radio name=quality value=faster checked>Faster	\
 				<br>&nbsp;<input type=radio name=quality value=better>Better		\
 			</td>										\
 		   </tr>										\
@@ -937,7 +1005,6 @@ if (typeof exports !== "undefined") {
 	imexam.fixupDiv(this);
     }
 
-console.log("Here")
     JS9.RegisterPlugin("ImExam", "Contours", contInit, {
 	    menu: "view",
 
@@ -947,7 +1014,7 @@ console.log("Here")
 
 	    toolbarSeparate: true,
 
-            winDims: [300, 300],
+            winDims: [325, 300],
     });
 }());
 

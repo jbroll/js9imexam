@@ -19,14 +19,15 @@ JX    = 		\
 	contour.jx
 
 JS    = 		\
-	xyproj.js	\
-	radproj.js	\
-	regstat.js	\
-	reghist.js	\
 	encircled.js	\
-	rghxrg.js	\
+	infobox.js	\
+	imcnts.js	\
 	pixtable.js	\
-	imcnts.js
+	radproj.js	\
+	reghist.js	\
+	regstat.js	\
+	rghxrg.js	\
+	xyproj.js
 
 ICON = 4arrow.png
 
