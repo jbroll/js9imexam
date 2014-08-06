@@ -839,8 +839,6 @@ if (typeof exports !== "undefined") {
 	    binning = 1;
 	} else {
 	    data = binner.bin2d(data, parseInt(binning));
-
-	console.log(data.shape);
 	}
 
 	var level = JSON.parse("[" + levelString.trim().split(/\s+/).join(",") + "]").map(function(x) { return x*binning*binning; });
@@ -854,15 +852,24 @@ if (typeof exports !== "undefined") {
 	JS9.waiting(true);
 	setTimeout(function() {
 	    try {
+		var fudge = 0
+
+		if ( binning > 1 ) {
+		    fudge = 1;
+		}
 
 		if ( quality === "better" ) {
 		    var c      = new conrec.Conrec();
 
 		    try {
+			var xcoord = imexam.ndops.iota(0, data.shape[0]-1).map(function(x) { return x*binning+(binning-1)/2 +1.0 })
+			var ycoord = imexam.ndops.iota(0, data.shape[1]-1).map(function(x) { return x*binning+(binning-1)/2 +1.0 })
+
+			//var xcoord = imexam.ndops.iota(1, data.shape[0]).map(function(x) { return (x-(binning-1)/2) * binning + fudge })
+			//var ycoord = imexam.ndops.iota(1, data.shape[1]).map(function(x) { return (x-(binning-1)/2) * binning + fudge })
+
 			c.contour(data
-				, 0, data.shape[0]-1, 0, data.shape[1]-1
-				, imexam.ndops.iota(1, data.shape[0]).map(function(x) { return x*binning-binning/2+0.5 })
-				, imexam.ndops.iota(1, data.shape[1]).map(function(x) { return x*binning-binning/2+0.5 })
+				, 0, data.shape[0]-1, 0, data.shape[1]-1 , xcoord, ycoord
 				, level.length, level);
 		    } catch (e) {
 			alert("Too many coutour segments: Check your coutour levels.\n\nAre you trying to coutour the background levels of an image?");
@@ -884,12 +891,13 @@ if (typeof exports !== "undefined") {
 				points = [];
 				contours.push({ shape: "polygon", pts: points });
 			    } else {
-				points.push({ x: x*binning+0.5, y: y*binning+0.5 });
+				//points.push({ x: (x+0.5-(binning-1)/2) * binning + fudge, y: (y+0.5-(binning-1)/2) * binning + fudge });
+				points.push({ x: x*binning + 0.5, y: y*binning + 0.5 });
 			    }
 			  });
+		    contours.length = contours.length-1;
 		}
 
-		contours.length = contours.length-1;
 
 		JS9.NewShapeLayer(im, "contour", JS9.Catalogs.opts);
 		JS9.RemoveShapes(im, "contour");
