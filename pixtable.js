@@ -104,6 +104,7 @@
 
             menuItem: "Pixel Table",
             winTitle: "Pixel Table",
+	    winResize: true,
 
 	    toolbarSeparate: true,
 

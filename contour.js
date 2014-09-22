@@ -824,7 +824,7 @@ if (typeof exports !== "undefined") {
 
 
     function drawContours(div, display) {
-	var im   = JS9.GetImage(display);
+	var im   = JS9.GetImage({display: display});
 	var form = $(div).find(".contour-form")[0];
 
 	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
@@ -865,6 +865,9 @@ if (typeof exports !== "undefined") {
 			var xcoord = imexam.ndops.iota(0, data.shape[0]-1).map(function(x) { return x*binning+(binning-1)/2 +1.0 })
 			var ycoord = imexam.ndops.iota(0, data.shape[1]-1).map(function(x) { return x*binning+(binning-1)/2 +1.0 })
 
+			//var xcoord = imexam.ndops.iota(1, data.shape[0]).map(function(x) { return (x-(binning-1)/2) * binning + fudge })
+			//var ycoord = imexam.ndops.iota(1, data.shape[1]).map(function(x) { return (x-(binning-1)/2) * binning + fudge })
+
 			c.contour(data
 				, 0, data.shape[0]-1, 0, data.shape[1]-1 , xcoord, ycoord
 				, level.length, level);
@@ -888,6 +891,7 @@ if (typeof exports !== "undefined") {
 				points = [];
 				contours.push({ shape: "polygon", pts: points });
 			    } else {
+				//points.push({ x: (x+0.5-(binning-1)/2) * binning + fudge, y: (y+0.5-(binning-1)/2) * binning + fudge });
 				points.push({ x: x*binning + 0.5, y: y*binning + 0.5 });
 			    }
 			  });
@@ -895,9 +899,9 @@ if (typeof exports !== "undefined") {
 		}
 
 
-		JS9.NewShapeLayer(im, "contour", JS9.Catalogs.opts);
-		JS9.RemoveShapes(im, "contour");
-		JS9.AddShapes(im, "contour", contours, {color: "yellow"});
+		JS9.NewShapeLayer("contour", JS9.Catalogs.opts, {display: im});
+		JS9.RemoveShapes("contour", {display: im});
+		JS9.AddShapes("contour", contours, {color: "yellow"}, {display: im});
 	    }
 	    finally {
 		JS9.waiting(false);
@@ -906,7 +910,7 @@ if (typeof exports !== "undefined") {
     }
 
     function getMinMax(div, display) {
-	var im  = JS9.GetImage(display);
+	var im  = JS9.GetImage({display: display});
 
 	if ( im ) {
 	    var form = $(div).find(".contour-form")[0];
@@ -919,7 +923,7 @@ if (typeof exports !== "undefined") {
 
     function makeLevel(div, display) {
 	var i;
-	var im  = JS9.GetImage(display);
+	var im  = JS9.GetImage({display: display});
 
 	if ( im ) {
 	    var form = $(div).find(".contour-form")[0];
@@ -944,7 +948,7 @@ if (typeof exports !== "undefined") {
     }
 
     function contInit() {
-	var im  = JS9.GetImage(this.display);
+	var im  = JS9.GetImage({display: this.display});
 	var div = this.div;
 
 	div.innerHTML = '<form class="contour-form">							\
@@ -970,6 +974,9 @@ if (typeof exports !== "undefined") {
 				<option>3</option>							\
 				<option>4</option>							\
 				<option>5</option>							\
+				<option>6</option>							\
+				<option>7</option>							\
+				<option>8</option>							\
 				</select>								\
 				pix									\
 			</td>										\
@@ -978,9 +985,9 @@ if (typeof exports !== "undefined") {
 				Smooth									\
 				<select id=smooth name=smopix>						\
 				<option>None</option>							\
-				<option selected value=0.75>3</option>					\
-				<option value=1.00>5</option>						\
-				<option value=1.25>7</option>						\
+				<option value=0.75 selected>3</option>							\
+				<option value=1.00>5</option>							\
+				<option value=1.25>7</option>							\
 				</select>								\
 				pix									\
 			</td>										\
@@ -1014,13 +1021,15 @@ if (typeof exports !== "undefined") {
 
             winTitle: "Contours",
             menuItem: "Contours",
-	    help:     "imexam/contour.html",
+	    help:     "imexam/contours.html",
 
 	    toolbarSeparate: true,
 
             winDims: [325, 300],
     });
 }());
+
+
 
 
 },{"./bin":1,"./conrec":2,"./contfv":3}]},{},[4])

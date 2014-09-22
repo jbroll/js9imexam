@@ -16,7 +16,7 @@
 
 	var data = imexam.ndops.ndarray(im.raw.data, [im.raw.height, im.raw.width]);
 
-	var regs = JS9.GetRegions(im);
+	var regs = JS9.GetRegions({display: im});
 	var mimg = imexam.ndops.zeros(data.shape, Int32Array);
 
 	var list = mask.listRegions(regs);
@@ -67,7 +67,7 @@
 
 /*
     function getRegions(div, display) {
-	var im  = JS9.GetImage(display);
+	var im  = JS9.GetImage({display: display});
 
 	if ( im ) {
 	    var data = imexam.ndops.ndarray(im.raw.data);
