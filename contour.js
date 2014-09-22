@@ -865,9 +865,6 @@ if (typeof exports !== "undefined") {
 			var xcoord = imexam.ndops.iota(0, data.shape[0]-1).map(function(x) { return x*binning+(binning-1)/2 +1.0 })
 			var ycoord = imexam.ndops.iota(0, data.shape[1]-1).map(function(x) { return x*binning+(binning-1)/2 +1.0 })
 
-			//var xcoord = imexam.ndops.iota(1, data.shape[0]).map(function(x) { return (x-(binning-1)/2) * binning + fudge })
-			//var ycoord = imexam.ndops.iota(1, data.shape[1]).map(function(x) { return (x-(binning-1)/2) * binning + fudge })
-
 			c.contour(data
 				, 0, data.shape[0]-1, 0, data.shape[1]-1 , xcoord, ycoord
 				, level.length, level);
@@ -891,7 +888,6 @@ if (typeof exports !== "undefined") {
 				points = [];
 				contours.push({ shape: "polygon", pts: points });
 			    } else {
-				//points.push({ x: (x+0.5-(binning-1)/2) * binning + fudge, y: (y+0.5-(binning-1)/2) * binning + fudge });
 				points.push({ x: x*binning + 0.5, y: y*binning + 0.5 });
 			    }
 			  });
@@ -953,7 +949,7 @@ if (typeof exports !== "undefined") {
 
 	div.innerHTML = '<form class="contour-form">							\
 	    <table><tr>	<td>N</td>									\
-			<td><input type=text name=nlevel value=10 size=10></td>				\
+			<td><input type=text name=nlevel value=5 size=10></td>				\
 		       	<td><input type=button value="Draw Contours" class="drw-contour"></td></tr>	\
 	           <tr>	<td>Min</td>									\
 			<td><input type=text name=min size=10></td>					\
@@ -982,9 +978,9 @@ if (typeof exports !== "undefined") {
 				Smooth									\
 				<select id=smooth name=smopix>						\
 				<option>None</option>							\
-				<option value=0.75>3</option>							\
-				<option value=1.00>5</option>							\
-				<option value=1.25>7</option>							\
+				<option selected value=0.75>3</option>					\
+				<option value=1.00>5</option>						\
+				<option value=1.25>7</option>						\
 				</select>								\
 				pix									\
 			</td>										\
@@ -1018,7 +1014,7 @@ if (typeof exports !== "undefined") {
 
             winTitle: "Contours",
             menuItem: "Contours",
-	    help:     "imexam/coutours.html",
+	    help:     "imexam/contour.html",
 
 	    toolbarSeparate: true,
 

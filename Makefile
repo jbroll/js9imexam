@@ -44,7 +44,8 @@ install: FORCE
 	mkdir -p $(JS9JS)
 	cp -p $(HTML) $(JS9)
 	cp -p $(JX:.jx=.js) $(JS) $(ICON) $(JS9JS)/.
-	cp -p imexam.html $(JS9JS)/.
+	cp -p contour.html $(JS9JS)/.
+	cp -p imexam.html  $(JS9JS)/.
 
 
 lint :
