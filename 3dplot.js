@@ -89,7 +89,7 @@
 
     function pluginInit() {
 	imexam.fixupDiv(this);
-        $(this.div).append("Create a region to see 3d plot<br>");
+        $(this.div).append("<p style='padding: 20px 0px 0px 20px; margin: 0px'>create, click, move, or resize a region to see 3d plot<br>");
     }
 
     JS9.RegisterPlugin("ImExam", "3dPlot", pluginInit, {
@@ -98,6 +98,8 @@
             menuItem: "3dPlot",
             winTitle: "3dPlot",
 	    help:     "imexam/imexam.html#3dplot",
+
+	    dynamicSelect: true,
 
 	    toolbarSeparate: true,
 

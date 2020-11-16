@@ -74,7 +74,7 @@
 
     function projInit() {
 	imexam.fixupDiv(this);
-        $(this.div).append("Create a region to see projection<br>");
+        $(this.div).append("<p style='padding: 20px 0px 0px 20px; margin: 0px'>create, click, move, or resize a region to see projection<br>");
     }
 
     JS9.RegisterPlugin("ImExam", "XProj", projInit, {
@@ -83,6 +83,8 @@
             menuItem: "X Projection",
 	    winTitle: "X Projection",
 	    help:     "imexam/imexam.html#xyproj",
+
+	    dynamicSelect: true,
 
 	    toolbarSeparate: true,
 	    toolbarHTML: projToolbar,
@@ -100,6 +102,8 @@
             menuItem: "Y Projection",
 	    winTitle: "Y Projection",
 	    help:     "imexam/imexam.html#xyproj",
+
+	    dynamicSelect: true,
 
 	    toolbarSeparate: true,
 	    toolbarHTML: projToolbar,

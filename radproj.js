@@ -63,7 +63,7 @@
 
     function rprojInit() {
 	imexam.fixupDiv(this);
-        $(this.div).append("Create a region to see radial projection<br>");
+        $(this.div).append("<p style='padding: 20px 0px 0px 20px; margin: 0px'>create, click, move, or resize a region to see radial projection<br>");
     }
 
     JS9.RegisterPlugin("ImExam", "RadialProj", rprojInit, {
@@ -72,6 +72,8 @@
             menuItem: "Radial Proj",
             winTitle: "Radial Proj",
 	    help:     "imexam/imexam.html#r_proj",
+
+	    dynamicSelect: true,
 
 	    toolbarSeparate: true,
 

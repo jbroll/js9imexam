@@ -1,6 +1,7 @@
 
 JS9   = ../js9
-JS9JS = $(JS9)/plugins/imexam
+# JS9JS = $(JS9)/plugins/imexam
+JS9JS = ./dist
 
 HTML  = js9Imexam1.html js9Imexam2.html
 
@@ -11,7 +12,6 @@ HX    = 		\
 	reghist.html	\
 	encircled.html	\
 	3dplot.html
-	
 
 JX    = 		\
 	imexam.jx	\
@@ -58,8 +58,8 @@ js9plugins.js : $(PLUGINFILES)
 
 
 install: FORCE
-	mkdir -p $(JS9JS)
-	cp -p $(HTML) $(JS9)
+	mkdir -p $(JS9JS)/doc
+	cp -p $(HTML) $(JS9JS)/doc
 	cp -p $(JX:.jx=.js) $(JS) $(ICON) $(JS9JS)/.
 	cp -p contours.html $(JS9JS)/.
 	cp -p imexam.html  $(JS9JS)/.
@@ -69,8 +69,8 @@ lint :
 	jslint $(JX) $(JS) $(JR)
 
 
-TYPED = node_modules/typed-array-function.js		\
-	node_modules/typed-array-ops.js
+TYPED = node_modules/typed-array-function/typed-array-function.js	\
+	node_modules/typed-array-ops/typed-array-ops.js
 
 imexam.js : imexam.jx template.js mask.js raster.js zoom.js $(TYPED)
 	browserify -r ./imexam.jx:./imexam > imexam.js
@@ -90,13 +90,15 @@ contour.js : contour.jx contfv.js conrec.js regions.js bin.js
 	echo "" >> contour.js
 	echo "" >> contour.js
 
-
 npm-install:
 	npm install			\
 	    typed-array-function	\
 	    typed-array-ops		\
 	    typed-array-rotate		\
 	    typed-numeric-uncmin 
+
+clean:	FORCE
+	@(rm -rf foo* *~)
 
 FORCE:
 

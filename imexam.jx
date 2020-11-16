@@ -16,15 +16,17 @@ var typed = ndops;
 
 ndops.zeros   = function zeros(shape, Type) {
   var i, sz = 1;
+  var ishape = [];
   if ( Type === undefined ) {
 	Type = Float32Array;
   }
 
   for(i=0; i<shape.length; ++i) {
-    sz *= shape[i];
+    ishape.push(Math.floor(shape[i]));
+    sz *= ishape[i];
   }
 
-  return ndops.ndarray(new Type(sz), shape);
+  return ndops.ndarray(new Type(sz), ishape);
 };
 
 ndops.fill = typed(function (a, func) {
@@ -110,13 +112,14 @@ ndops.print = function(a, width, prec) {
 };
 
 ndops._hist = typed(function (a, width , min, max) {
-    var size = (max-min) / width;
+    var size = Math.floor((max-min) / width);
     var  h   = new Int32Array(size+1);
 
     // -----
+    if( !isNaN(a) ){
         var bin = Math.max(0, Math.min(size, Math.round((a-min)/width))) | 0;	// | is truncate
         h[bin]++;
-
+    }
     // -----
 
    return h;
@@ -198,7 +201,7 @@ ndops.qcenter = typed(function (a) {
 		    + a[iY-1][iX  ] 
 		    + a[iY-1][iX+1] 
 		    + a[iY  ][iX-1] 
-	    	    + a[iY  ][iX  ]
+		    + a[iY  ][iX  ]
 		    + a[iY  ][iX+1] 
 		    + a[iY+1][iX-1] 
 		    + a[iY+1][iX  ] 
@@ -306,8 +309,10 @@ ndops.rms = typed(function (a) {
     var sum = 0;
     var squ = 0;
     // ----
+    if( !isNaN(a) ){
 	sum +=   a;
 	squ += a*a;
+    }
     // ----
 
     var mean = sum/a.size;
@@ -320,7 +325,7 @@ ndops.rmsClipped = typed(function (a, min, max) {
     var sum = 0;
     var squ = 0;
     // ----
-	if ( (min === null || a > min) && (max === null || a < max) ) {
+	if ( !isNaN(a) && (min === null || a > min) && (max === null || a < max) ) {
 	    n++;
 	    sum +=   a;
 	    squ += a*a;
@@ -336,7 +341,7 @@ ndops.meanClipped = typed(function (a, min, max) {
     var n = 0;
     var sum = 0;
     // ----
-	if ( (min === null || a > min) && (max === null || a < max) ) {
+	if ( !isNaN(a) && (min === null || a > min) && (max === null || a < max) ) {
 	    n++;
 	    sum +=   a;
 	}
@@ -362,10 +367,11 @@ imops.backgr = function(data, width) {
 };
 
 imops.mksection = function(x, y, w, h) {
-        return [[x-(w/2), x+(w/2)], [y-(h/2), y+(h/2)]];
+        return [[Math.floor(x-(w/2)), Math.floor(x+(w/2))],
+		[Math.floor(y-(h/2)), Math.floor(y+(h/2))]];
 };
 
-imops._rproj = typed(function(a, cx, cy, radius, length) {
+imops._rproj = typed(function (a, cx, cy, radius, length) {
     var rad = new Float32Array(length);
     var val = new Float32Array(length);
     var r = Math.sqrt(radius*radius);
@@ -376,7 +382,7 @@ imops._rproj = typed(function(a, cx, cy, radius, length) {
     // ----
 	var d = Math.sqrt((iY-cy)*(iY-cy) + (iX-cx)*(iX-cx));
 
-	if ( d <= r ) { 
+	if ( (d <= r) && !isNaN(a) ) {
 	    rad[i] = d;
 	    val[i] = a;
 
@@ -446,7 +452,7 @@ imops._encen = typed(function (a, cx, cy, radius) {
 
 
 imops.encen = function(im, center) {
-    var radius = ((im.shape[0]/2 + im.shape[1]/2) / 2) | 0;
+    var radius = Math.floor((im.shape[0]/2 + im.shape[1]/2) / 2);
 
     var reply = imops._encen(im, center[1], center[0], radius);
 
@@ -501,7 +507,7 @@ ndops.gsfit1d = function(radi, data, x0) {
 
     }, x0, 0.000001);
 
-    console.log(reply.message);
+    // console.log(reply.message);
 
     return reply.solution;
 };
@@ -529,6 +535,7 @@ function reg2section(xreg) {
             break;
 
        	case "polygon":
+        case "line":
 	    var i, xx = 0, yy = 0, minx = 1000000, maxx = 0, miny = 1000000, maxy = 0;
 
 	    for ( i = 0; i < xreg.pts.length; i++ ) {
@@ -544,12 +551,25 @@ function reg2section(xreg) {
 	    xreg.x = xx/xreg.pts.length;
 	    xreg.y = yy/xreg.pts.length;
 
-	    xreg.width  = maxx - minx;
-	    xreg.height = maxy - miny;
+	    if( xreg.shape === "line" && xreg.pts.length === 2 ){
+                xreg.width = Math.sqrt(((xreg.pts[0].x - xreg.pts[1].x)  *
+                                        (xreg.pts[0].x - xreg.pts[1].x)) +
+                                       ((xreg.pts[0].y - xreg.pts[1].y)  *
+                                        (xreg.pts[0].y - xreg.pts[1].y)));
+                xreg.height = 1;
+	    } else {
+	        xreg.width  = maxx - minx;
+		xreg.height = maxy - miny;
+	    }
+	    break;
 
+	case "text":
+	    xreg.width = 10;
+	    xreg.height = 10;
 	    break;
 
        	default:
+	    break;
     }
 
     return imops.mksection(xreg.x, xreg.y, xreg.width, xreg.height);
